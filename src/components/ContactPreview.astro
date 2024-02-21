@@ -7,7 +7,7 @@ interface Props {
 
 const { data, slug } = Astro.props.contact;
 ---
-<a class="card" href={`/contact/${slug}`}>
+<a class="card" href={data.title} target="_blank">
 	<img src={data.img} alt={data.img_alt || ''} loading="lazy" decoding="async" />
 </a>
 

@@ -2,34 +2,22 @@
 title: NextJS
 publishDate: 1970-03-02 00:00:00
 img: /assets/nextjs.svg
-img_alt: Iridescent ripples of a bright blue and pink liquid
-description: |
-  We designed a whodunnit-style game to introduce Markdown formatting. Suspense — suspicion — syntax!
+img_alt: Next JS Logo
+description: Frontend Framework I only use for hobby projects.
 tags:
-  - Design
-  - Dev
-  - User Testing
+  - Hobby
+  - Frontend
+  - Newbie
 ---
 
-## Level-two heading
+## Exploring NextJS
 
-> Tell me and I forget. Teach me and I remember. Involve me and I learn.
+> Embracing Performance and SEO in Frontend Development
 
-Lorem ipsum dolor sit amet, <a href="https://astro.build/">Astro</a> makes people happy. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Proin nibh nisl condimentum id venenatis a condimentum vitae. Dapibus ultrices in iaculis nunc. Arcu odio ut sem nulla pharetra diam sit amet. Diam quis enim lobortis scelerisque fermentum dui faucibus in ornare.
+LRecently, I stumbled upon Next.js, a frontend framework that has piqued my interest. I am particularly excited about the development potential offered by Next.js, especially considering its impressive performance and SEO capabilities. The thought of creating websites with lightning-fast load times and strong search engine optimization values is truly captivating.
 
-Arcu dui vivamus arcu felis bibendum ut tristique et egestas. Eget gravida cum sociis natoque penatibus. Cras fermentum odio eu feugiat pretium nibh. Proin nibh nisl condimentum id venenatis. Porta nibh venenatis cras sed felis eget velit. Id diam vel quam elementum pulvinar etiam non.
+However, I must admit that there are some concerns regarding the open issues within the framework. While this may raise a level of apprehension, I am optimistic that these challenges will be addressed over time, and I am eager to contribute to the growth and improvement of Next.js.
 
-### Level-three heading
+Despite the initial learning curve and challenges associated with diving into a new framework, I am genuinely looking forward to the development journey with Next.js. I believe that the opportunities it presents for creating modern, efficient, and SEO-friendly web applications outweigh any initial hurdles.
 
-Ultrices tincidunt arcu non sodales neque sodales ut. Sed enim ut sem viverra aliquet eget sit amet. Lacus luctus accumsan tortor posuere ac ut consequat semper viverra. Viverra accumsan in nisl nisi scelerisque eu ultrices. In massa tempor nec feugiat nisl pretium fusce.
-
-### Level-three heading
-
-Sed pulvinar porttitor mi in ultricies. Etiam non dolor gravida eros pulvinar pellentesque et dictum ex. Proin eu ornare ligula, sed condimentum dui. Vivamus tincidunt tellus mi, sed semper ipsum pharetra a. Suspendisse sollicitudin at sapien nec volutpat. Etiam justo urna, laoreet ac lacus sed, ultricies facilisis dolor. Integer posuere, metus vel viverra gravida, risus elit ornare magna, id feugiat erat risus ullamcorper libero. Proin vitae diam auctor, laoreet lorem vitae, varius tellus.
-
-Aenean pretium purus augue, ut bibendum erat convallis quis. Cras condimentum quis velit ac mollis. Suspendisse non purus fringilla, venenatis nisl porta, finibus odio. Curabitur aliquet metus faucibus libero interdum euismod. Morbi sed magna nisl. Morbi odio nibh, facilisis vel sapien eu, tempus tincidunt erat. Nullam erat velit, sagittis at purus quis, tristique scelerisque tortor. Pellentesque lacinia tortor id est aliquam viverra. Vestibulum et diam ac ipsum mollis fringilla.
-
-#### Level-four heading
-
-- We noted this
-- And also this other point
+In conclusion, while there may be uncertainties and challenges associated with Next.js, the promise of superior performance and SEO benefits makes it a compelling choice for frontend development. I am excited to see how Next.js evolves and how it can empower developers like myself to build exceptional web experiences.

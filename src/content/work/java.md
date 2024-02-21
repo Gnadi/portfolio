@@ -2,34 +2,32 @@
 title: Java
 publishDate: 2020-03-02 00:00:00
 img: /assets/java.svg
-img_alt: Iridescent ripples of a bright blue and pink liquid
+img_alt: Java Logo
 description: |
-  We designed a whodunnit-style game to introduce Markdown formatting. Suspense — suspicion — syntax!
+  First choice for building robust professional backend applications. 
 tags:
-  - Design
-  - Dev
-  - User Testing
+  - Professional
+  - Backend
+  - Maintainability
 ---
 
-## Level-two heading
 
-> Tell me and I forget. Teach me and I remember. Involve me and I learn.
+## Java Journey
 
-Lorem ipsum dolor sit amet, <a href="https://astro.build/">Astro</a> makes people happy. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Proin nibh nisl condimentum id venenatis a condimentum vitae. Dapibus ultrices in iaculis nunc. Arcu odio ut sem nulla pharetra diam sit amet. Diam quis enim lobortis scelerisque fermentum dui faucibus in ornare.
+> Harnessing QueryDSL, Hibernate, and Continuous Growth
 
-Arcu dui vivamus arcu felis bibendum ut tristique et egestas. Eget gravida cum sociis natoque penatibus. Cras fermentum odio eu feugiat pretium nibh. Proin nibh nisl condimentum id venenatis. Porta nibh venenatis cras sed felis eget velit. Id diam vel quam elementum pulvinar etiam non.
+Since my first encounter with Java during my training, the language's exceptional readability and versatility have captivated me. Today, years later, I remain enthralled by Java and utilize it daily in my role as a professional full-stack software developer.
 
-### Level-three heading
+One area that has particularly enriched my work is database integration. Here, I rely on powerful frameworks like QueryDSL and Hibernate. These tools not only facilitate efficient database access but also streamline the development of robust and well-structured applications. The clear syntax of QueryDSL coupled with the flexibility and power of Hibernate makes working with databases a true pleasure.
 
-Ultrices tincidunt arcu non sodales neque sodales ut. Sed enim ut sem viverra aliquet eget sit amet. Lacus luctus accumsan tortor posuere ac ut consequat semper viverra. Viverra accumsan in nisl nisi scelerisque eu ultrices. In massa tempor nec feugiat nisl pretium fusce.
+Another aspect of my professional journey is my commitment to continuous learning. Despite my years of experience, I have consistently pursued further education in the realm of Java. These educational endeavors have not only helped deepen my skills but also ensured that I remain abreast of the latest technology trends. In the constantly evolving world of software development, continuous learning is essential to staying relevant and crafting the best possible solutions to complex problems.
 
-### Level-three heading
+Overall, my journey with Java is one of enthusiasm and continuous improvement. The fascination with the language and the tools it offers drives me to strive for excellence every day and develop innovative solutions. And as technology advances and new trends emerge, I am steadfast in my commitment to nurturing my passion for Java and the art of software development.
 
-Sed pulvinar porttitor mi in ultricies. Etiam non dolor gravida eros pulvinar pellentesque et dictum ex. Proin eu ornare ligula, sed condimentum dui. Vivamus tincidunt tellus mi, sed semper ipsum pharetra a. Suspendisse sollicitudin at sapien nec volutpat. Etiam justo urna, laoreet ac lacus sed, ultricies facilisis dolor. Integer posuere, metus vel viverra gravida, risus elit ornare magna, id feugiat erat risus ullamcorper libero. Proin vitae diam auctor, laoreet lorem vitae, varius tellus.
+Let us embark on a journey together to explore the fascination of Java and the boundless possibilities of software development - the adventure has only just begun.
+#### Skills
 
-Aenean pretium purus augue, ut bibendum erat convallis quis. Cras condimentum quis velit ac mollis. Suspendisse non purus fringilla, venenatis nisl porta, finibus odio. Curabitur aliquet metus faucibus libero interdum euismod. Morbi sed magna nisl. Morbi odio nibh, facilisis vel sapien eu, tempus tincidunt erat. Nullam erat velit, sagittis at purus quis, tristique scelerisque tortor. Pellentesque lacinia tortor id est aliquam viverra. Vestibulum et diam ac ipsum mollis fringilla.
-
-#### Level-four heading
-
-- We noted this
-- And also this other point
+- Java EE
+- Java 8 & 17
+- Hibernate
+- JUnit
