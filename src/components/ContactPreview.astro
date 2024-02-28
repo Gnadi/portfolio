@@ -5,7 +5,7 @@ interface Props {
 	contact: CollectionEntry<'contact'>;
 }
 
-const { data, slug } = Astro.props.contact;
+const { data} = Astro.props.contact;
 ---
 <a class="card" href={data.title} target="_blank">
 	<img src={data.img} alt={data.img_alt || ''} loading="lazy" decoding="async" />

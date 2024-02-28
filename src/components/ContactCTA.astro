@@ -5,6 +5,12 @@ import Icon from './Icon.astro';
 
 <aside>
 	<h2>Interested in working together?</h2>
+	<img
+		alt="Logo"
+		width="300"
+		height="300"
+		src="/assets/logo.jpg"
+	/>
 	<CallToAction href="mailto:johannes.gnadlinger1997@gmail.com">
 		Send Me a Message
 		<Icon icon="paper-plane-tilt" size="1.2em" />
@@ -12,6 +18,10 @@ import Icon from './Icon.astro';
 </aside>
 
 <style>
+	img {
+		border-radius: 1.5rem;
+		box-shadow: var(--shadow-md);
+	}
 	aside {
 		display: flex;
 		flex-direction: column;
