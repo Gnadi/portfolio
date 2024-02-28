@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+import ContactCTA from '../components/ContactCTA.astro';
+import Hero from '../components/Hero.astro';
+---
+
+<BaseLayout title="About | Johannes Gnadlinger" description="About Johannes Gnadlinger">
+	<div class="stack gap-20">
+		<main class="wrapper about">
+			<Hero
+				title="Hola!"
+				tagline="Thanks for stopping by. Read below to learn more about myself and my background."
+			>
+				<img
+					width="1600"
+					height="1200"
+					src="/assets/about.jpg"
+					alt="Johannes Gnadlinger"
+				/>
+			</Hero>
+
+			<section>
+				<h2 class="section-title">Background</h2>
+				<div class="content">
+					<p>
+						Granted, the photo is a bit older ;) But it still describes me well! I am a cheerful person who loves to travel and meet new people.
+
+						Growing up in Wels, I moved to Linz several years ago and have been living here with my wife and our little daughter since then.
+
+						I discovered my passion for programming as a teenager. At the age of 16, I wrote my first "Hello World," and at 20, I began my career at Raiffeisen Software GmbH, where I continue to learn new things every day.
+
+						In my free time, I enjoy experimenting with new technologies in side projects and listening to exciting podcasts, preferably about science or politics (exception: Gemischtes Hack).
+
+						I've managed to quit smoking since then, and while my success on the tennis court hasn't noticeably improved, I feel better overall.
+
+						A good and respectful interaction with others is important to me.
+					</p>
+				</div>
+			</section>
+		</main>
+
+		<ContactCTA />
+	</div>
+</BaseLayout>
+
+<style>
+	.about {
+		display: flex;
+		flex-direction: column;
+		gap: 3.5rem;
+	}
+
+	img {
+		margin-top: 1.5rem;
+		border-radius: 1.5rem;
+		box-shadow: var(--shadow-md);
+	}
+
+	section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		color: var(--gray-200);
+	}
+
+	.section-title {
+		grid-column-start: 1;
+		font-size: var(--text-xl);
+		color: var(--gray-0);
+	}
+
+	.content {
+		grid-column: 2 / 4;
+	}
+
+	.content :global(a) {
+		text-decoration: 1px solid underline transparent;
+		text-underline-offset: 0.25em;
+		transition: text-decoration-color var(--theme-transition);
+	}
+
+	.content :global(a:hover),
+	.content :global(a:focus) {
+		text-decoration-color: currentColor;
+	}
+
+	@media (min-width: 50em) {
+		.about {
+			display: grid;
+			grid-template-columns: 1fr 60% 1fr;
+		}
+
+		.about > :global(:first-child) {
+			grid-column-start: 2;
+		}
+
+		section {
+			display: contents;
+			font-size: var(--text-lg);
+		}
+	}
+</style>

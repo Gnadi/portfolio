@@ -2,6 +2,7 @@
 import Icon from './Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import type { iconPaths } from './IconPaths';
+import Language from "./Language.astro";
 
 /** Main menu items */
 const textLinks: { label: string; href: string }[] = [
@@ -82,7 +83,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 								'link',
 								{
 									active:
-										Astro.url.pathname === href ||
+										Astro.url.pathname === href || Astro.url.pathname == '/de' && href == '/' ||
 										(href !== '/' && Astro.url.pathname.startsWith(href)),
 								},
 							]}
@@ -105,6 +106,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 					))
 				}
 			</div>
+			<Language/>
 
 			<div class="theme-toggle">
 				<ThemeToggle />
