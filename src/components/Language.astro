@@ -1,5 +1,4 @@
 ---
-import Icon from "./Icon.astro";
 ---
 <language-dropdown>
     <div class="relative inline-block text-left">
@@ -34,34 +33,21 @@ import Icon from "./Icon.astro";
             super();
 
             const button = this.querySelector('button')!;
-            var x = document.getElementById("menu-elements");
-            var x1 = document.getElementById("currentLanguage");
+            var menuElements = document.getElementById("menu-elements")!;
+            var curLanguage = document.getElementById("currentLanguage")!;
             if (location.pathname.split('/')[1] == 'de') {
-                x1.innerHTML = 'DE';
+                curLanguage.innerHTML = 'DE';
             } else {
-                x1.innerHTML='EN';
+                curLanguage.innerHTML = 'EN';
             }
-            x.style.display = "none";
-            /** Set the theme to dark/light mode. */
-            const setTheme = (dark: boolean) => {
-                document.documentElement.classList[dark ? 'add' : 'remove']('theme-dark');
-                button.setAttribute('aria-pressed', String(dark));
-            };
-
-            // Toggle the theme when a user clicks the button.
+            menuElements.style.display = "none";
             button.addEventListener('click', () => {
-                if (x.style.display === "none") {
-                    x.style.display = "block";
+                if (menuElements.style.display === "none") {
+                    menuElements.style.display = "block";
                 } else {
-                    x.style.display = "none";
+                    menuElements.style.display = "none";
                 }
             });
-            // Initialize button state to reflect current theme.
-            setTheme(this.isDark());
-        }
-
-        isDark() {
-            return document.documentElement.classList.contains('theme-dark');
         }
     }
 

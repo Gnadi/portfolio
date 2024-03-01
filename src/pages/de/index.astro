@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 
 // Layout import — provides basic page elements: <head>, <nav>, <footer> etc.
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -44,7 +45,8 @@ const contacts = (await getCollection('contact')).slice(0,4);
 					</div>
 				</Hero>
 
-				<img
+				<Image
+					loading="eager"
 					alt="Selfie of Johannes Gnadlinger"
 					width="480"
 					height="620"
