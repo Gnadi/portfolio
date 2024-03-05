@@ -34,7 +34,7 @@ const { Content } = await entry.render();
 			<header>
 				<div class="wrapper stack gap-2">
 					<div class="d-flex">
-						<a class="back-link" href="/work/"><Icon icon="arrow-left" /> Skills</a>
+						<a class="back-link" href="/work/"><Icon icon="arrow-left" /> <span class="pl-2">Skills</span></a>
 					</div>
 					<Hero title={entry.data.title} align="start">
 						<div class="details">
@@ -139,7 +139,8 @@ const { Content } = await entry.render();
 
 	@media (min-width: 50em) {
 		.back-link {
-			display: block;
+			display: flex;
+			justify-items: center;
 			align-self: flex-start;
 		}
 

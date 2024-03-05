@@ -3,9 +3,14 @@ import Icon from './Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import type { iconPaths } from './IconPaths';
 import Language from "./Language.astro";
+import {getLangFromUrl} from "../i18n/utils";
 
 /** Main menu items */
-const textLinks: { label: string; href: string }[] = [
+const textLinks: { label: string; href: string }[] = getLangFromUrl(Astro.url) == "de" ? [
+	{ label: 'Home', href: '/de/' },
+	{ label: 'Skills', href: '/de/work' },
+	{ label: 'About', href: '/de/about' },
+] : [
 	{ label: 'Home', href: '/' },
 	{ label: 'Skills', href: '/work/' },
 	{ label: 'About', href: '/about/' },
@@ -45,8 +50,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 								'link',
 								{
 									active:
-										Astro.url.pathname === href ||
-										(href !== '/' && Astro.url.pathname.startsWith(href)),
+										Astro.url.pathname === href && (href !== '/' && href !='de'),
 								},
 							]}
 							href={href}
@@ -83,8 +87,8 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 								'link',
 								{
 									active:
-										Astro.url.pathname === href || Astro.url.pathname == '/de' && href == '/' ||
-										(href !== '/' && Astro.url.pathname.startsWith(href)),
+										Astro.url.pathname === href  ||
+										(href !== '/' && href !== '/de/' && Astro.url.pathname.startsWith(href)),
 								},
 							]}
 							href={href}

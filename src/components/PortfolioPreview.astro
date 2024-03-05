@@ -8,11 +8,9 @@ interface Props {
 
 const { data, slug } = Astro.props.project;
 ---
-
-<a class="card" href={`/work/${slug}`}>
-	<Image class="image" width="480" height="480" src={data.img} alt={data.img_alt || ''} loading="eager" decoding="async" />
-</a>
-
+	<a id="portfolio-link" class="card" href={`/work/${slug}`}>
+		<Image class="image" width="480" height="480" src={data.img} alt={data.img_alt || ''} loading="eager" decoding="async" />
+	</a>
 <style>
 	.card {
 		padding: 5%;
