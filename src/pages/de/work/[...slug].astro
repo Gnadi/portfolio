@@ -18,16 +18,10 @@ interface Props {
 // https://docs.astro.build/en/core-concepts/routing/#dynamic-routes
 export async function getStaticPaths() {
 	const work = await getCollection('work');
-
-	return work.map(entry => {
-		const [lang, ...slug] = entry.slug.split('/');
-		return { params: { lang, slug: slug.join('/') || undefined }, props: entry };
-	});
-	/*
 	return work.map((entry) => ({
 		params: { slug: entry.slug },
 		props: { entry },
-	}));*/
+	}));
 }
 
 const { entry } = Astro.props;
