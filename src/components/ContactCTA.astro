@@ -3,7 +3,6 @@ import CallToAction from './CallToAction.astro';
 import Icon from './Icon.astro';
 import { Image } from 'astro:assets';
 import {getLangFromUrl} from "../i18n/utils";
-import {Astro} from "astro/env";
 const title = getLangFromUrl(Astro.url) == "de" ? "Starten wir das nächste Projekt gemeinsam?" : "Interested in working together?";
 const message = getLangFromUrl(Astro.url) == "de" ? "Schreiben Sie mir" : "Send Me a Message";
 ---

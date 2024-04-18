@@ -15,7 +15,7 @@ import PortfolioPreview from '../../components/PortfolioPreview.astro';
 
 // Page section components
 import ContactCTA from '../../components/ContactCTA.astro';
-import Skills from '../../components/Skills.astro';
+import SkillsDE from '../../components/SkillsDE.astro';
 import ContactPreview from "../../components/ContactPreview.astro";
 
 // Content Fetching: List four most recent work projects
@@ -57,7 +57,7 @@ const contacts = (await getCollection('contact')).slice(0,4);
 				/>
 			</header>
 
-			<Skills />
+			<SkillsDE />
 		</div>
 
 		<main class="wrapper stack gap-20 lg:gap-48">
