@@ -3,7 +3,7 @@ title: Quarkus
 publishDate: 1970-03-02 00:00:00
 img: /assets/quarkus.svg
 img_alt: Quarkus Logo
-description: Application Server I use at work and for hobby projects
+description: Application Server den ich in der Arbeit und privat verwende
 tags:
   - Professional
   - Application Server
@@ -11,12 +11,12 @@ tags:
 
 ### Quarkus
 
-> Revolutionizing Application Servers with Performance and Simplicity
+> Ein kleiner Schritt für mich, aber ein großer für ...
 
-Quarkus has emerged as my favorite application server, offering an unparalleled experience in software development. Its seamless workflow and exceptional performance have made working with Quarkus a delight. Whether tackling professional projects or indulging in hobby endeavors, Quarkus proves to be a versatile and reliable companion.
+Quarkus hat sich als mein bevorzugter Anwendungsserver etabliert und bietet ein unvergleichliches Erlebnis in der Softwareentwicklung. Sein nahtloser Workflow und seine außergewöhnliche Leistung haben das Arbeiten mit Quarkus zu einer Freude gemacht. Ob bei beruflichen Projekten oder bei persönlichen Unternehmungen, Quarkus erweist sich als vielseitiger und zuverlässiger Begleiter.
 
-The speed and efficiency of Quarkus are truly impressive, enabling rapid development without compromising on performance. Its lightweight nature and optimized runtime make it ideal for building fast and responsive applications, even in resource-constrained environments.
+Die Geschwindigkeit und Effizienz von Quarkus sind wirklich beeindruckend und ermöglichen eine schnelle Entwicklung, ohne die Leistung zu beeinträchtigen. Seine geringe Größe und optimierte Laufzeit machen es ideal für den Bau schneller und reaktionsfähiger Anwendungen, selbst in ressourcenbeschränkten Umgebungen.
 
-While Quarkus excels in many aspects, I acknowledge that its documentation may still have room for improvement. However, this minor inconvenience pales in comparison to the overall benefits and joy of working with Quarkus.
+Obwohl Quarkus in vielen Aspekten hervorragt, erkenne ich an, dass seine Dokumentation noch Raum für Verbesserungen bieten könnte. Diese geringfügige Unannehmlichkeit verblasst jedoch im Vergleich zu den Gesamtvorteilen und der Freude, mit Quarkus zu arbeiten.
 
-In conclusion, Quarkus has earned its place as my preferred application server, thanks to its exceptional blend of simplicity, performance, and versatility. I look forward to continued innovation and refinement within the Quarkus ecosystem, as it continues to empower developers like myself to create outstanding software solutions.
+Zusammenfassend hat sich Quarkus dank seiner außergewöhnlichen Kombination aus Einfachheit, Leistung und Vielseitigkeit seinen Platz als mein bevorzugter Anwendungsserver verdient. Ich freue mich auf anhaltende Innovationen und Verfeinerungen innerhalb des Quarkus-Ökosystems, da es weiterhin Entwickler wie mich befähigt, herausragende Softwarelösungen zu erstellen.
