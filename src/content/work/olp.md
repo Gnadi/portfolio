@@ -1,7 +1,7 @@
 ---
 title: Open Liberty Project
 publishDate: 2019-10-02 00:00:00
-img: /assets/olp.png
+img: /assets/olp.webp
 img_alt: Logo from olp
 description: Application Server I use at work
 tags:
