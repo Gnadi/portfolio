@@ -10,10 +10,12 @@ const textLinks: { label: string; href: string }[] = getLangFromUrl(Astro.url) =
 	{ label: 'Home', href: '/de/' },
 	{ label: 'Skills', href: '/de/work' },
 	{ label: 'About', href: '/de/about' },
+	{ label: 'Lebenslauf', href: '/de/about' },
 ] : [
 	{ label: 'Home', href: '/' },
 	{ label: 'Skills', href: '/work/' },
 	{ label: 'About', href: '/about/' },
+	{ label: 'CV', href: '/about/' },
 ];
 
 /** Icon links to social media — edit these with links to your profiles! */
@@ -93,7 +95,9 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 							]}
 							href={href}
 						>
-							{label}
+                            <div class="pill">
+                                {label} {label === 'CV' || label === 'Lebenslauf' ? <Icon icon="external" size="1.33em" /> : ''}
+                            </div>
 						</a>
 					</li>
 				))
@@ -157,6 +161,11 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 </script>
 
 <style>
+    .pill {
+        display: flex;
+        gap: 0.5rem;
+        white-space: nowrap;
+    }
 	nav {
 		z-index: 9999;
 		position: relative;
