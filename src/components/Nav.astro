@@ -10,12 +10,12 @@ const textLinks: { label: string; href: string }[] = getLangFromUrl(Astro.url) =
 	{ label: 'Home', href: '/de/' },
 	{ label: 'Skills', href: '/de/work' },
 	{ label: 'About', href: '/de/about' },
-	{ label: 'Lebenslauf', href: '/de/about' },
+	{ label: 'Lebenslauf', href: 'https://cv-liard-six.vercel.app/' },
 ] : [
 	{ label: 'Home', href: '/' },
 	{ label: 'Skills', href: '/work/' },
 	{ label: 'About', href: '/about/' },
-	{ label: 'CV', href: '/about/' },
+	{ label: 'CV', href: 'https://cv-liard-six.vercel.app/' },
 ];
 
 /** Icon links to social media — edit these with links to your profiles! */
@@ -85,6 +85,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 					<li>
 						<a
 							aria-current={Astro.url.pathname === href}
+							target={label === 'CV' || label === 'Lebenslauf' ? '_blank' : '_parent'}
 							class:list={[
 								'link',
 								{
