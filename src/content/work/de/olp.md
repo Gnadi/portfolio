@@ -8,7 +8,6 @@ tags:
   - Professional
   - Application Server
   - Kubernetes
-  - Java
 ---
 ### Erfahrungen mit OLP
 

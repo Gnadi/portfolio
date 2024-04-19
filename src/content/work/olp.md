@@ -8,7 +8,6 @@ tags:
   - Professional
   - Application Server
   - Kubernetes
-  - Java
 ---
 ### Maximizing Efficiency in Application Development
 
