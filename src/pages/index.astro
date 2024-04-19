@@ -128,10 +128,11 @@ const contacts = (await getCollection('contact')).slice(0,4);
 		align-items: center;
 		gap: 2rem;
 	}
-
-	.roles {
-		display: flex;
-		justify-content: space-around;
+	@media (max-width: 50em) {
+		.roles {
+			display: flex;
+			justify-content: space-around;
+		}
 	}
 
 	.hero img {
