@@ -12,7 +12,7 @@ export default defineConfig({
       prefixDefaultLocale: false
     }
   },
-  site: 'https://www.johannes.gnadlinger.me/',
+  site: 'https://www.gnadlinger.me/',
   integrations: [tailwind(), sitemap({
     i18n: {
       defaultLocale: 'en', // All urls that don't contain `es` or `fr` after `https://stargazers.club/` will be treated as default locale, i.e. `en`
