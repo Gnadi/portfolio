@@ -10,12 +10,14 @@ const textLinks: { label: string; href: string }[] = getLangFromUrl(Astro.url) =
 	{ label: 'Home', href: '/de/' },
 	{ label: 'Skills', href: '/de/work' },
 	{ label: 'About', href: '/de/about' },
-	{ label: 'Lebenslauf', href: 'https://cv-git-main-gnadis-projects.vercel.app/' },
+	{ label: 'Lebenslauf', href: 'https://cv.gnadlinger.me/' },
+	{ label: 'Blog', href: 'https://blog.gnadlinger.me/' },
 ] : [
 	{ label: 'Home', href: '/' },
 	{ label: 'Skills', href: '/work/' },
 	{ label: 'About', href: '/about/' },
-	{ label: 'CV', href: 'https://cv-git-main-gnadis-projects.vercel.app/' },
+	{ label: 'CV', href: 'https://cv.gnadlinger.me/' },
+	{ label: 'Blog', href: 'https://blog.gnadlinger.me/' },
 ];
 
 /** Icon links to social media — edit these with links to your profiles! */
@@ -85,7 +87,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 					<li>
 						<a
 							aria-current={Astro.url.pathname === href}
-							target={label === 'CV' || label === 'Lebenslauf' ? '_blank' : '_parent'}
+							target={label === 'CV' || label === 'Lebenslauf' || label === 'Blog' ? '_blank' : '_parent'}
 							class:list={[
 								'link',
 								{
@@ -97,7 +99,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 							href={href}
 						>
                             <div class="pill">
-                                {label} {label === 'CV' || label === 'Lebenslauf' ? <Icon icon="external" size="1.33em" /> : ''}
+                                {label} {label === 'CV' || label === 'Lebenslauf' || label === 'Blog' ? <Icon icon="external" size="1.33em" /> : ''}
                             </div>
 						</a>
 					</li>
