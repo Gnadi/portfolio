@@ -23,13 +23,16 @@ import {defaultLang} from "../i18n/ui";
 
 // Content Fetching: List four most recent work projects
 const lang = getLangFromUrl(Astro.url);
-const projects = (await getCollection('work')).map(entry => {
+const projects = (await getCollection('work')).map((entry: any) => {
 	const [lang, ...slug] = entry.slug.split('/');
 	return { params: { lang, slug: slug.join('/') || undefined }, props: entry };
-}).filter(entry => lang == defaultLang ? entry.params.lang != 'de' : entry.params.lang == lang)
-	.sort((a, b) => b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf())
+}).filter((entry: any) => lang == defaultLang ? entry.params.lang != 'de' : entry.params.lang == lang)
+	.sort((a: any, b: any) => b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf())
 	.slice(0, 4);
 const contacts = (await getCollection('contact')).slice(0,4);
+
+// Compute years of experience since 2018 (e.g. 2018 -> current year)
+const experienceYears = new Date().getFullYear() - 2018;
 
 // Full Astro Component Syntax:
 // https://docs.astro.build/core-concepts/astro-components/
@@ -73,13 +76,13 @@ const contacts = (await getCollection('contact')).slice(0,4);
 			<section class="section with-background with-cta">
 				<header class="section-header stack gap-2 lg:gap-4">
 					<h3>Skills</h3>
-					<p>These are the technologies I've been working with as a professional software developer for 6 years.</p>
+					<p>These are the technologies I've been working with as a professional software developer for {experienceYears} {experienceYears === 1 ? 'year' : 'years'}.</p>
 				</header>
 
 				<div class="gallery">
 					<Grid variant="offset">
 						{
-							projects.map((project) => (
+							projects.map((project: any) => (
 								<li>
 									<PortfolioPreview project={project.props} />
 								</li>
@@ -108,7 +111,7 @@ const contacts = (await getCollection('contact')).slice(0,4);
 				<div class="gallery">
 					<Grid variant="small">
 						{
-							contacts.map((contact) => (
+							contacts.map((contact: any) => (
 								<li class="mention-card">
 									<ContactPreview contact={contact} />
 								</li>

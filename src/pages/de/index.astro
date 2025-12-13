@@ -19,13 +19,16 @@ import SkillsDE from '../../components/SkillsDE.astro';
 import ContactPreview from "../../components/ContactPreview.astro";
 
 // Content Fetching: List four most recent work projects
-const projects = (await getCollection('work')).map(entry =>{
+const projects = (await getCollection('work')).map((entry: any) =>{
 	const [lang, ...slug] = entry.slug.split('/');
 	return { params: { lang, slug: slug.join('/') || undefined }, props: entry };
-}).filter(entry => entry.params.lang == 'de')
-	.sort((a, b) => b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf())
+}).filter((entry: any) => entry.params.lang == 'de')
+	.sort((a: any, b: any) => b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf())
 	.slice(0, 4);
 const contacts = (await getCollection('contact')).slice(0,4);
+
+// Compute years of experience since 2018 (e.g. 2018 -> current year)
+const experienceYears = new Date().getFullYear() - 2018;
 
 // Full Astro Component Syntax:
 // https://docs.astro.build/core-concepts/astro-components/
@@ -69,13 +72,13 @@ const contacts = (await getCollection('contact')).slice(0,4);
 			<section class="section with-background with-cta">
 				<header class="section-header stack gap-2 lg:gap-4">
 					<h3>Skills</h3>
-					<p>Das sind die Technologien, mit denen ich als professioneller Softwareentwickler seit 6 Jahren arbeite.</p>
+					<p>Das sind die Technologien, mit denen ich als professioneller Softwareentwickler seit {experienceYears} {experienceYears === 1 ? 'Jahr' : 'Jahren'} arbeite.</p>
 				</header>
 
 				<div class="gallery">
 					<Grid variant="offset">
 						{
-							projects.map((project) => (
+							projects.map((project: any) => (
 								<li>
 									<PortfolioPreview project={project.props} />
 								</li>
@@ -105,7 +108,7 @@ const contacts = (await getCollection('contact')).slice(0,4);
 				<div class="gallery">
 					<Grid variant="small">
 						{
-							contacts.map((contact) => (
+							contacts.map((contact: any) => (
 								<li class="mention-card">
 									<ContactPreview contact={contact} />
 								</li>
