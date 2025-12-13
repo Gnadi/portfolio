@@ -6,6 +6,7 @@
 import MainHead from '../components/MainHead.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Analytics from '@vercel/analytics/astro';
 
 interface Props {
 	title?: string | undefined;
@@ -20,6 +21,7 @@ const { title, description } = Astro.props;
 		<link rel="sitemap" href="/sitemap-index.xml"/>
 		<link rel="canonical" href="https://www.gnadlinger.me/" /> 
 		<MainHead title={title} description={description} />
+		<Analytics />
 	</head>
 	<body>
 		<div class="stack backgrounds">
