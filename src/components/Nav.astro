@@ -1,37 +1,59 @@
 ---
-import Icon from './Icon.astro';
-import ThemeToggle from './ThemeToggle.astro';
-import type { iconPaths } from './IconPaths';
+import Icon from "./Icon.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import type { iconPaths } from "./IconPaths";
 import Language from "./Language.astro";
-import {getLangFromUrl} from "../i18n/utils";
+import { getLangFromUrl } from "../i18n/utils";
 
 /** Main menu items */
-const textLinks: { label: string; href: string }[] = getLangFromUrl(Astro.url) == "de" ? [
-	{ label: 'Home', href: '/de/' },
-	{ label: 'Skills', href: '/de/work' },
-	{ label: 'About', href: '/de/about' },
-	{ label: 'Lebenslauf', href: 'https://cv.gnadlinger.me/' },
-	{ label: 'Blog', href: 'https://blog.gnadlinger.me/' },
-] : [
-	{ label: 'Home', href: '/' },
-	{ label: 'Skills', href: '/work/' },
-	{ label: 'About', href: '/about/' },
-	{ label: 'CV', href: 'https://cv.gnadlinger.me/' },
-	{ label: 'Blog', href: 'https://blog.gnadlinger.me/' },
-];
+const textLinks: { label: string; href: string }[] =
+	getLangFromUrl(Astro.url) == "de"
+		? [
+				{ label: "Home", href: "/de/" },
+				{ label: "Skills", href: "/de/work" },
+				{ label: "Karriere", href: "/de/career" },
+				{ label: "About", href: "/de/about" },
+				{ label: "Lebenslauf", href: "https://cv.gnadlinger.me/" },
+				{ label: "Blog", href: "https://blog.gnadlinger.me/" },
+			]
+		: [
+				{ label: "Home", href: "/" },
+				{ label: "Skills", href: "/work/" },
+				{ label: "Career", href: "/career/" },
+				{ label: "About", href: "/about/" },
+				{ label: "CV", href: "https://cv.gnadlinger.me/" },
+				{ label: "Blog", href: "https://blog.gnadlinger.me/" },
+			];
 
 /** Icon links to social media — edit these with links to your profiles! */
-const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[] = [
-	{ label: 'Stackoverflow', href: 'https://stackoverflow.com/users/6504152/johannes-gnadlinger', icon: 'stackoverflow-logo' },
-	{ label: 'GitHub', href: 'https://github.com/Gnadi', icon: 'github-logo' },
-	{ label: 'LinkedIn', href: 'https://at.linkedin.com/in/johannes-gnadlinger-842293271', icon: 'linkedin-logo' },
+const iconLinks: {
+	label: string;
+	href: string;
+	icon: keyof typeof iconPaths;
+}[] = [
+	{
+		label: "Stackoverflow",
+		href: "https://stackoverflow.com/users/6504152/johannes-gnadlinger",
+		icon: "stackoverflow-logo",
+	},
+	{ label: "GitHub", href: "https://github.com/Gnadi", icon: "github-logo" },
+	{
+		label: "LinkedIn",
+		href: "https://at.linkedin.com/in/johannes-gnadlinger-842293271",
+		icon: "linkedin-logo",
+	},
 ];
 ---
 
 <nav>
 	<div class="menu-header">
 		<a href="/" class="site-title">
-			<Icon icon="home" color="var(--accent-regular)" size="3em" gradient />
+			<Icon
+				icon="home"
+				color="var(--accent-regular)"
+				size="3em"
+				gradient
+			/>
 			Johannes Gnadlinger
 		</a>
 		<menu-button>
@@ -51,10 +73,12 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 						<a
 							aria-current={Astro.url.pathname === href}
 							class:list={[
-								'link',
+								"link",
 								{
 									active:
-										Astro.url.pathname === href && (href !== '/' && href !='de'),
+										Astro.url.pathname === href &&
+										href !== "/" &&
+										href != "de",
 								},
 							]}
 							href={href}
@@ -87,20 +111,44 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 					<li>
 						<a
 							aria-current={Astro.url.pathname === href}
-							target={label === 'CV' || label === 'Lebenslauf' || label === 'Blog' ? '_blank' : '_parent'}
+							target={
+								label === "CV" ||
+								label === "Lebenslauf" ||
+								label === "Blog"
+									? "_blank"
+									: "_parent"
+							}
 							class:list={[
-								'link',
+								"link",
 								{
 									active:
-										Astro.url.pathname === href  ||
-										(href !== '/' && href !== '/de/' && (Astro.url.pathname.startsWith(href) || (label === 'Skills' && (Astro.url.pathname.startsWith(href) || Astro.url.pathname.startsWith('/work/de'))))),
+										Astro.url.pathname === href ||
+										(href !== "/" &&
+											href !== "/de/" &&
+											(Astro.url.pathname.startsWith(
+												href,
+											) ||
+												(label === "Skills" &&
+													(Astro.url.pathname.startsWith(
+														href,
+													) ||
+														Astro.url.pathname.startsWith(
+															"/work/de",
+														))))),
 								},
 							]}
 							href={href}
 						>
-                            <div class="pill">
-                                {label} {label === 'CV' || label === 'Lebenslauf' || label === 'Blog' ? <Icon icon="external" size="1.33em" /> : ''}
-                            </div>
+							<div class="pill">
+								{label}{" "}
+								{label === "CV" ||
+								label === "Lebenslauf" ||
+								label === "Blog" ? (
+									<Icon icon="external" size="1.33em" />
+								) : (
+									""
+								)}
+							</div>
 						</a>
 					</li>
 				))
@@ -117,7 +165,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 					))
 				}
 			</div>
-			<Language/>
+			<Language />
 
 			<div class="theme-toggle">
 				<ThemeToggle />
@@ -132,43 +180,47 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 			super();
 
 			// Inject menu toggle button when JS runs.
-			this.appendChild(this.querySelector('template')!.content.cloneNode(true));
-			const btn = this.querySelector('button')!;
+			this.appendChild(
+				this.querySelector("template")!.content.cloneNode(true),
+			);
+			const btn = this.querySelector("button")!;
 
 			// Hide menu (shown by default to support no-JS browsers).
-			const menu = document.getElementById('menu-content')!;
+			const menu = document.getElementById("menu-content")!;
 			menu.hidden = true;
 			// Add "menu-content" class in JS to avoid covering content in non-JS browsers.
-			menu.classList.add('menu-content');
+			menu.classList.add("menu-content");
 
 			/** Set whether the menu is currently expanded or collapsed. */
 			const setExpanded = (expand: boolean) => {
-				btn.setAttribute('aria-expanded', expand ? 'true' : 'false');
+				btn.setAttribute("aria-expanded", expand ? "true" : "false");
 				menu.hidden = !expand;
 			};
 
 			// Toggle menu visibility when the menu button is clicked.
-			btn.addEventListener('click', () => setExpanded(menu.hidden));
+			btn.addEventListener("click", () => setExpanded(menu.hidden));
 
 			// Hide menu button for large screens.
-			const handleViewports = (e: MediaQueryList | MediaQueryListEvent) => {
+			const handleViewports = (
+				e: MediaQueryList | MediaQueryListEvent,
+			) => {
 				setExpanded(e.matches);
 				btn.hidden = e.matches;
 			};
-			const mediaQueries = window.matchMedia('(min-width: 50em)');
+			const mediaQueries = window.matchMedia("(min-width: 50em)");
 			handleViewports(mediaQueries);
-			mediaQueries.addEventListener('change', handleViewports);
+			mediaQueries.addEventListener("change", handleViewports);
 		}
 	}
-	customElements.define('menu-button', MenuButton);
+	customElements.define("menu-button", MenuButton);
 </script>
 
 <style>
-    .pill {
-        display: flex;
-        gap: 0.5rem;
-        white-space: nowrap;
-    }
+	.pill {
+		display: flex;
+		gap: 0.5rem;
+		white-space: nowrap;
+	}
 	nav {
 		z-index: 9999;
 		position: relative;
@@ -205,9 +257,10 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 		box-shadow: var(--shadow-md);
 	}
 
-	.menu-button[aria-expanded='true'] {
+	.menu-button[aria-expanded="true"] {
 		color: var(--gray-0);
-		background: linear-gradient(180deg, var(--gray-600), transparent),
+		background:
+			linear-gradient(180deg, var(--gray-600), transparent),
 			radial-gradient(var(--gray-900), var(--gray-800) 150%);
 	}
 
@@ -218,7 +271,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 	.menu-button::before {
 		position: absolute;
 		inset: -1px;
-		content: '';
+		content: "";
 		background: var(--gradient-stroke);
 		border-radius: 999rem;
 		z-index: -1;
@@ -327,7 +380,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 		.nav-items::before {
 			position: absolute;
 			inset: -1px;
-			content: '';
+			content: "";
 			background: var(--gradient-stroke);
 			border-radius: 999rem;
 			z-index: -1;

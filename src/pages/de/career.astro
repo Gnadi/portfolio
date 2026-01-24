@@ -1,0 +1,331 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Hero from "../../components/Hero.astro";
+import Icon from "../../components/Icon.astro";
+import ContactCTA from "../../components/ContactCTA.astro";
+
+const careerData = [
+    {
+        type: "job",
+        title: "Software Developer",
+        organization: "Raiffeisen Software GmbH",
+        startDate: "2018-07-01",
+        endDate: "Present",
+        description:
+            "Developing scalable web applications using Angular and Java.",
+    },
+    {
+        type: "project",
+        title: "MeinELBA Vertrieb und Testautomatisierung",
+        organization: "Developer",
+        startDate: "2018-07-02",
+        endDate: "2019-07-01",
+        description:
+            "Entwicklung der webbasierten Vertriebsfunktionen in MeinELBA Vertrieb und die Implementierung der Testautomatisierung.",
+    },
+    {
+        type: "project",
+        title: "Infinity Benachrichtigungen, Banknachrichten und Berateranzeige",
+        organization: "Developer",
+        startDate: "2019-07-01",
+        endDate: "2020-07-01",
+        description:
+            "Entwicklung von Benachrichtigungen, Banknachrichten und Berateranzeige im Businessbanking Infinity",
+    },
+    {
+        type: "project",
+        title: "MeinELBA Barrierefreiheit",
+        organization: "Developer",
+        startDate: "2020-07-01",
+        endDate: "2020-09-01",
+        description:
+            "Entwicklung von Barrierefreiheit für MeinELBA in Zusammenarbeit mit dem österreichischen Blindenverband.",
+    },
+    {
+        type: "project",
+        title: "Infinity Anbindung Raiffeisen Salzburg | Finanzstatus 2.0",
+        organization: "Requirements Engineer",
+        startDate: "2020-09-01",
+        endDate: "2020-12-01",
+        description:
+            "Raiffeisen Verband Salzburg Anbindung an Infinity und Umsetzung von neuen Funktionen im Finanzstatus.",
+    },
+    {
+        type: "project",
+        title: "MeinELBA 2.0",
+        organization: "Developer",
+        startDate: "2021-01-01",
+        endDate: "2021-12-31",
+        description:
+            "Ablöse von meinELBA 1.0 und Entwicklung von meinELBA 2.0 mit Angular und neuem Styleguide",
+    },
+    {
+        type: "project",
+        title: "Infinity Mailbox",
+        organization: "Product Owner",
+        startDate: "2022-01-01",
+        endDate: "2022-12-31",
+        description:
+            "Entwicklung von Infinity Mailbox mit Anbbindung an die Bankapplikation des jeweiligen Bankberaters",
+    },
+    {
+        type: "project",
+        title: "Infinity Terminvereinbarung",
+        organization: "Product Owner",
+        startDate: "2023-01-01",
+        endDate: "2023-09-01",
+        description:
+            "Mit Infinity Terminvereinbarung, haben Kunden die Möglichkeit Termine direkt im vom Bankberater freigegeben Kalender zu buchen",
+    },
+    {
+        type: "project",
+        title: "Infinity Bankgarantie Ausland",
+        organization: "Developer",
+        startDate: "2023-09-01",
+        endDate: "2023-12-31",
+        description:
+            "Mit Bankgarantie Ausland, können Kunden Bankgarantien direkt in Infinity erfassen und herunterladen",
+    },
+    {
+        type: "project",
+        title: "Infinity Zahlungsverkehr MBS Ablöse durch EBICS",
+        organization: "Developer",
+        startDate: "2024-01-01",
+        endDate: "Present",
+        description:
+            "Implementation and use of the EBICS payment standard in parallel with the operation of MBS.",
+    },
+    {
+        type: "project",
+        title: "Infinity Internationalter Zahlungsverkehr",
+        organization: "Developer",
+        startDate: "2024-01-01",
+        endDate: "2024-09-01",
+        description:
+            "Mit dem internationalen Zahlungsverkehr ist es möglich, Aufräge bei anderen Banken direkt in Infinity zu beauftragen",
+    },
+    {
+        type: "project",
+        title: "Infinity Deutscher Markt",
+        organization: "Developer",
+        startDate: "2024-09-01",
+        endDate: "2025-02-01",
+        description:
+            "Mit dem Projekt ist es auch möglich, deutsche Bankverbindungen in Infinity zu nutzen",
+    },
+    {
+        type: "project",
+        title: "Infinity Empfängerverifikation",
+        organization: "Developer",
+        startDate: "2025-02-01",
+        endDate: "2025-12-01",
+        description:
+            "Umsetzung der verpflichtenden Empfängerverifikation bei Überweisungen",
+    },
+    {
+        type: "project",
+        title: "Bulgarien Euro Umstellung",
+        organization: "Developer",
+        startDate: "2025-12-02",
+        endDate: "2026-01-01",
+        description: "Migration der Bankverbindungen aus Bulgarien auf Euro",
+    },
+    {
+        type: "hackathon",
+        title: "Raiffeisen Arena Hackathon",
+        organization: "Developer",
+        startDate: "2023-11-10",
+        endDate: "2023-11-12",
+        description:
+            "2. Platz. Entwicklung einer App für die Raiffeisen Arena.",
+    },
+    {
+        type: "hackathon",
+        title: "Samsung Icarus VR Hackathon",
+        organization: "Developer",
+        startDate: "2022-11-11",
+        endDate: "2022-11-12",
+        description:
+            "3. Platz. Entwicklung eines VR Spiels für das Fitnessgerät Icarus mit der Samsung VR Gear Brille.",
+    },
+    {
+        type: "hackathon",
+        title: "Climathon",
+        organization: "Developer",
+        startDate: "2021-11-11",
+        endDate: "2021-11-12",
+        description:
+            "4. Platz. Entwicklung einer App für ein Bonusprogramm der ÖBB, bei der gespartes CO2 in Gutscheine getauscht werden kann.",
+    },
+];
+
+// Sort by start date (newest first)
+const sortedCareer = careerData.sort(
+    (a, b) => new Date(b.startDate).valueOf() - new Date(a.startDate).valueOf(),
+);
+
+const getIcon = (type: string) => {
+    switch (type) {
+        case "job":
+            return "briefcase";
+        case "project":
+            return "code";
+        case "side-project":
+            return "pencil-line";
+        case "hackathon":
+            return "trophy";
+        default:
+            return "star";
+    }
+};
+
+const getTypeLabel = (type: string) => {
+    switch (type) {
+        case "job":
+            return "Job";
+        case "project":
+            return "Projekt";
+        case "side-project":
+            return "Nebenprojekt";
+        case "hackathon":
+            return "Hackathon";
+        default:
+            return "Eintrag";
+    }
+};
+---
+
+<BaseLayout
+    title="Karriere | Johannes Gnadlinger"
+    description="Mein beruflicher Werdegang"
+>
+    <div class="stack gap-20">
+        <main class="wrapper stack gap-8">
+            <Hero
+                title="Karriere"
+                tagline="Mein beruflicher Weg, Projekte und Erfolge."
+                align="start"
+            />
+
+            <div class="timeline">
+                {
+                    sortedCareer.map((item) => (
+                        <div class="timeline-item">
+                            <div class="timeline-marker">
+                                <div class="icon-wrapper">
+                                    <Icon
+                                        icon={getIcon(item.type) as any}
+                                        size="1.2em"
+                                    />
+                                </div>
+                            </div>
+                            <div class="timeline-content card">
+                                <div class="header">
+                                    <span class="type-badge">
+                                        {getTypeLabel(item.type)}
+                                    </span>
+                                    <span class="date">
+                                        {item.startDate.split("-")[0]} -{" "}
+                                        {item.endDate?.includes("-")
+                                            ? item.endDate.split("-")[0]
+                                            : item.endDate}
+                                    </span>
+                                </div>
+                                <h3>{item.title}</h3>
+                                <p class="organization">{item.organization}</p>
+                                <p>{item.description}</p>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        </main>
+        <ContactCTA />
+    </div>
+</BaseLayout>
+
+<style>
+    .timeline {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        padding-left: 2rem;
+        border-left: 2px solid var(--gray-800);
+    }
+
+    .timeline-item {
+        position: relative;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -2rem; /* Adjust based on padding-left of timeline */
+        top: 0;
+        transform: translateX(-50%);
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--gray-999);
+        border: 2px solid var(--gray-800);
+        border-radius: 50%;
+        z-index: 1;
+    }
+
+    .icon-wrapper {
+        color: var(--accent-regular);
+    }
+
+    .timeline-content {
+        margin-left: 1.5rem;
+    }
+
+    .card {
+        border: 1px solid var(--gray-800);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        background-color: var(--gray-999_40);
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow var(--theme-transition);
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-md);
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        font-size: var(--text-sm);
+    }
+
+    .type-badge {
+        background-color: var(--accent-regular);
+        color: var(--accent-text-over);
+        padding: 0.2rem 0.5rem;
+        border-radius: 999rem;
+        font-weight: bold;
+        font-size: 0.8em;
+        text-transform: uppercase;
+    }
+
+    .date {
+        color: var(--gray-400);
+    }
+
+    .card h3 {
+        font-size: var(--text-xl);
+        color: var(--gray-0);
+        margin-bottom: 0.25rem;
+    }
+
+    .organization {
+        font-weight: bold;
+        color: var(--accent-regular);
+        margin-bottom: 0.5rem;
+    }
+</style>
