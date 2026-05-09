@@ -1,0 +1,148 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BusinessCard from '../components/BusinessCard.astro';
+---
+
+<BaseLayout
+	title="Card | Johannes Gnadlinger"
+	description="Digital business card for Johannes Gnadlinger — Backend Engineer at Raiffeisen Software GmbH, Linz, Austria."
+>
+	<div class="card-page wrapper">
+		<div class="page-header">
+			<h1 class="page-title">Digital Business Card</h1>
+			<p class="page-sub">Backend Engineer &middot; Linz, Austria 🇦🇹</p>
+		</div>
+
+		<div class="card-stage">
+			<BusinessCard />
+			<p class="hint" aria-hidden="true">Hover or tap to flip</p>
+		</div>
+
+		<div class="actions">
+			<a href="/about/" class="back-link">← About page</a>
+			<button class="print-btn" id="print-btn">Print / Save as PDF</button>
+		</div>
+	</div>
+</BaseLayout>
+
+<script>
+	document.getElementById('print-btn')?.addEventListener('click', () => window.print());
+</script>
+
+<style>
+	.card-page {
+		min-height: 70vh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 2.5rem;
+		padding-block: 4rem;
+	}
+
+	.page-header {
+		text-align: center;
+	}
+
+	.page-title {
+		font-family: var(--font-brand);
+		font-size: var(--text-2xl);
+		color: var(--gray-0);
+	}
+
+	.page-sub {
+		margin-top: 0.4rem;
+		font-size: var(--text-md);
+		color: var(--gray-400);
+	}
+
+	.card-stage {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.75rem;
+		width: 100%;
+	}
+
+	.hint {
+		font-size: var(--text-sm);
+		color: var(--gray-500);
+		font-style: italic;
+	}
+
+	.actions {
+		display: flex;
+		gap: 1.25rem;
+		align-items: center;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.back-link {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+		text-decoration: none;
+		transition: color var(--theme-transition);
+	}
+
+	.back-link:hover {
+		color: var(--accent-regular);
+	}
+
+	.print-btn {
+		padding: 0.55rem 1.5rem;
+		border-radius: 999rem;
+		border: 1px solid var(--accent-regular);
+		background: var(--accent-regular);
+		color: var(--accent-text-over);
+		font-family: var(--font-brand);
+		font-size: var(--text-sm);
+		cursor: pointer;
+		transition: box-shadow var(--theme-transition), opacity var(--theme-transition);
+	}
+
+	.print-btn:hover {
+		box-shadow: var(--shadow-md);
+		opacity: 0.88;
+	}
+
+	/* Print: hide chrome, show only the card back */
+	@media print {
+		:global(nav),
+		:global(footer),
+		.page-header,
+		.hint,
+		.actions {
+			display: none !important;
+		}
+
+		.card-page {
+			min-height: unset;
+			padding: 0;
+			justify-content: flex-start;
+		}
+
+		:global(.card-scene) {
+			width: 85.6mm;
+			height: 54mm;
+			perspective: none;
+		}
+
+		:global(.card) {
+			transform: none !important;
+			transition: none !important;
+		}
+
+		:global(.card-front) {
+			display: none !important;
+		}
+
+		:global(.card-back) {
+			transform: none !important;
+			backface-visibility: visible !important;
+			-webkit-backface-visibility: visible !important;
+			position: relative !important;
+			inset: unset !important;
+		}
+	}
+</style>
