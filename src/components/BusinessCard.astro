@@ -1,359 +1,415 @@
 ---
 import Icon from './Icon.astro';
+
+const cardUrl = 'https://www.gnadlinger.me/card';
+const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(cardUrl)}&margin=6`;
 ---
 
-<div class="bc-scene">
-	<!-- Layered background: photo + gradient veil -->
-	<div class="bc-bg-photo" aria-hidden="true"></div>
-	<div class="bc-bg-veil" aria-hidden="true"></div>
+<div class="card-scene" tabindex="0" aria-label="Business card for Johannes Gnadlinger – hover or tap to flip">
+	<div class="card">
 
-	<!-- Headline (left side, Trade Republic style) -->
-	<div class="bc-headline">
-		<span class="bc-label">Backend Engineer</span>
-		<h2 class="bc-name">Johannes<br />Gnadlinger</h2>
-		<p class="bc-company">Raiffeisen Software GmbH</p>
-		<p class="bc-location">📍 Linz, Austria</p>
-	</div>
-
-	<!-- Frosted glass business card (right side) -->
-	<div class="bc-card" id="bc-card" aria-label="Business card – contact details">
-		<div class="bc-card-inner">
-			<!-- Card header row -->
-			<div class="bc-card-top">
-				<div class="bc-monogram" aria-hidden="true">JG</div>
-				<span class="bc-card-tag">BUSINESS CARD</span>
+		<!-- ═══ FRONT ═══════════════════════════════════════ -->
+		<div class="card-face card-front">
+			<div class="front-glow" aria-hidden="true"></div>
+			<div class="front-body">
+				<div class="portrait-wrapper">
+					<img
+						src="/assets/portrait.webp"
+						alt="Johannes Gnadlinger"
+						class="portrait"
+						width="160"
+						height="160"
+						loading="lazy"
+					/>
+				</div>
+				<div class="front-text">
+					<span class="card-name">Johannes Gnadlinger</span>
+					<span class="card-title">Backend Engineer</span>
+					<span class="card-company">Raiffeisen Software GmbH</span>
+					<span class="card-location">📍 Linz, Austria</span>
+				</div>
 			</div>
-
-			<!-- Contact links -->
-			<ul class="bc-links" role="list">
-				<li>
-					<a href="mailto:johannes.gnadlinger1997@gmail.com" class="bc-link">
-						<Icon icon="paper-plane-tilt" size="1.1em" />
-						<span>johannes.gnadlinger1997@gmail.com</span>
-					</a>
-				</li>
-				<li>
-					<a href="https://github.com/Gnadi" class="bc-link" target="_blank" rel="noopener noreferrer">
-						<Icon icon="github-logo" size="1.1em" />
-						<span>github.com/Gnadi</span>
-					</a>
-				</li>
-				<li>
-					<a href="https://at.linkedin.com/in/johannes-gnadlinger-842293271" class="bc-link" target="_blank" rel="noopener noreferrer">
-						<Icon icon="linkedin-logo" size="1.1em" />
-						<span>LinkedIn</span>
-					</a>
-				</li>
-				<li>
-					<a href="https://cv.gnadlinger.me/" class="bc-link" target="_blank" rel="noopener noreferrer">
-						<Icon icon="external" size="1.1em" />
-						<span>cv.gnadlinger.me</span>
-					</a>
-				</li>
-				<li>
-					<a href="https://blog.gnadlinger.me/" class="bc-link" target="_blank" rel="noopener noreferrer">
-						<Icon icon="pencil-line" size="1.1em" />
-						<span>blog.gnadlinger.me</span>
-					</a>
-				</li>
-				<li>
-					<a href="https://stackoverflow.com/users/6504152/johannes-gnadlinger" class="bc-link" target="_blank" rel="noopener noreferrer">
-						<Icon icon="stackoverflow-logo" size="1.1em" />
-						<span>Stack Overflow</span>
-					</a>
-				</li>
-			</ul>
-
-			<!-- Card footer -->
-			<div class="bc-card-bottom">
-				<span class="bc-card-url">gnadlinger.me</span>
+			<div class="front-footer">
+				<span class="flip-hint">Hover or tap to flip ↩</span>
 			</div>
 		</div>
 
-		<!-- Dynamic shine / reflection overlay -->
-		<div class="bc-shine" id="bc-shine" aria-hidden="true"></div>
+		<!-- ═══ BACK ════════════════════════════════════════ -->
+		<div class="card-face card-back">
+
+			<!-- Name + title header -->
+			<div class="back-header">
+				<div class="initials-badge" aria-hidden="true">JG</div>
+				<div class="back-name-block">
+					<span class="back-name">Johannes Gnadlinger</span>
+					<span class="back-title">Backend Engineer · Raiffeisen Software GmbH</span>
+				</div>
+			</div>
+
+			<!-- Contact links -->
+			<div class="contact-list">
+				<a href="mailto:johannes.gnadlinger1997@gmail.com" class="contact-item">
+					<Icon icon="paper-plane-tilt" size="1em" />
+					<span>johannes.gnadlinger1997@gmail.com</span>
+				</a>
+				<a href="https://github.com/Gnadi" class="contact-item" target="_blank" rel="noopener noreferrer">
+					<Icon icon="github-logo" size="1em" />
+					<span>github.com/Gnadi</span>
+				</a>
+				<a href="https://at.linkedin.com/in/johannes-gnadlinger-842293271" class="contact-item" target="_blank" rel="noopener noreferrer">
+					<Icon icon="linkedin-logo" size="1em" />
+					<span>LinkedIn</span>
+				</a>
+				<a href="https://stackoverflow.com/users/6504152/johannes-gnadlinger" class="contact-item" target="_blank" rel="noopener noreferrer">
+					<Icon icon="stackoverflow-logo" size="1em" />
+					<span>Stack Overflow</span>
+				</a>
+				<a href="https://cv.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
+					<Icon icon="external" size="1em" />
+					<span>cv.gnadlinger.me</span>
+				</a>
+				<a href="https://blog.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
+					<Icon icon="pencil-line" size="1em" />
+					<span>blog.gnadlinger.me</span>
+				</a>
+			</div>
+
+			<!-- Footer: location + QR code -->
+			<div class="back-footer">
+				<span class="card-location-back">📍 Linz, Austria</span>
+				<div class="qr-wrapper">
+					<img
+						src={qrSrc}
+						alt={`QR code linking to ${cardUrl}`}
+						class="qr-code"
+						width="88"
+						height="88"
+						loading="lazy"
+					/>
+					<span class="qr-label">Scan to share</span>
+				</div>
+			</div>
+
+		</div>
 	</div>
 </div>
 
 <script>
-	const card = document.getElementById('bc-card') as HTMLElement | null;
-	const shine = document.getElementById('bc-shine') as HTMLElement | null;
-	const scene = card?.closest<HTMLElement>('.bc-scene') ?? null;
+	document.querySelectorAll<HTMLElement>('.card-scene').forEach((scene) => {
+		const card = scene.querySelector<HTMLElement>('.card');
+		const front = scene.querySelector<HTMLElement>('.card-front');
+		const back = scene.querySelector<HTMLElement>('.card-back');
+		if (!card) return;
 
-	if (card && scene) {
-		let rafId = 0;
-		let isHovering = false;
-
-		function setTilt(rotX: number, rotY: number, shineX: number, shineY: number) {
-			card!.style.transform =
-				`perspective(1000px) rotateZ(-8deg) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-			if (shine) {
-				shine.style.background =
-					`radial-gradient(ellipse at ${shineX}% ${shineY}%, rgba(255,255,255,0.2) 0%, transparent 65%)`;
-			}
+		function flip() {
+			scene.classList.toggle('is-flipped');
+			const flipped = scene.classList.contains('is-flipped');
+			front?.setAttribute('aria-hidden', flipped ? 'true' : 'false');
+			back?.setAttribute('aria-hidden', flipped ? 'false' : 'true');
 		}
 
-		scene.addEventListener('mousemove', (e: MouseEvent) => {
-			if (!isHovering) {
-				isHovering = true;
-				card!.style.animationPlayState = 'paused';
-			}
-			cancelAnimationFrame(rafId);
-			rafId = requestAnimationFrame(() => {
-				const rect = scene.getBoundingClientRect();
-				const dx = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
-				const dy = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
-				setTilt(dy * -10, dx * 12, ((dx + 1) / 2) * 100, ((dy + 1) / 2) * 100);
-			});
+		scene.addEventListener('click', flip);
+		scene.addEventListener('keydown', (e: KeyboardEvent) => {
+			if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); }
 		});
-
-		scene.addEventListener('mouseleave', () => {
-			isHovering = false;
-			cancelAnimationFrame(rafId);
-			card!.style.animationPlayState = 'running';
-			card!.style.transform = '';
-			if (shine) shine.style.background = '';
-		});
-
-		scene.addEventListener('touchmove', (e: TouchEvent) => {
-			const touch = e.touches[0];
-			const rect = scene.getBoundingClientRect();
-			const dx = (touch.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
-			const dy = (touch.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
-			setTilt(dy * -6, dx * 8, ((dx + 1) / 2) * 100, ((dy + 1) / 2) * 100);
-		}, { passive: true });
-
-		scene.addEventListener('touchend', () => {
-			card!.style.transform = '';
-			if (shine) shine.style.background = '';
-		});
-	}
+	});
 </script>
 
 <style>
 	/* ── Scene ──────────────────────────────────────────── */
-	.bc-scene {
+	.card-scene {
+		perspective: 1200px;
+		width: min(700px, 100%);
+		height: 400px;
+		cursor: pointer;
+		outline: none;
+	}
+
+	/* ── Card ───────────────────────────────────────────── */
+	.card {
 		position: relative;
 		width: 100%;
-		min-height: 560px;
-		border-radius: 1.5rem;
+		height: 100%;
+		transform-style: preserve-3d;
+		transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+	}
+
+	@media (hover: hover) {
+		.card-scene:hover .card {
+			transform: rotateY(180deg);
+		}
+	}
+
+	.card-scene.is-flipped .card,
+	.card-scene:focus-visible .card {
+		transform: rotateY(180deg);
+	}
+
+	/* ── Shared face ────────────────────────────────────── */
+	.card-face {
+		position: absolute;
+		inset: 0;
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+		border-radius: 1.25rem;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
-		align-items: flex-start;
+		box-shadow: var(--shadow-lg);
+	}
+
+	/* ═══════════════ FRONT ════════════════════════════════ */
+	.card-front {
+		background: var(--gradient-accent);
+		color: var(--accent-text-over);
 		justify-content: space-between;
-		gap: 2.5rem;
-		padding: 3rem 2.5rem;
 	}
 
-	/* ── Background photo ───────────────────────────────── */
-	.bc-bg-photo {
+	.front-glow {
 		position: absolute;
 		inset: 0;
-		background-image: url('/assets/about.jpg');
-		background-size: cover;
-		background-position: center 20%;
-		z-index: 0;
+		background: radial-gradient(ellipse at 70% 25%, rgba(197, 97, 246, 0.4) 0%, transparent 60%);
+		pointer-events: none;
 	}
 
-	.bc-bg-veil {
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(
-			140deg,
-			rgba(28, 0, 86, 0.88) 0%,
-			rgba(118, 17, 166, 0.62) 55%,
-			rgba(28, 0, 86, 0.78) 100%
-		);
-		z-index: 1;
+	.front-body {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 2rem;
+		padding: 2.25rem 2.5rem;
 	}
 
-	/* ── Headline ───────────────────────────────────────── */
-	.bc-headline {
-		position: relative;
-		z-index: 3;
+	.portrait-wrapper {
+		flex-shrink: 0;
+		width: 120px;
+		height: 120px;
+		border-radius: 50%;
+		overflow: hidden;
+		border: 3px solid rgba(255, 255, 255, 0.45);
+		box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.12);
+	}
+
+	.portrait {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center top;
+	}
+
+	.front-text {
 		display: flex;
 		flex-direction: column;
 		gap: 0.3rem;
+	}
+
+	.card-name {
+		font-family: var(--font-brand);
+		font-size: var(--text-2xl);
+		font-weight: 700;
+		line-height: 1.15;
 		color: #fff;
 	}
 
-	.bc-label {
+	.card-title {
+		font-size: var(--text-lg);
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.card-company {
 		font-size: var(--text-base);
-		color: rgba(255, 255, 255, 0.55);
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.72);
 	}
 
-	.bc-name {
-		font-family: var(--font-brand);
-		font-size: clamp(2.5rem, 7vw, 4rem);
-		font-weight: 700;
-		line-height: 1.05;
-		color: #fff;
-		margin: 0.2rem 0 0;
+	.card-location {
+		margin-top: 0.4rem;
+		font-size: var(--text-base);
+		color: rgba(255, 255, 255, 0.65);
 	}
 
-	.bc-company {
-		margin-top: 0.75rem;
-		font-size: var(--text-md);
-		color: rgba(255, 255, 255, 0.7);
-	}
-
-	.bc-location {
-		font-size: var(--text-md);
-		color: rgba(255, 255, 255, 0.55);
-	}
-
-	/* ── Glass card ─────────────────────────────────────── */
-	.bc-card {
-		position: relative;
-		z-index: 4;
-		align-self: center;
-		width: min(380px, 92%);
-		aspect-ratio: 1.586 / 1;
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(20px) saturate(160%);
-		-webkit-backdrop-filter: blur(20px) saturate(160%);
-		border: 1px solid rgba(255, 255, 255, 0.25);
-		border-radius: 1.25rem;
-		box-shadow:
-			0 20px 60px rgba(0, 0, 0, 0.5),
-			inset 0 1px 0 rgba(255, 255, 255, 0.38),
-			inset 0 -1px 0 rgba(255, 255, 255, 0.08);
-		overflow: hidden;
-		animation: bc-float 5.5s ease-in-out infinite;
-		will-change: transform;
-		cursor: default;
-	}
-
-	@keyframes bc-float {
-		0%, 100% {
-			transform: perspective(1200px) rotateZ(-8deg) translateY(0px);
-		}
-		50% {
-			transform: perspective(1200px) rotateZ(-8deg) translateY(-16px);
-		}
-	}
-
-	/* ── Card inner ─────────────────────────────────────── */
-	.bc-card-inner {
-		position: relative;
-		z-index: 1;
-		height: 100%;
-		padding: 1.4rem 1.75rem;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		color: #fff;
-	}
-
-	.bc-card-top {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.bc-monogram {
-		width: 2.75rem;
-		height: 2.75rem;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.18);
-		border: 1px solid rgba(255, 255, 255, 0.38);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-family: var(--font-brand);
-		font-size: var(--text-sm);
-		font-weight: 700;
-		letter-spacing: 0.04em;
-		color: #fff;
-	}
-
-	.bc-card-tag {
-		font-size: var(--text-sm);
-		letter-spacing: 0.14em;
-		color: rgba(255, 255, 255, 0.45);
-		text-transform: uppercase;
-	}
-
-	/* ── Links grid ─────────────────────────────────────── */
-	.bc-links {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.55rem 1.25rem;
-	}
-
-	.bc-link {
-		display: flex;
-		align-items: center;
-		gap: 0.45rem;
-		font-size: var(--text-sm);
-		color: rgba(255, 255, 255, 0.85);
-		text-decoration: none;
-		transition: color 0.15s;
-		white-space: nowrap;
-		overflow: hidden;
-	}
-
-	.bc-link span {
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.bc-link:hover {
-		color: #fff;
-	}
-
-	/* ── Card bottom ────────────────────────────────────── */
-	.bc-card-bottom {
+	.front-footer {
+		padding: 0.65rem 2.5rem;
+		background: rgba(0, 0, 0, 0.18);
 		display: flex;
 		justify-content: flex-end;
 	}
 
-	.bc-card-url {
+	.flip-hint {
 		font-size: var(--text-sm);
-		letter-spacing: 0.06em;
-		color: rgba(255, 255, 255, 0.42);
+		color: rgba(255, 255, 255, 0.5);
+		letter-spacing: 0.02em;
 	}
 
-	/* ── Shine overlay ──────────────────────────────────── */
-	.bc-shine {
-		position: absolute;
-		inset: 0;
-		z-index: 2;
-		pointer-events: none;
-		transition: background 0.12s ease-out;
+	/* ═══════════════ BACK ═════════════════════════════════ */
+	.card-back {
+		transform: rotateY(180deg);
+		background: var(--gray-999);
+		border: 1px solid var(--gray-800);
+		color: var(--gray-0);
+		justify-content: space-between;
+		padding: 1.75rem 2.25rem;
+		gap: 1rem;
 	}
 
-	/* ── Desktop: side-by-side layout ───────────────────── */
-	@media (min-width: 50em) {
-		.bc-scene {
-			flex-direction: row;
-			align-items: center;
-			justify-content: space-between;
-			min-height: 600px;
-			padding: 4rem 4rem;
-		}
-
-		.bc-headline {
-			max-width: 44%;
-		}
-
-		.bc-card {
-			align-self: auto;
-			width: clamp(380px, 48%, 520px);
-		}
+	/* Header */
+	.back-header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid var(--gray-800);
 	}
 
-	/* ── Reduced motion ─────────────────────────────────── */
-	@media (prefers-reduced-motion: reduce) {
-		.bc-card {
-			animation: none;
-			transform: perspective(1200px) rotateZ(-8deg);
+	.initials-badge {
+		flex-shrink: 0;
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		background: var(--gradient-accent);
+		color: #fff;
+		font-family: var(--font-brand);
+		font-weight: 700;
+		font-size: var(--text-base);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.back-name-block {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
+
+	.back-name {
+		font-family: var(--font-brand);
+		font-size: var(--text-lg);
+		font-weight: 700;
+		color: var(--gray-0);
+	}
+
+	.back-title {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+	}
+
+	/* Contact grid */
+	.contact-list {
+		flex: 1;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.55rem 1.5rem;
+		align-content: center;
+	}
+
+	.contact-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: var(--text-base);
+		color: var(--gray-200);
+		text-decoration: none;
+		transition: color var(--theme-transition);
+		white-space: nowrap;
+		overflow: hidden;
+	}
+
+	.contact-item span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.contact-item:hover {
+		color: var(--accent-regular);
+	}
+
+	.contact-item :global(svg) {
+		flex-shrink: 0;
+		color: var(--accent-regular);
+	}
+
+	/* Footer: location + QR */
+	.back-footer {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		padding-top: 0.75rem;
+		border-top: 1px solid var(--gray-800);
+	}
+
+	.card-location-back {
+		font-size: var(--text-base);
+		color: var(--gray-400);
+	}
+
+	.qr-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.3rem;
+	}
+
+	.qr-code {
+		display: block;
+		width: 80px;
+		height: 80px;
+		border-radius: 0.5rem;
+		background: #fff;
+		padding: 4px;
+	}
+
+	.qr-label {
+		font-size: var(--text-sm);
+		color: var(--gray-500);
+		letter-spacing: 0.02em;
+	}
+
+	/* ── Mobile ─────────────────────────────────────────── */
+	@media (max-width: 36em) {
+		.card-scene {
+			height: 380px;
+		}
+
+		.front-body {
+			padding: 1.75rem 1.75rem;
+			gap: 1.25rem;
+		}
+
+		.portrait-wrapper {
+			width: 90px;
+			height: 90px;
+		}
+
+		.card-name {
+			font-size: var(--text-xl);
+		}
+
+		.card-title {
+			font-size: var(--text-base);
+		}
+
+		.card-company,
+		.card-location {
+			font-size: var(--text-sm);
+		}
+
+		.card-back {
+			padding: 1.25rem 1.5rem;
+		}
+
+		.contact-list {
+			grid-template-columns: 1fr;
+			gap: 0.45rem;
+		}
+
+		.contact-item {
+			font-size: var(--text-sm);
+		}
+
+		.qr-code {
+			width: 64px;
+			height: 64px;
 		}
 	}
 </style>
