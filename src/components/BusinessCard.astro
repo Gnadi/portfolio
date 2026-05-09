@@ -15,16 +15,6 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 			<div class="front-bg-veil" aria-hidden="true"></div>
 
 			<div class="front-body">
-				<div class="portrait-wrapper">
-					<img
-						src="/assets/portrait.webp"
-						alt="Johannes Gnadlinger"
-						class="portrait"
-						width="160"
-						height="160"
-						loading="lazy"
-					/>
-				</div>
 				<div class="front-text">
 					<span class="card-name">Johannes Gnadlinger</span>
 					<span class="card-title">Backend Engineer</span>
@@ -41,9 +31,16 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 		<!-- ═══ BACK ════════════════════════════════════════ -->
 		<div class="card-face card-back">
 
-			<!-- Header: badge + name -->
+			<!-- Header: round portrait + name -->
 			<div class="back-header">
-				<div class="initials-badge" aria-hidden="true">JG</div>
+				<img
+					src="/assets/portrait.webp"
+					alt="Johannes Gnadlinger"
+					class="back-portrait"
+					width="80"
+					height="80"
+					loading="lazy"
+				/>
 				<div class="back-name-block">
 					<span class="back-name">Johannes Gnadlinger</span>
 					<span class="back-title">Backend Engineer · Raiffeisen Software GmbH</span>
@@ -63,11 +60,11 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 					</a>
 					<a href="https://at.linkedin.com/in/johannes-gnadlinger-842293271" class="contact-item" target="_blank" rel="noopener noreferrer">
 						<Icon icon="linkedin-logo" size="1em" />
-						<span>LinkedIn</span>
+						<span>in/johannes-gnadlinger</span>
 					</a>
 					<a href="https://stackoverflow.com/users/6504152/johannes-gnadlinger" class="contact-item" target="_blank" rel="noopener noreferrer">
 						<Icon icon="stackoverflow-logo" size="1em" />
-						<span>Stack Overflow</span>
+						<span>johannes-gnadlinger</span>
 					</a>
 					<a href="https://cv.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
 						<Icon icon="external" size="1em" />
@@ -196,28 +193,8 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 		z-index: 2;
 		flex: 1;
 		display: flex;
-		align-items: center;
-		gap: 2rem;
+		align-items: flex-end;
 		padding: 2.25rem 2.5rem;
-	}
-
-	.portrait-wrapper {
-		flex-shrink: 0;
-		width: 120px;
-		height: 120px;
-		border-radius: 50%;
-		overflow: hidden;
-		border: 3px solid rgba(255, 255, 255, 0.45);
-		box-shadow:
-			0 0 0 7px rgba(255, 255, 255, 0.12),
-			0 4px 24px rgba(0, 0, 0, 0.35);
-	}
-
-	.portrait {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center top;
 	}
 
 	.front-text {
@@ -287,19 +264,14 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 		flex-shrink: 0;
 	}
 
-	.initials-badge {
+	.back-portrait {
 		flex-shrink: 0;
-		width: 3rem;
-		height: 3rem;
+		width: 3.25rem;
+		height: 3.25rem;
 		border-radius: 50%;
-		background: var(--gradient-accent);
-		color: #fff;
-		font-family: var(--font-brand);
-		font-weight: 700;
-		font-size: var(--text-base);
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		object-fit: cover;
+		object-position: center top;
+		border: 2px solid var(--gray-800);
 	}
 
 	.back-name-block {
@@ -416,11 +388,9 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 
 	/* ── Mobile ─────────────────────────────────────────── */
 	@media (max-width: 36em) {
-		.card-scene { height: 360px; }
+		.card-scene { height: 340px; }
 
-		.front-body { padding: 1.5rem 1.5rem; gap: 1.25rem; }
-
-		.portrait-wrapper { width: 88px; height: 88px; }
+		.front-body { padding: 1.5rem 1.5rem; }
 
 		.card-name  { font-size: var(--text-xl); }
 		.card-title { font-size: var(--text-base); }
@@ -430,9 +400,11 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 
 		.card-back { padding: 1.25rem 1.25rem; }
 
+		.back-portrait { width: 2.5rem; height: 2.5rem; }
+
 		.contact-item { font-size: var(--text-sm); }
 
-		.qr-code { width: 84px; height: 84px; }
+		.qr-code { width: 80px; height: 80px; }
 		.qr-label { font-size: 0.7rem; }
 		.qr-url   { font-size: 0.65rem; }
 	}
