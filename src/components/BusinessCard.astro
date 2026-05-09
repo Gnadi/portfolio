@@ -2,7 +2,7 @@
 import Icon from './Icon.astro';
 
 const cardUrl = 'https://www.gnadlinger.me/card';
-const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(cardUrl)}&margin=6`;
+const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(cardUrl)}&margin=8`;
 ---
 
 <div class="card-scene" tabindex="0" aria-label="Business card for Johannes Gnadlinger – hover or tap to flip">
@@ -10,7 +10,10 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 
 		<!-- ═══ FRONT ═══════════════════════════════════════ -->
 		<div class="card-face card-front">
-			<div class="front-glow" aria-hidden="true"></div>
+			<!-- Layered background: photo + gradient veil -->
+			<div class="front-bg-photo" aria-hidden="true"></div>
+			<div class="front-bg-veil" aria-hidden="true"></div>
+
 			<div class="front-body">
 				<div class="portrait-wrapper">
 					<img
@@ -29,6 +32,7 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 					<span class="card-location">📍 Linz, Austria</span>
 				</div>
 			</div>
+
 			<div class="front-footer">
 				<span class="flip-hint">Hover or tap to flip ↩</span>
 			</div>
@@ -37,7 +41,7 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 		<!-- ═══ BACK ════════════════════════════════════════ -->
 		<div class="card-face card-back">
 
-			<!-- Name + title header -->
+			<!-- Header: badge + name -->
 			<div class="back-header">
 				<div class="initials-badge" aria-hidden="true">JG</div>
 				<div class="back-name-block">
@@ -46,66 +50,71 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 				</div>
 			</div>
 
-			<!-- Contact links -->
-			<div class="contact-list">
-				<a href="mailto:johannes.gnadlinger1997@gmail.com" class="contact-item">
-					<Icon icon="paper-plane-tilt" size="1em" />
-					<span>johannes.gnadlinger1997@gmail.com</span>
-				</a>
-				<a href="https://github.com/Gnadi" class="contact-item" target="_blank" rel="noopener noreferrer">
-					<Icon icon="github-logo" size="1em" />
-					<span>github.com/Gnadi</span>
-				</a>
-				<a href="https://at.linkedin.com/in/johannes-gnadlinger-842293271" class="contact-item" target="_blank" rel="noopener noreferrer">
-					<Icon icon="linkedin-logo" size="1em" />
-					<span>LinkedIn</span>
-				</a>
-				<a href="https://stackoverflow.com/users/6504152/johannes-gnadlinger" class="contact-item" target="_blank" rel="noopener noreferrer">
-					<Icon icon="stackoverflow-logo" size="1em" />
-					<span>Stack Overflow</span>
-				</a>
-				<a href="https://cv.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
-					<Icon icon="external" size="1em" />
-					<span>cv.gnadlinger.me</span>
-				</a>
-				<a href="https://blog.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
-					<Icon icon="pencil-line" size="1em" />
-					<span>blog.gnadlinger.me</span>
-				</a>
-			</div>
+			<!-- Main: contacts left / QR right -->
+			<div class="back-main">
+				<div class="contact-list">
+					<a href="mailto:johannes.gnadlinger1997@gmail.com" class="contact-item">
+						<Icon icon="paper-plane-tilt" size="1em" />
+						<span>johannes.gnadlinger1997@gmail.com</span>
+					</a>
+					<a href="https://github.com/Gnadi" class="contact-item" target="_blank" rel="noopener noreferrer">
+						<Icon icon="github-logo" size="1em" />
+						<span>github.com/Gnadi</span>
+					</a>
+					<a href="https://at.linkedin.com/in/johannes-gnadlinger-842293271" class="contact-item" target="_blank" rel="noopener noreferrer">
+						<Icon icon="linkedin-logo" size="1em" />
+						<span>LinkedIn</span>
+					</a>
+					<a href="https://stackoverflow.com/users/6504152/johannes-gnadlinger" class="contact-item" target="_blank" rel="noopener noreferrer">
+						<Icon icon="stackoverflow-logo" size="1em" />
+						<span>Stack Overflow</span>
+					</a>
+					<a href="https://cv.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
+						<Icon icon="external" size="1em" />
+						<span>cv.gnadlinger.me</span>
+					</a>
+					<a href="https://blog.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
+						<Icon icon="pencil-line" size="1em" />
+						<span>blog.gnadlinger.me</span>
+					</a>
+				</div>
 
-			<!-- Footer: location + QR code -->
-			<div class="back-footer">
-				<span class="card-location-back">📍 Linz, Austria</span>
-				<div class="qr-wrapper">
+				<!-- QR code: its own clean panel -->
+				<div class="qr-panel">
 					<img
 						src={qrSrc}
-						alt={`QR code linking to ${cardUrl}`}
+						alt={`QR code – ${cardUrl}`}
 						class="qr-code"
-						width="88"
-						height="88"
+						width="110"
+						height="110"
 						loading="lazy"
 					/>
 					<span class="qr-label">Scan to share</span>
+					<span class="qr-url">gnadlinger.me/card</span>
 				</div>
 			</div>
 
+			<!-- Footer -->
+			<div class="back-footer">
+				<span class="card-location-back">📍 Linz, Austria</span>
+			</div>
 		</div>
+
 	</div>
 </div>
 
 <script>
 	document.querySelectorAll<HTMLElement>('.card-scene').forEach((scene) => {
-		const card = scene.querySelector<HTMLElement>('.card');
-		const front = scene.querySelector<HTMLElement>('.card-front');
-		const back = scene.querySelector<HTMLElement>('.card-back');
+		const card   = scene.querySelector<HTMLElement>('.card');
+		const front  = scene.querySelector<HTMLElement>('.card-front');
+		const back   = scene.querySelector<HTMLElement>('.card-back');
 		if (!card) return;
 
 		function flip() {
 			scene.classList.toggle('is-flipped');
 			const flipped = scene.classList.contains('is-flipped');
-			front?.setAttribute('aria-hidden', flipped ? 'true' : 'false');
-			back?.setAttribute('aria-hidden', flipped ? 'false' : 'true');
+			front?.setAttribute('aria-hidden', String(flipped));
+			back?.setAttribute('aria-hidden', String(!flipped));
 		}
 
 		scene.addEventListener('click', flip);
@@ -125,7 +134,7 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 		outline: none;
 	}
 
-	/* ── Card ───────────────────────────────────────────── */
+	/* ── Card (flipper) ─────────────────────────────────── */
 	.card {
 		position: relative;
 		width: 100%;
@@ -135,15 +144,10 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 	}
 
 	@media (hover: hover) {
-		.card-scene:hover .card {
-			transform: rotateY(180deg);
-		}
+		.card-scene:hover .card { transform: rotateY(180deg); }
 	}
-
 	.card-scene.is-flipped .card,
-	.card-scene:focus-visible .card {
-		transform: rotateY(180deg);
-	}
+	.card-scene:focus-visible .card { transform: rotateY(180deg); }
 
 	/* ── Shared face ────────────────────────────────────── */
 	.card-face {
@@ -158,21 +162,38 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 		box-shadow: var(--shadow-lg);
 	}
 
-	/* ═══════════════ FRONT ════════════════════════════════ */
+	/* ══════════════════════ FRONT ══════════════════════════ */
 	.card-front {
-		background: var(--gradient-accent);
-		color: var(--accent-text-over);
 		justify-content: space-between;
+		color: #fff;
 	}
 
-	.front-glow {
+	/* Photo background */
+	.front-bg-photo {
 		position: absolute;
 		inset: 0;
-		background: radial-gradient(ellipse at 70% 25%, rgba(197, 97, 246, 0.4) 0%, transparent 60%);
-		pointer-events: none;
+		background-image: url('/assets/about.jpg');
+		background-size: cover;
+		background-position: center 15%;
+		z-index: 0;
+	}
+
+	/* Purple gradient veil over the photo */
+	.front-bg-veil {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			125deg,
+			rgba(28, 0, 86, 0.82) 0%,
+			rgba(118, 17, 166, 0.58) 55%,
+			rgba(28, 0, 86, 0.72) 100%
+		);
+		z-index: 1;
 	}
 
 	.front-body {
+		position: relative;
+		z-index: 2;
 		flex: 1;
 		display: flex;
 		align-items: center;
@@ -187,7 +208,9 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 		border-radius: 50%;
 		overflow: hidden;
 		border: 3px solid rgba(255, 255, 255, 0.45);
-		box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.12);
+		box-shadow:
+			0 0 0 7px rgba(255, 255, 255, 0.12),
+			0 4px 24px rgba(0, 0, 0, 0.35);
 	}
 
 	.portrait {
@@ -209,12 +232,13 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 		font-weight: 700;
 		line-height: 1.15;
 		color: #fff;
+		text-shadow: 0 1px 8px rgba(0,0,0,0.4);
 	}
 
 	.card-title {
 		font-size: var(--text-lg);
 		font-weight: 500;
-		color: rgba(255, 255, 255, 0.9);
+		color: rgba(255, 255, 255, 0.92);
 	}
 
 	.card-company {
@@ -229,26 +253,27 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 	}
 
 	.front-footer {
+		position: relative;
+		z-index: 2;
 		padding: 0.65rem 2.5rem;
-		background: rgba(0, 0, 0, 0.18);
+		background: rgba(0, 0, 0, 0.25);
 		display: flex;
 		justify-content: flex-end;
 	}
 
 	.flip-hint {
 		font-size: var(--text-sm);
-		color: rgba(255, 255, 255, 0.5);
+		color: rgba(255, 255, 255, 0.52);
 		letter-spacing: 0.02em;
 	}
 
-	/* ═══════════════ BACK ═════════════════════════════════ */
+	/* ══════════════════════ BACK ═══════════════════════════ */
 	.card-back {
 		transform: rotateY(180deg);
 		background: var(--gray-999);
 		border: 1px solid var(--gray-800);
 		color: var(--gray-0);
-		justify-content: space-between;
-		padding: 1.75rem 2.25rem;
+		padding: 1.75rem 2rem;
 		gap: 1rem;
 	}
 
@@ -259,6 +284,7 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 		gap: 1rem;
 		padding-bottom: 1rem;
 		border-bottom: 1px solid var(--gray-800);
+		flex-shrink: 0;
 	}
 
 	.initials-badge {
@@ -280,6 +306,7 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 		display: flex;
 		flex-direction: column;
 		gap: 0.2rem;
+		min-width: 0;
 	}
 
 	.back-name {
@@ -292,15 +319,29 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 	.back-title {
 		font-size: var(--text-sm);
 		color: var(--gray-400);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
-	/* Contact grid */
+	/* Main area: contacts + QR panel */
+	.back-main {
+		flex: 1;
+		display: flex;
+		gap: 0;
+		min-height: 0;
+		align-items: stretch;
+	}
+
+	/* Contact list */
 	.contact-list {
 		flex: 1;
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.55rem 1.5rem;
-		align-content: center;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 0.5rem;
+		min-width: 0;
+		padding-right: 1.25rem;
 	}
 
 	.contact-item {
@@ -320,20 +361,50 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 		text-overflow: ellipsis;
 	}
 
-	.contact-item:hover {
-		color: var(--accent-regular);
-	}
+	.contact-item:hover { color: var(--accent-regular); }
 
 	.contact-item :global(svg) {
 		flex-shrink: 0;
 		color: var(--accent-regular);
 	}
 
-	/* Footer: location + QR */
-	.back-footer {
+	/* QR panel: its own column with left border */
+	.qr-panel {
+		flex-shrink: 0;
 		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		padding-left: 1.25rem;
+		border-left: 1px solid var(--gray-800);
+	}
+
+	.qr-code {
+		display: block;
+		width: 110px;
+		height: 110px;
+		border-radius: 0.6rem;
+		/* white container so QR is always scannable regardless of theme */
+		background: #fff;
+		padding: 6px;
+	}
+
+	.qr-label {
+		font-size: var(--text-sm);
+		font-weight: 600;
+		color: var(--gray-200);
+	}
+
+	.qr-url {
+		font-size: 0.75rem;
+		color: var(--gray-500);
+		letter-spacing: 0.01em;
+	}
+
+	/* Footer */
+	.back-footer {
+		flex-shrink: 0;
 		padding-top: 0.75rem;
 		border-top: 1px solid var(--gray-800);
 	}
@@ -343,73 +414,26 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${e
 		color: var(--gray-400);
 	}
 
-	.qr-wrapper {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.3rem;
-	}
-
-	.qr-code {
-		display: block;
-		width: 80px;
-		height: 80px;
-		border-radius: 0.5rem;
-		background: #fff;
-		padding: 4px;
-	}
-
-	.qr-label {
-		font-size: var(--text-sm);
-		color: var(--gray-500);
-		letter-spacing: 0.02em;
-	}
-
 	/* ── Mobile ─────────────────────────────────────────── */
 	@media (max-width: 36em) {
-		.card-scene {
-			height: 380px;
-		}
+		.card-scene { height: 360px; }
 
-		.front-body {
-			padding: 1.75rem 1.75rem;
-			gap: 1.25rem;
-		}
+		.front-body { padding: 1.5rem 1.5rem; gap: 1.25rem; }
 
-		.portrait-wrapper {
-			width: 90px;
-			height: 90px;
-		}
+		.portrait-wrapper { width: 88px; height: 88px; }
 
-		.card-name {
-			font-size: var(--text-xl);
-		}
+		.card-name  { font-size: var(--text-xl); }
+		.card-title { font-size: var(--text-base); }
+		.card-company, .card-location { font-size: var(--text-sm); }
 
-		.card-title {
-			font-size: var(--text-base);
-		}
+		.front-footer { padding: 0.6rem 1.5rem; }
 
-		.card-company,
-		.card-location {
-			font-size: var(--text-sm);
-		}
+		.card-back { padding: 1.25rem 1.25rem; }
 
-		.card-back {
-			padding: 1.25rem 1.5rem;
-		}
+		.contact-item { font-size: var(--text-sm); }
 
-		.contact-list {
-			grid-template-columns: 1fr;
-			gap: 0.45rem;
-		}
-
-		.contact-item {
-			font-size: var(--text-sm);
-		}
-
-		.qr-code {
-			width: 64px;
-			height: 64px;
-		}
+		.qr-code { width: 84px; height: 84px; }
+		.qr-label { font-size: 0.7rem; }
+		.qr-url   { font-size: 0.65rem; }
 	}
 </style>
