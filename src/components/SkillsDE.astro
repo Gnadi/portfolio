@@ -4,19 +4,19 @@ import Icon from './Icon.astro';
 
 <section class="box skills">
 	<div class="stack gap-2 lg:gap-4">
-		<Icon icon="terminal-window" color="var(--accent-regular)" size="2.5rem" gradient />
-		<h2>Full Stack</h2>
-		<p>Ich entwickle moderne, robuste und qualitativ hochwertige Produkte für private und geschäftliche Kunden.</p>
+		<Icon icon="bank" color="var(--accent-regular)" size="2.5rem" gradient />
+		<h3>Corporate Payment Systems</h3>
+		<p>Backend-Services für Zahlungsflüsse, SEPA-Transaktionen und Ledger-Konsistenz in regulierten, transaktionsintensiven Systemen.</p>
 	</div>
 	<div class="stack gap-2 lg:gap-4">
-		<Icon icon="rocket-launch" color="var(--accent-regular)" size="2.5rem" gradient />
-		<h2>Next Step</h2>
-		<p>Ich bin immer an neuen Technologien und Projekten interessiert.</p>
+		<Icon icon="terminal-window" color="var(--accent-regular)" size="2.5rem" gradient />
+		<h3>Private Banking Systems</h3>
+		<p>End-to-End-Anwendungen, Frontend und Backend, für kundennahe Bankdienste.</p>
 	</div>
 	<div class="stack gap-2 lg:gap-4">
 		<Icon icon="strategy" color="var(--accent-regular)" size="2.5rem" gradient />
-		<h2>Verstehen</h2>
-		<p>Ich versuche, die Projekte, an denen ich arbeite, zu 100 % sowohl im Frontend als auch im Backend zu verstehen.</p>
+		<h3>Engineering Thinking</h3>
+		<p>Services entwerfen, die sich unter Last, Fehlern und Retries vorhersagbar verhalten. Korrektheit und Betriebsstabilität vor Features.</p>
 	</div>
 </section>
 
@@ -35,7 +35,7 @@ import Icon from './Icon.astro';
 		gap: 3rem;
 	}
 
-	.skills h2 {
+	.skills h3 {
 		font-size: var(--text-lg);
 	}
 
@@ -55,7 +55,7 @@ import Icon from './Icon.astro';
 			gap: 5rem;
 		}
 
-		.skills h2 {
+		.skills h3 {
 			font-size: var(--text-2xl);
 		}
 	}

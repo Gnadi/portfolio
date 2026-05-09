@@ -10,7 +10,7 @@ const textLinks: { label: string; href: string }[] =
 	getLangFromUrl(Astro.url) == "de"
 		? [
 				{ label: "Home", href: "/de/" },
-				{ label: "Skills", href: "/de/work" },
+				{ label: "Projekte", href: "/de/work" },
 				{ label: "Karriere", href: "/de/career" },
 				{ label: "About", href: "/de/about" },
 				{ label: "Lebenslauf", href: "https://cv.gnadlinger.me/" },
@@ -18,7 +18,7 @@ const textLinks: { label: string; href: string }[] =
 			]
 		: [
 				{ label: "Home", href: "/" },
-				{ label: "Skills", href: "/work/" },
+				{ label: "Projects", href: "/work/" },
 				{ label: "Career", href: "/career/" },
 				{ label: "About", href: "/about/" },
 				{ label: "CV", href: "https://cv.gnadlinger.me/" },
@@ -125,16 +125,9 @@ const iconLinks: {
 										Astro.url.pathname === href ||
 										(href !== "/" &&
 											href !== "/de/" &&
-											(Astro.url.pathname.startsWith(
+											Astro.url.pathname.startsWith(
 												href,
-											) ||
-												(label === "Skills" &&
-													(Astro.url.pathname.startsWith(
-														href,
-													) ||
-														Astro.url.pathname.startsWith(
-															"/work/de",
-														))))),
+											)),
 								},
 							]}
 							href={href}

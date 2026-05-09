@@ -21,7 +21,6 @@ import ContactPreview from "../components/ContactPreview.astro";
 import {getLangFromUrl} from "../i18n/utils";
 import {defaultLang} from "../i18n/ui";
 
-// Content Fetching: List four most recent work projects
 const lang = getLangFromUrl(Astro.url);
 const projects = (await getCollection('work')).map((entry: any) => {
 	const [lang, ...slug] = entry.slug.split('/');
@@ -30,15 +29,6 @@ const projects = (await getCollection('work')).map((entry: any) => {
 	.sort((a: any, b: any) => b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf())
 	.slice(0, 4);
 const contacts = (await getCollection('contact')).slice(0,4);
-
-// Compute years of experience since 2018 (e.g. 2018 -> current year)
-const experienceYears = new Date().getFullYear() - 2018;
-
-// Full Astro Component Syntax:
-// https://docs.astro.build/core-concepts/astro-components/
-
-//"Angular","TypeScript","Java","Quarkus","Open Liberty","Splunk","Dynatrace","Openshift","XL Release","Microsoft SQL Server","Mongo DB","React/Next.js",
-//	"Tennis ;)",
 ---
 
 <BaseLayout>
@@ -47,14 +37,14 @@ const experienceYears = new Date().getFullYear() - 2018;
 			<header class="hero">
 				<Hero
 					title="Hello, my name is Johannes Gnadlinger"
-					tagline="I am a Fullstack Developer who is currently based in Linz, Austria. 🇦🇹 🇪🇺"
+					tagline="Backend Engineer specializing in corporate payment systems and financial infrastructure. Based in Linz, Austria. 🇦🇹 🇪🇺"
 					align="start"
 				>
 					<div class="roles">
-						<a href="https://cv.gnadlinger.me/" target="_blank" aria-label="Link zu meinem CV.">
+						<a href="https://cv.gnadlinger.me/" target="_blank" aria-label="Open my CV in a new tab">
 						<Pill><Icon icon="external" size="1.33em" /> CV</Pill>
 						</a>
-						<a href="https://blog.gnadlinger.me/" target="_blank" aria-label="Link zu meinem CV.">
+						<a href="https://blog.gnadlinger.me/" target="_blank" aria-label="Open my blog in a new tab">
 							<Pill><Icon icon="external" size="1.33em" /> Blog</Pill>
 						</a>
 					</div>
@@ -69,14 +59,21 @@ const experienceYears = new Date().getFullYear() - 2018;
 				/>
 			</header>
 
-			<Skills />
+			<section class="systems-section stack gap-6 lg:gap-10">
+				<header class="section-header stack gap-2 lg:gap-4 systems-header">
+					<h2>Systems I've Worked On</h2>
+					<p>Backend systems for private and corporate banking — payment flows, transaction reliability, operational correctness.</p>
+				</header>
+				<Skills />
+				<p class="tech-line">Primary technologies: Java, Jakarta EE, REST APIs, Angular</p>
+			</section>
 		</div>
 
 		<main class="wrapper stack gap-20 lg:gap-48">
 			<section class="section with-background with-cta">
 				<header class="section-header stack gap-2 lg:gap-4">
-					<h3>Skills</h3>
-					<p>These are the technologies I've been working with as a professional software developer for {experienceYears} {experienceYears === 1 ? 'year' : 'years'}.</p>
+					<h2>Projects</h2>
+					<p>Side projects I designed, built, and ship myself.</p>
 				</header>
 
 				<div class="gallery">
@@ -101,11 +98,8 @@ const experienceYears = new Date().getFullYear() - 2018;
 
 			<section class="section with-background bg-variant">
 				<header class="section-header stack gap-2 lg:gap-4">
-					<h3>Find Me / Contact Me</h3>
-					<p>
-						I am casually active on Stackoverflow and Github for private projects.
-						Maybe starting a Twitter / X Account soon.. also available through LinkedIn.
-					</p>
+					<h2>Find Me / Contact Me</h2>
+					<p>Find me on Stack Overflow, GitHub, and LinkedIn.</p>
 				</header>
 
 				<div class="gallery">
@@ -212,7 +206,7 @@ const experienceYears = new Date().getFullYear() - 2018;
 		color: var(--gray-300);
 	}
 
-	.section-header h3 {
+	.section-header h2 {
 		font-size: var(--text-2xl);
 	}
 
@@ -232,7 +226,7 @@ const experienceYears = new Date().getFullYear() - 2018;
 			font-size: var(--text-lg);
 		}
 
-		.section-header h3 {
+		.section-header h2 {
 			font-size: var(--text-4xl);
 		}
 
@@ -269,6 +263,33 @@ const experienceYears = new Date().getFullYear() - 2018;
 		.mention-card {
 			border-radius: 1.5rem;
 			height: 9.5rem;
+		}
+	}
+
+	.systems-header {
+		justify-self: center;
+		text-align: center;
+		max-width: 50ch;
+		margin-inline: auto;
+	}
+
+	.systems-header h2 {
+		font-size: var(--text-2xl);
+	}
+
+	.tech-line {
+		text-align: center;
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+	}
+
+	@media (min-width: 50em) {
+		.systems-header h2 {
+			font-size: var(--text-4xl);
+		}
+
+		.tech-line {
+			font-size: var(--text-md);
 		}
 	}
 </style>

@@ -92,7 +92,7 @@ const careerData = [
         organization: "Developer",
         startDate: "2024-01-01",
         endDate: "Present",
-        description: "Development of the .",
+        description: "Migration from MBS to the EBICS standard for Infinity payment transactions.",
     },
     {
         type: "project",
@@ -230,7 +230,7 @@ const getTypeLabel = (type: string) => {
                                             : item.endDate}
                                     </span>
                                 </div>
-                                <h3>{item.title}</h3>
+                                <h2>{item.title}</h2>
                                 <p class="organization">{item.organization}</p>
                                 <p>{item.description}</p>
                             </div>
@@ -316,7 +316,7 @@ const getTypeLabel = (type: string) => {
         color: var(--gray-400);
     }
 
-    .card h3 {
+    .card h2 {
         font-size: var(--text-xl);
         color: var(--gray-0);
         margin-bottom: 0.25rem;
