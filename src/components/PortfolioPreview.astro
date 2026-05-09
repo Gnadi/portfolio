@@ -5,14 +5,17 @@ import Pill from './Pill.astro';
 
 interface Props {
 	project: CollectionEntry<'work'>;
+	headingLevel?: 2 | 3;
 }
 
-const { data } = Astro.props.project;
+const { project, headingLevel = 3 } = Astro.props;
+const { data } = project;
 const statusLabel = data.status === 'live' ? 'Live' : data.status === 'preview' ? 'Preview' : null;
+const HeadingTag = `h${headingLevel}` as 'h2' | 'h3';
 ---
 <a class:list={['card', { preview: data.status === 'preview' }]} href={data.url} target="_blank" rel="noreferrer">
 	<div class="header">
-		<h3 class="title">{data.title}</h3>
+		<HeadingTag class="title">{data.title}</HeadingTag>
 		<div class="meta">
 			{statusLabel && <Pill>{statusLabel}</Pill>}
 			<span class="external"><Icon icon="external" size="1.2em" /></span>
