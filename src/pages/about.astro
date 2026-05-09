@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 import ContactCTA from '../components/ContactCTA.astro';
 import Hero from '../components/Hero.astro';
+import BusinessCard from '../components/BusinessCard.astro';
 ---
 
 <BaseLayout title="About | Johannes Gnadlinger" description="About Johannes Gnadlinger">
@@ -58,6 +59,9 @@ import Hero from '../components/Hero.astro';
 					</p>
 				</div>
 			</section>
+			<div class="card-section">
+				<BusinessCard />
+			</div>
 		</main>
 
 		<ContactCTA />
@@ -118,6 +122,10 @@ import Hero from '../components/Hero.astro';
 		section {
 			display: contents;
 			font-size: var(--text-lg);
+		}
+
+		.card-section {
+			grid-column: 2 / 3;
 		}
 	}
 </style>

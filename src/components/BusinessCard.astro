@@ -1,0 +1,343 @@
+---
+import Icon from './Icon.astro';
+---
+
+<div class="card-scene" tabindex="0" aria-label="Business card for Johannes Gnadlinger – hover or tap to flip">
+	<div class="card">
+		<!-- Front -->
+		<div class="card-face card-front" aria-hidden="false">
+			<div class="front-glow"></div>
+			<div class="front-body">
+				<div class="portrait-wrapper">
+					<img
+						src="/assets/portrait.webp"
+						alt="Johannes Gnadlinger"
+						class="portrait"
+						width="120"
+						height="120"
+						loading="lazy"
+					/>
+				</div>
+				<div class="front-text">
+					<span class="card-name">Johannes Gnadlinger</span>
+					<span class="card-title">Backend Engineer</span>
+					<span class="card-company">Raiffeisen Software GmbH</span>
+					<span class="card-location">📍 Linz, Austria</span>
+				</div>
+			</div>
+			<div class="front-footer">
+				<span class="flip-hint">Hover or tap to flip ↩</span>
+			</div>
+		</div>
+
+		<!-- Back -->
+		<div class="card-face card-back" aria-hidden="true">
+			<div class="back-header">
+				<div class="initials-badge">JG</div>
+				<div class="back-name-block">
+					<span class="back-name">Johannes Gnadlinger</span>
+					<span class="back-title">Backend Engineer · Raiffeisen Software GmbH</span>
+				</div>
+			</div>
+
+			<div class="contact-list">
+				<a href="mailto:johannes.gnadlinger1997@gmail.com" class="contact-item">
+					<Icon icon="paper-plane-tilt" size="1em" />
+					<span>johannes.gnadlinger1997@gmail.com</span>
+				</a>
+				<a href="https://github.com/Gnadi" class="contact-item" target="_blank" rel="noopener noreferrer">
+					<Icon icon="github-logo" size="1em" />
+					<span>github.com/Gnadi</span>
+				</a>
+				<a href="https://at.linkedin.com/in/johannes-gnadlinger-842293271" class="contact-item" target="_blank" rel="noopener noreferrer">
+					<Icon icon="linkedin-logo" size="1em" />
+					<span>LinkedIn</span>
+				</a>
+				<a href="https://stackoverflow.com/users/6504152/johannes-gnadlinger" class="contact-item" target="_blank" rel="noopener noreferrer">
+					<Icon icon="stackoverflow-logo" size="1em" />
+					<span>Stack Overflow</span>
+				</a>
+				<a href="https://cv.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
+					<Icon icon="external" size="1em" />
+					<span>cv.gnadlinger.me</span>
+				</a>
+				<a href="https://blog.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
+					<Icon icon="pencil-line" size="1em" />
+					<span>blog.gnadlinger.me</span>
+				</a>
+			</div>
+
+			<div class="back-footer">
+				<span class="card-location-back">📍 Linz, Austria</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.card-scene').forEach((scene) => {
+		scene.addEventListener('click', () => {
+			scene.classList.toggle('is-flipped');
+			const front = scene.querySelector<HTMLElement>('.card-front');
+			const back = scene.querySelector<HTMLElement>('.card-back');
+			const flipped = scene.classList.contains('is-flipped');
+			if (front) front.setAttribute('aria-hidden', flipped ? 'true' : 'false');
+			if (back) back.setAttribute('aria-hidden', flipped ? 'false' : 'true');
+		});
+	});
+</script>
+
+<style>
+	/* ── Scene (3D context) ─────────────────────────────── */
+	.card-scene {
+		perspective: 1200px;
+		width: min(600px, 100%);
+		height: 320px;
+		cursor: pointer;
+		outline: none;
+	}
+
+	/* ── Card (flippable container) ─────────────────────── */
+	.card {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		transform-style: preserve-3d;
+		transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+	}
+
+	@media (hover: hover) {
+		.card-scene:hover .card {
+			transform: rotateY(180deg);
+		}
+	}
+
+	.card-scene.is-flipped .card,
+	.card-scene:focus-visible .card {
+		transform: rotateY(180deg);
+	}
+
+	/* ── Shared face styles ─────────────────────────────── */
+	.card-face {
+		position: absolute;
+		inset: 0;
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+		border-radius: 1.25rem;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	/* ══════════════ FRONT ══════════════════════════════════ */
+	.card-front {
+		background: var(--gradient-accent);
+		color: var(--accent-text-over);
+		justify-content: space-between;
+	}
+
+	.front-glow {
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(ellipse at 70% 30%, rgba(197, 97, 246, 0.35) 0%, transparent 65%);
+		pointer-events: none;
+	}
+
+	.front-body {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		padding: 1.75rem 2rem;
+	}
+
+	.portrait-wrapper {
+		flex-shrink: 0;
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+		overflow: hidden;
+		border: 3px solid rgba(255, 255, 255, 0.4);
+		box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.1);
+	}
+
+	.portrait {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center top;
+	}
+
+	.front-text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.card-name {
+		font-family: var(--font-brand);
+		font-size: var(--text-xl);
+		font-weight: 700;
+		line-height: 1.2;
+		color: #fff;
+	}
+
+	.card-title {
+		font-size: var(--text-md);
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.card-company {
+		font-size: var(--text-sm);
+		color: rgba(255, 255, 255, 0.7);
+	}
+
+	.card-location {
+		margin-top: 0.5rem;
+		font-size: var(--text-sm);
+		color: rgba(255, 255, 255, 0.7);
+	}
+
+	.front-footer {
+		padding: 0.6rem 2rem;
+		background: rgba(0, 0, 0, 0.15);
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+	}
+
+	.flip-hint {
+		font-size: var(--text-sm);
+		color: rgba(255, 255, 255, 0.55);
+		letter-spacing: 0.02em;
+	}
+
+	/* ══════════════ BACK ═══════════════════════════════════ */
+	.card-back {
+		transform: rotateY(180deg);
+		background: var(--gray-999);
+		border: 1px solid var(--gray-800);
+		box-shadow: var(--shadow-md);
+		color: var(--gray-0);
+		justify-content: space-between;
+		padding: 1.5rem 1.75rem;
+		gap: 0.75rem;
+	}
+
+	.back-header {
+		display: flex;
+		align-items: center;
+		gap: 0.875rem;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid var(--gray-800);
+	}
+
+	.initials-badge {
+		flex-shrink: 0;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 50%;
+		background: var(--gradient-accent);
+		color: #fff;
+		font-family: var(--font-brand);
+		font-weight: 700;
+		font-size: var(--text-base);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.back-name-block {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+
+	.back-name {
+		font-family: var(--font-brand);
+		font-size: var(--text-base);
+		font-weight: 700;
+		color: var(--gray-0);
+	}
+
+	.back-title {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+	}
+
+	/* ── Contact list ───────────────────────────────────── */
+	.contact-list {
+		flex: 1;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.4rem 1rem;
+		align-content: center;
+	}
+
+	.contact-item {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: var(--text-sm);
+		color: var(--gray-200);
+		text-decoration: none;
+		transition: color var(--theme-transition);
+		white-space: nowrap;
+		overflow: hidden;
+	}
+
+	.contact-item span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.contact-item:hover {
+		color: var(--accent-regular);
+	}
+
+	.contact-item :global(svg) {
+		flex-shrink: 0;
+		color: var(--accent-regular);
+	}
+
+	/* ── Back footer ─────────────────────────────────────── */
+	.back-footer {
+		padding-top: 0.5rem;
+		border-top: 1px solid var(--gray-800);
+	}
+
+	.card-location-back {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+	}
+
+	/* ── Responsive (small screens) ──────────────────────── */
+	@media (max-width: 30em) {
+		.card-scene {
+			height: 280px;
+		}
+
+		.front-body {
+			padding: 1.25rem 1.25rem;
+			gap: 1rem;
+		}
+
+		.portrait-wrapper {
+			width: 76px;
+			height: 76px;
+		}
+
+		.card-name {
+			font-size: var(--text-lg);
+		}
+
+		.card-back {
+			padding: 1.1rem 1.25rem;
+		}
+
+		.contact-list {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
