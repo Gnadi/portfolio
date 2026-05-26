@@ -12,9 +12,12 @@ const projects = (await getCollection('work')).map(entry =>{
 	const [lang, ...slug] = entry.slug.split('/');
 	return { params: { lang, slug: slug.join('/') || undefined }, props: entry };
 }).filter(entry => entry.params.lang == 'de')
-	.sort(
-	(a, b) => b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf()
-);
+	.sort((a, b) => {
+		const aPreview = a.props.data.status === 'preview' ? 1 : 0;
+		const bPreview = b.props.data.status === 'preview' ? 1 : 0;
+		if (aPreview !== bPreview) return aPreview - bPreview;
+		return b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf();
+	});
 ---
 
 <BaseLayout

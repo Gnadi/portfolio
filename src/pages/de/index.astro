@@ -22,7 +22,12 @@ const projects = (await getCollection('work')).map((entry: any) =>{
 	const [lang, ...slug] = entry.slug.split('/');
 	return { params: { lang, slug: slug.join('/') || undefined }, props: entry };
 }).filter((entry: any) => entry.params.lang == 'de')
-	.sort((a: any, b: any) => b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf())
+	.sort((a: any, b: any) => {
+		const aPreview = a.props.data.status === 'preview' ? 1 : 0;
+		const bPreview = b.props.data.status === 'preview' ? 1 : 0;
+		if (aPreview !== bPreview) return aPreview - bPreview;
+		return b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf();
+	})
 	.slice(0, 4);
 const contacts = (await getCollection('contact')).slice(0,4);
 ---
