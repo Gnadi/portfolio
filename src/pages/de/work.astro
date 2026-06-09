@@ -9,7 +9,7 @@ import Hero from '../../components/Hero.astro';
 import Grid from '../../components/Grid.astro';
 
 const projects = (await getCollection('work')).map(entry =>{
-	const [lang, ...slug] = entry.slug.split('/');
+	const [lang, ...slug] = entry.id.replace(/\.md$/, '').split('/');
 	return { params: { lang, slug: slug.join('/') || undefined }, props: entry };
 }).filter(entry => entry.params.lang == 'de')
 	.sort((a, b) => {
