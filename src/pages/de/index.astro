@@ -19,7 +19,7 @@ import SkillsDE from '../../components/SkillsDE.astro';
 import ContactPreview from "../../components/ContactPreview.astro";
 
 const projects = (await getCollection('work')).map((entry: any) =>{
-	const [lang, ...slug] = entry.slug.split('/');
+	const [lang, ...slug] = entry.id.replace(/\.md$/, '').split('/');
 	return { params: { lang, slug: slug.join('/') || undefined }, props: entry };
 }).filter((entry: any) => entry.params.lang == 'de')
 	.sort((a: any, b: any) => {

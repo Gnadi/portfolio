@@ -23,7 +23,7 @@ import {defaultLang} from "../i18n/ui";
 
 const lang = getLangFromUrl(Astro.url);
 const projects = (await getCollection('work')).map((entry: any) => {
-	const [lang, ...slug] = entry.slug.split('/');
+	const [lang, ...slug] = entry.id.replace(/\.md$/, '').split('/');
 	return { params: { lang, slug: slug.join('/') || undefined }, props: entry };
 }).filter((entry: any) => lang == defaultLang ? entry.params.lang != 'de' : entry.params.lang == lang)
 	.sort((a: any, b: any) => {
