@@ -4,19 +4,93 @@ import '../styles/global.css';
 interface Props {
 	title?: string | undefined;
 	description?: string | undefined;
+	/** Whether this page has both an English and a German counterpart. */
+	alternates?: boolean;
 }
 
 const {
 	title = 'Johannes Gnadlinger: Personal Site',
 	description = 'The personal site of Johannes Gnadlinger',
+	alternates = true,
 } = Astro.props;
+
+// Resolve the canonical site origin from astro.config (`site`), with a fallback.
+const site = Astro.site ?? new URL('https://www.gnadlinger.me/');
+
+// Per-page canonical URL — reflects the actual page, not the homepage.
+const pathname = Astro.url.pathname;
+const canonical = new URL(pathname, site).href;
+
+// Language alternates (hreflang). Derive the language-neutral base path,
+// then build the English and German URLs from it.
+const isDe = pathname === '/de' || pathname.startsWith('/de/');
+const basePath = isDe ? pathname.replace(/^\/de/, '') || '/' : pathname;
+const enHref = new URL(basePath, site).href;
+const deHref = new URL(basePath === '/' ? '/de/' : `/de${basePath}`, site).href;
+
+const ogLocale = isDe ? 'de_DE' : 'en_US';
+const ogImage = new URL('/assets/about.jpg', site).href;
+
+// Person entity — helps search engines connect this site to "Johannes Gnadlinger".
+const personSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Person',
+	name: 'Johannes Gnadlinger',
+	givenName: 'Johannes',
+	familyName: 'Gnadlinger',
+	url: new URL('/', site).href,
+	image: new URL('/assets/portrait.webp', site).href,
+	jobTitle: 'Backend Engineer',
+	worksFor: {
+		'@type': 'Organization',
+		name: 'Raiffeisen Software GmbH',
+	},
+	address: {
+		'@type': 'PostalAddress',
+		addressLocality: 'Linz',
+		addressCountry: 'AT',
+	},
+	sameAs: [
+		'https://github.com/Gnadi',
+		'https://at.linkedin.com/in/johannes-gnadlinger-842293271',
+		'https://stackoverflow.com/users/6504152/johannes-gnadlinger',
+	],
+};
 ---
 
 <meta charset="UTF-8" />
-<meta name="description" property="og:description" content={description} />
 <meta name="viewport" content="width=device-width" />
 <meta name="generator" content={Astro.generator} />
 <title>{title}</title>
+<meta name="description" content={description} />
+
+<link rel="canonical" href={canonical} />
+{
+	alternates && (
+		<>
+			<link rel="alternate" hreflang="en" href={enHref} />
+			<link rel="alternate" hreflang="de" href={deHref} />
+			<link rel="alternate" hreflang="x-default" href={enHref} />
+		</>
+	)
+}
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Johannes Gnadlinger" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={ogLocale} />
+<meta property="og:image" content={ogImage} />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
 
 <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
 <link
