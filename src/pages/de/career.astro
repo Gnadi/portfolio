@@ -131,6 +131,15 @@ const careerData = [
         description: "Migration der Bankverbindungen aus Bulgarien auf Euro",
     },
     {
+        type: "certification",
+        title: "Ingenieur Zertifizierung",
+        organization: "WKO Oberösterreich",
+        startDate: "2026-01-01",
+        endDate: "2026-01-01",
+        description:
+            "Erfolgreicher Abschluss der Ingenieur-Zertifizierung.",
+    },
+    {
         type: "hackathon",
         title: "Raiffeisen Arena Hackathon",
         organization: "Developer",
@@ -174,6 +183,8 @@ const getIcon = (type: string) => {
             return "pencil-line";
         case "hackathon":
             return "trophy";
+        case "certification":
+            return "medal";
         default:
             return "star";
     }
@@ -189,6 +200,8 @@ const getTypeLabel = (type: string) => {
             return "Nebenprojekt";
         case "hackathon":
             return "Hackathon";
+        case "certification":
+            return "Zertifizierung";
         default:
             return "Eintrag";
     }

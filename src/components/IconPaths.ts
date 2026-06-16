@@ -32,4 +32,5 @@ export const iconPaths = {
 	'linkedin-logo': `<rect width="184" height="184" x="36" y="36" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" rx="8"/><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M120 112v64m-32-64v64m32-36a28 28 0 0 1 56 0v36"/><circle stroke="none" cx="88" cy="80" r="12"/>`,
 	briefcase: `<rect x="32" y="72" width="192" height="144" rx="16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><path d="M80,72V48a16,16,0,0,1,16-16h64a16,16,0,0,1,16,16V72" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>`,
 	bank: `<path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M28.16 72 128 16l99.84 56ZM56 96v88M104 96v88M152 96v88M200 96v88M32 216h192M40 184h176"/>`,
+	medal: `<circle cx="128" cy="168" r="56" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M88 132 56 24l72 32 72-32-32 108"/>`,
 };
