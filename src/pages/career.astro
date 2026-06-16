@@ -130,6 +130,15 @@ const careerData = [
         description: "Migration of bank accounts from Bulgaria to Euro.",
     },
     {
+        type: "certification",
+        title: "Engineer Certification",
+        organization: "WKO Upper Austria",
+        startDate: "2026-01-01",
+        endDate: "2026-01-01",
+        description:
+            "Successfully completed the Engineer Certification.",
+    },
+    {
         type: "hackathon",
         title: "Raiffeisen Arena Hackathon",
         organization: "Developer",
@@ -173,6 +182,8 @@ const getIcon = (type: string) => {
             return "pencil-line";
         case "hackathon":
             return "trophy";
+        case "certification":
+            return "medal";
         default:
             return "star";
     }
@@ -188,6 +199,8 @@ const getTypeLabel = (type: string) => {
             return "Side Project";
         case "hackathon":
             return "Hackathon";
+        case "certification":
+            return "Certification";
         default:
             return "Entry";
     }
