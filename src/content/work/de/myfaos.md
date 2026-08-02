@@ -23,30 +23,30 @@ stack:
   - Cloudinary
   - Vitest
 screenshots:
-  - src: /assets/projects/myfaos/dashboard.webp
-    alt: myFAOS-Dashboard mit heutigen Terminen, fälligen Aufgaben, Geburtstagen und Aufgabenverteilung
+  - src: /assets/projects/myfaos/de/dashboard.webp
+    alt: myFAOS-Dashboard mit den heutigen Terminen und Schnellzugriff-Kacheln
     orientation: portrait
     caption: Das Dashboard beantwortet eine Frage — wie sieht heute aus?
-  - src: /assets/projects/myfaos/calendar.webp
-    alt: Gemeinsamer Familienkalender mit farblich zugeordneten Terminen
+  - src: /assets/projects/myfaos/de/calendar.webp
+    alt: Gemeinsame Wochenansicht mit Filtern pro Familienmitglied und zwei Terminen
     orientation: portrait
-    caption: Ein gemeinsamer Kalender, farblich nach Familienmitglied.
-  - src: /assets/projects/myfaos/tasks.webp
-    alt: Haushaltsaufgaben mit Prioritäten und Zuständigkeiten
+    caption: Ein gemeinsamer Kalender, filterbar nach Familienmitglied.
+  - src: /assets/projects/myfaos/de/tasks.webp
+    alt: Aufgaben-Board mit Familien-Effizienzwert sowie Backlog- und Geplant-Spalte
     orientation: portrait
     caption: Aufgaben mit Zuständigkeit und Priorität — samt Verteilung, damit sichtbar bleibt, wer gerade mehr trägt.
-  - src: /assets/projects/myfaos/meals.webp
-    alt: Wochenplan mit Frühstück, Mittag- und Abendessen pro Tag sowie Rezept-Tab
+  - src: /assets/projects/myfaos/de/shopping.webp
+    alt: Gemeinsame Einkaufsliste mit offenen Posten und zuletzt verwendeten Artikeln
     orientation: portrait
-    caption: Der Wochenplan fürs Essen, mit gespeicherten Lieblingsrezepten und Koch-Rotation.
-  - src: /assets/projects/myfaos/shopping.webp
-    alt: Gemeinsame Einkaufsliste nach Kategorien gruppiert
+    caption: Eine gemeinsame Einkaufsliste — zuletzt Verwendetes ist einen Tipp entfernt.
+  - src: /assets/projects/myfaos/de/gifts.webp
+    alt: Geschenkeplaner mit Budget-Fortschritt und Geschenkideen pro Kind
     orientation: portrait
-    caption: Eine gemeinsame Einkaufsliste, die sich aus dem Wochenplan füllt.
-  - src: /assets/projects/myfaos/health.webp
-    alt: Impfpass pro Kind mit erledigten, fälligen und geplanten Einträgen
+    caption: Der Geschenkeplaner verfolgt Ideen, Status und was vom Budget übrig ist.
+  - src: /assets/projects/myfaos/de/health.webp
+    alt: Impfpass eines Kindes mit anstehender Tetanus-Auffrischung
     orientation: portrait
-    caption: Eine Gesundheitsakte pro Kind — was erledigt ist, was als Nächstes ansteht, plus PDF-Export.
+    caption: Eine Gesundheitsakte pro Kind — was als Nächstes ansteht, plus PDF-Export.
 ---
 
 Einen Haushalt mit kleinen Kindern zu organisieren ist ein Logistikproblem, auf das

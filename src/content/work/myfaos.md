@@ -23,30 +23,30 @@ stack:
   - Cloudinary
   - Vitest
 screenshots:
-  - src: /assets/projects/myfaos/dashboard.webp
-    alt: myFAOS dashboard showing today's appointments, due tasks, upcoming birthdays and workload split
+  - src: /assets/projects/myfaos/en/dashboard.webp
+    alt: myFAOS dashboard showing today's appointments and quick access tiles
     orientation: portrait
     caption: The dashboard answers one question — what does today look like?
-  - src: /assets/projects/myfaos/calendar.webp
-    alt: Shared family calendar with colour-coded events per family member
+  - src: /assets/projects/myfaos/en/calendar.webp
+    alt: Shared week calendar with per-member filters and two events
     orientation: portrait
-    caption: One shared calendar, colour-coded per family member.
-  - src: /assets/projects/myfaos/tasks.webp
-    alt: Household task list with priorities and assignees
+    caption: One shared calendar, filterable per family member.
+  - src: /assets/projects/myfaos/en/tasks.webp
+    alt: Task board with a family efficiency score and backlog and planned columns
     orientation: portrait
-    caption: Household tasks, assigned and prioritised — with a workload split so it stays visible who is carrying what.
-  - src: /assets/projects/myfaos/meals.webp
-    alt: Weekly meal plan with breakfast, lunch and dinner per day plus a recipe tab
+    caption: Household tasks, assigned and prioritised — with a split so it stays visible who is carrying what.
+  - src: /assets/projects/myfaos/en/shopping.webp
+    alt: Shared shopping list with items to buy and a recently used grid
     orientation: portrait
-    caption: The weekly meal plan, with saved favourites and a cooking rotation.
-  - src: /assets/projects/myfaos/shopping.webp
-    alt: Shared shopping list grouped by category
+    caption: A shared shopping list, with recently used items one tap away.
+  - src: /assets/projects/myfaos/en/gifts.webp
+    alt: Gift planner showing budget progress and gift ideas per child
     orientation: portrait
-    caption: A shared shopping list that fills itself from the meal plan.
-  - src: /assets/projects/myfaos/health.webp
-    alt: Vaccination record per child with completed, due and planned entries
+    caption: The gift planner tracks ideas, status and what is left of the budget.
+  - src: /assets/projects/myfaos/en/health.webp
+    alt: Vaccination record for a child showing an upcoming tetanus booster
     orientation: portrait
-    caption: A vaccination record per child, with what is done, what is due next, and a PDF export.
+    caption: A vaccination record per child, with what is due next and a PDF export.
 ---
 
 Running a household with small children is a logistics problem nobody trained you for.
