@@ -1,0 +1,320 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+
+import ContactCTA from './ContactCTA.astro';
+import Icon from './Icon.astro';
+import Pill from './Pill.astro';
+import ProjectGallery from './ProjectGallery.astro';
+import { project as copy, type SiteLang } from '../i18n/ui';
+
+interface Props {
+	entry: CollectionEntry<'work'>;
+	lang: SiteLang;
+}
+
+const { entry, lang } = Astro.props;
+const { data } = entry;
+const t = copy[lang];
+
+const backHref = lang === 'de' ? '/de/work' : '/work/';
+const statusLabel = data.status === 'live' ? t.live : data.status === 'preview' ? t.preview : null;
+const started = data.publishDate.toLocaleDateString(lang === 'de' ? 'de-AT' : 'en-GB', {
+	month: 'long',
+	year: 'numeric',
+});
+
+const { Content } = await render(entry);
+---
+
+<div class="stack gap-20">
+	<div class="stack gap-15">
+		<header class="wrapper stack gap-8">
+			<a class="back" href={backHref}>
+				<Icon icon="arrow-left" size="1em" />
+				{t.back}
+			</a>
+
+			<div class="hero stack gap-4">
+				<div class="stack gap-2">
+					<div class="meta">
+						{statusLabel && <Pill>{statusLabel}</Pill>}
+						<span class="started">{t.published} {started}</span>
+					</div>
+					<h1 class="title">{data.title}</h1>
+					<p class="tagline">{data.tagline ?? data.description}</p>
+				</div>
+
+				<div class="actions">
+					<a class="action primary" href={data.url} target="_blank" rel="noreferrer">
+						{t.visit}
+						<Icon icon="external" size="1.1em" />
+					</a>
+					{
+						data.repo && (
+							<a class="action" href={data.repo} target="_blank" rel="noreferrer">
+								<Icon icon="github-logo" size="1.1em" />
+								{t.source}
+							</a>
+						)
+					}
+				</div>
+
+				<ul class="tags">
+					{data.tags.map((tag) => <li class="tag">{tag}</li>)}
+				</ul>
+			</div>
+		</header>
+
+		{
+			data.screenshots.length > 0 && (
+				<section class="wrapper stack gap-8">
+					<h2 class="section-title">{t.screenshots}</h2>
+					<ProjectGallery shots={data.screenshots} closeLabel={t.close} />
+				</section>
+			)
+		}
+
+		<section class="wrapper body">
+			<article class="prose">
+				<Content />
+			</article>
+
+			{
+				data.stack.length > 0 && (
+					<aside class="stack-panel">
+						<h2 class="panel-title">{t.stack}</h2>
+						<ul class="stack-list">
+							{data.stack.map((item) => (
+								<li>{item}</li>
+							))}
+						</ul>
+					</aside>
+				)
+			}
+		</section>
+	</div>
+
+	<ContactCTA />
+</div>
+
+<style>
+	.back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		width: fit-content;
+		font-family: var(--font-brand);
+		font-size: var(--text-sm);
+		color: var(--gray-300);
+		text-decoration: none;
+	}
+
+	.back:hover,
+	.back:focus-visible {
+		color: var(--link-color);
+		text-decoration: underline;
+	}
+
+	.meta {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+
+	.started {
+		font-family: var(--font-brand);
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+	}
+
+	.title {
+		font-size: var(--text-3xl);
+		color: var(--gray-0);
+	}
+
+	.tagline {
+		max-width: 55ch;
+		font-size: var(--text-lg);
+		color: var(--gray-300);
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+
+	.action {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.6em 1.5em;
+		border-radius: 999rem;
+		border: 1px solid var(--gray-800);
+		background: var(--gray-999_40);
+		color: var(--gray-100);
+		font-family: var(--font-brand);
+		font-size: var(--text-base);
+		text-decoration: none;
+		white-space: nowrap;
+		transition: box-shadow var(--theme-transition);
+	}
+
+	.action:hover,
+	.action:focus-visible {
+		box-shadow: var(--shadow-sm);
+	}
+
+	.action.primary {
+		border-color: transparent;
+		background: var(--gradient-accent-orange);
+		color: var(--accent-text-over);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.action.primary:hover,
+	.action.primary:focus-visible {
+		box-shadow: var(--shadow-md);
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		list-style: none;
+		padding: 0;
+	}
+
+	.tag {
+		padding: 0.3rem 0.8rem;
+		border: 1px solid var(--gray-800);
+		border-radius: 999rem;
+		font-size: var(--text-sm);
+		color: var(--gray-300);
+	}
+
+	.section-title,
+	.panel-title {
+		font-size: var(--text-xl);
+		color: var(--gray-0);
+	}
+
+	.body {
+		display: grid;
+		gap: 3rem;
+	}
+
+	.stack-panel {
+		align-self: start;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: 1.5rem;
+		border: 1px solid var(--gray-800);
+		border-radius: 0.75rem;
+		background: var(--gray-999_40);
+	}
+
+	.stack-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		list-style: none;
+		padding: 0;
+	}
+
+	.stack-list li {
+		padding: 0.3rem 0.8rem;
+		border-radius: 999rem;
+		background: var(--accent-subtle-overlay);
+		color: var(--gray-100);
+		font-size: var(--text-sm);
+	}
+
+	/* Markdown body */
+	.prose {
+		max-width: 70ch;
+		color: var(--gray-200);
+		font-size: var(--text-base);
+		line-height: 1.7;
+	}
+
+	.prose :global(h2) {
+		margin-block: 2.5rem 1rem;
+		font-size: var(--text-xl);
+		color: var(--gray-0);
+	}
+
+	.prose :global(h3) {
+		margin-block: 2rem 0.75rem;
+		font-size: var(--text-lg);
+		color: var(--gray-100);
+	}
+
+	.prose :global(:first-child) {
+		margin-block-start: 0;
+	}
+
+	.prose :global(p),
+	.prose :global(ul),
+	.prose :global(ol) {
+		margin-block: 1rem;
+	}
+
+	.prose :global(ul),
+	.prose :global(ol) {
+		padding-inline-start: 1.25rem;
+	}
+
+	.prose :global(li) {
+		margin-block: 0.4rem;
+	}
+
+	.prose :global(li::marker) {
+		color: var(--accent-regular);
+	}
+
+	.prose :global(strong) {
+		color: var(--gray-100);
+	}
+
+	.prose :global(code) {
+		padding: 0.1em 0.35em;
+		border-radius: 0.25rem;
+		background: var(--accent-subtle-overlay);
+		font-size: 0.9em;
+	}
+
+	.prose :global(blockquote) {
+		margin-block: 1.5rem;
+		padding-inline-start: 1rem;
+		border-inline-start: 3px solid var(--accent-regular);
+		color: var(--gray-300);
+		font-style: italic;
+	}
+
+	@media (min-width: 50em) {
+		.title {
+			font-size: var(--text-5xl);
+		}
+
+		.tagline {
+			font-size: var(--text-xl);
+		}
+
+		.section-title,
+		.panel-title {
+			font-size: var(--text-2xl);
+		}
+
+		.body {
+			grid-template-columns: minmax(0, 1fr) 20rem;
+			gap: 4rem;
+		}
+
+		.prose {
+			font-size: var(--text-md);
+		}
+	}
+</style>
