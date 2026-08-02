@@ -23,7 +23,6 @@ export const project = {
         close: 'Close image',
         live: 'Live',
         preview: 'Preview',
-        published: 'Started',
     },
     de: {
         back: 'Alle Projekte',
@@ -34,7 +33,6 @@ export const project = {
         close: 'Bild schließen',
         live: 'Live',
         preview: 'Vorschau',
-        published: 'Gestartet',
     },
 } as const;
 
