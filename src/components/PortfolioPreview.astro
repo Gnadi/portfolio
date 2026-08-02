@@ -10,15 +10,24 @@ interface Props {
 
 const { project, headingLevel = 3 } = Astro.props;
 const { data } = project;
-const statusLabel = data.status === 'live' ? 'Live' : data.status === 'preview' ? 'Preview' : null;
+// German entries are stored under `de/` and are served from `/de/work/<slug>`.
+const id = project.id.replace(/\.md$/, '');
+const isDe = id.startsWith('de/');
+const slug = id.replace(/^de\//, '');
+const href = isDe ? `/de/work/${slug}` : `/work/${slug}/`;
+const statusLabel = data.status === 'live'
+	? 'Live'
+	: data.status === 'preview'
+		? (isDe ? 'Vorschau' : 'Preview')
+		: null;
 const HeadingTag = `h${headingLevel}` as 'h2' | 'h3';
 ---
-<a class:list={['card', { preview: data.status === 'preview' }]} href={data.url} target="_blank" rel="noreferrer">
+<a class:list={['card', { preview: data.status === 'preview' }]} href={href}>
 	<div class="header">
 		<HeadingTag class="title">{data.title}</HeadingTag>
 		<div class="meta">
 			{statusLabel && <Pill>{statusLabel}</Pill>}
-			<span class="external"><Icon icon="external" size="1.2em" /></span>
+			<span class="external"><Icon icon="arrow-right" size="1.2em" /></span>
 		</div>
 	</div>
 	<p class="description">{data.description}</p>

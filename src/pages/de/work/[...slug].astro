@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProjectDetail from '../../../components/ProjectDetail.astro';
+
+export async function getStaticPaths() {
+	const entries = await getCollection('work');
+	return entries
+		.map((entry) => ({ entry, id: entry.id.replace(/\.md$/, '') }))
+		.filter(({ id }) => id.startsWith('de/'))
+		.map(({ entry, id }) => ({
+			params: { slug: id.replace(/^de\//, '') },
+			props: { entry },
+		}));
+}
+
+const { entry } = Astro.props;
+---
+
+<BaseLayout
+	title={`${entry.data.title} | Johannes Gnadlinger`}
+	description={entry.data.description}
+>
+	<ProjectDetail entry={entry} lang="de" />
+</BaseLayout>

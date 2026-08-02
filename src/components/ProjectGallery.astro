@@ -1,0 +1,206 @@
+---
+interface Shot {
+	src: string;
+	alt: string;
+	caption?: string;
+	orientation: 'landscape' | 'portrait';
+}
+
+interface Props {
+	shots: Shot[];
+	/** Screen-reader label for the close button of the lightbox. */
+	closeLabel: string;
+}
+
+const { shots, closeLabel } = Astro.props;
+---
+
+{
+	shots.length > 0 && (
+		<div class="gallery" data-gallery>
+			{shots.map((shot, i) => (
+				<figure class:list={['shot', shot.orientation]}>
+					<button
+						type="button"
+						class="zoom"
+						data-zoom={shot.src}
+						data-zoom-alt={shot.alt}
+						aria-label={shot.alt}
+					>
+						<img
+							src={shot.src}
+							alt={shot.alt}
+							loading={i < 2 ? 'eager' : 'lazy'}
+							decoding="async"
+						/>
+					</button>
+					{shot.caption && <figcaption>{shot.caption}</figcaption>}
+				</figure>
+			))}
+
+			<dialog class="lightbox" data-lightbox>
+				<button type="button" class="close" data-close aria-label={closeLabel}>&times;</button>
+				<img data-lightbox-img src="" alt="" />
+			</dialog>
+		</div>
+	)
+}
+
+<style>
+	.gallery {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.5rem;
+	}
+
+	.shot {
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.zoom {
+		display: block;
+		padding: 0;
+		border: 1px solid var(--gray-800);
+		border-radius: 0.75rem;
+		overflow: hidden;
+		background: var(--gray-999_40);
+		box-shadow: var(--shadow-sm);
+		cursor: zoom-in;
+		transition: box-shadow var(--theme-transition), transform var(--theme-transition);
+	}
+
+	.zoom:hover,
+	.zoom:focus-visible {
+		box-shadow: var(--shadow-md);
+		transform: translateY(-2px);
+	}
+
+	.zoom img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	figcaption {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+		line-height: 1.4;
+	}
+
+	/* The dialog covers the viewport and centres the image with flexbox.
+	   Letting it shrink-wrap instead leaves it stuck in the top-left corner,
+	   because `inset: 0` from the UA stylesheet defeats `margin: auto`. */
+	.lightbox {
+		inset: 0;
+		width: 100vw;
+		max-width: 100vw;
+		height: 100vh;
+		max-height: 100vh;
+		padding: 0;
+		border: none;
+		background: transparent;
+		overflow: hidden;
+	}
+
+	.lightbox[open] {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.lightbox::backdrop {
+		/* Deliberately dark in both themes — a white scrim over a light page
+		   does not read as a modal. */
+		background: hsla(225, 31%, 5%, 0.82);
+	}
+
+	.lightbox img {
+		display: block;
+		width: auto;
+		height: auto;
+		max-width: 92vw;
+		max-height: 90vh;
+		border-radius: 0.75rem;
+	}
+
+	.close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		z-index: 1;
+		width: 2.25rem;
+		height: 2.25rem;
+		display: grid;
+		place-items: center;
+		font-size: 1.5rem;
+		line-height: 1;
+		color: var(--gray-0);
+		background: var(--gray-999);
+		border: 1px solid var(--gray-800);
+		border-radius: 999rem;
+		box-shadow: var(--shadow-sm);
+		cursor: pointer;
+	}
+
+	@media (min-width: 50em) {
+		.gallery {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 2rem;
+		}
+
+		.shot.portrait {
+			/* Phone shots would tower over the desktop ones at full column width. */
+			align-items: center;
+		}
+
+		.shot.portrait .zoom {
+			max-width: 20rem;
+		}
+
+		.shot.portrait figcaption {
+			text-align: center;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.zoom {
+			transition: none;
+		}
+
+		.zoom:hover,
+		.zoom:focus-visible {
+			transform: none;
+		}
+	}
+</style>
+
+<script>
+	document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
+		const dialog = gallery.querySelector<HTMLDialogElement>('[data-lightbox]');
+		const img = gallery.querySelector<HTMLImageElement>('[data-lightbox-img]');
+		if (!dialog || !img) return;
+
+		gallery.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((button) => {
+			button.addEventListener('click', () => {
+				img.src = button.dataset.zoom ?? '';
+				img.alt = button.dataset.zoomAlt ?? '';
+				dialog.showModal();
+			});
+		});
+
+		dialog.querySelector('[data-close]')?.addEventListener('click', () => dialog.close());
+
+		// Clicking the backdrop (i.e. outside the image) closes too.
+		dialog.addEventListener('click', (event) => {
+			if (event.target === dialog) dialog.close();
+		});
+
+		// Drop the source on close so a hidden dialog isn't holding a large image.
+		dialog.addEventListener('close', () => {
+			img.src = '';
+		});
+	});
+</script>
