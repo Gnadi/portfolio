@@ -237,17 +237,18 @@ const getTypeLabel = (type: string) => {
                 align="start"
             />
 
-            <div class="filters" role="group" aria-label="Nach Typ filtern">
-                <button type="button" class="filter-btn active" data-filter="all" aria-pressed="true">
-                    Alle
-                </button>
-                {
-                    presentTypes.map((type) => (
-                        <button type="button" class="filter-btn" data-filter={type} aria-pressed="false">
-                            {getTypeLabel(type)}
-                        </button>
-                    ))
-                }
+            <div class="filters">
+                <label for="career-filter" class="filter-label">Nach Typ filtern</label>
+                <div class="select-wrapper">
+                    <select id="career-filter" class="filter-select">
+                        <option value="all">Alle</option>
+                        {
+                            presentTypes.map((type) => (
+                                <option value={type}>{getTypeLabel(type)}</option>
+                            ))
+                        }
+                    </select>
+                </div>
             </div>
 
             <div class="timeline">
@@ -288,23 +289,14 @@ const getTypeLabel = (type: string) => {
 </BaseLayout>
 
 <script>
-    const buttons = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
+    const select = document.querySelector<HTMLSelectElement>(".filter-select");
     const items = document.querySelectorAll<HTMLElement>(".timeline-item");
 
-    buttons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            buttons.forEach((b) => {
-                b.classList.remove("active");
-                b.setAttribute("aria-pressed", "false");
-            });
-            btn.classList.add("active");
-            btn.setAttribute("aria-pressed", "true");
-
-            const filter = btn.dataset.filter;
-            items.forEach((item) => {
-                const show = filter === "all" || item.dataset.type === filter;
-                item.style.display = show ? "" : "none";
-            });
+    select?.addEventListener("change", () => {
+        const filter = select.value;
+        items.forEach((item) => {
+            const show = filter === "all" || item.dataset.type === filter;
+            item.style.display = show ? "" : "none";
         });
     });
 </script>
@@ -312,35 +304,52 @@ const getTypeLabel = (type: string) => {
 <style>
     .filters {
         display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
+        align-items: center;
+        gap: 0.75rem;
     }
 
-    .filter-btn {
-        font: inherit;
-        cursor: pointer;
-        padding: 0.4rem 1rem;
-        border-radius: 999rem;
-        border: 1px solid var(--gray-800);
-        background-color: transparent;
-        color: var(--gray-300);
+    .filter-label {
         font-size: var(--text-sm);
         font-weight: 600;
-        transition:
-            background-color var(--theme-transition),
-            color var(--theme-transition),
-            border-color var(--theme-transition);
+        color: var(--gray-300);
     }
 
-    .filter-btn:hover {
-        border-color: var(--accent-regular);
+    .select-wrapper {
+        position: relative;
+        display: inline-flex;
+    }
+
+    .filter-select {
+        font: inherit;
+        cursor: pointer;
+        appearance: none;
+        padding: 0.5rem 2.5rem 0.5rem 1rem;
+        border-radius: 999rem;
+        border: 1px solid var(--gray-800);
+        background-color: var(--gray-999_40);
         color: var(--gray-0);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        transition: border-color var(--theme-transition);
     }
 
-    .filter-btn.active {
-        background-color: var(--accent-regular);
+    .filter-select:hover,
+    .filter-select:focus-visible {
         border-color: var(--accent-regular);
-        color: var(--accent-text-over);
+        outline: none;
+    }
+
+    .select-wrapper::after {
+        content: "";
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        width: 0.5rem;
+        height: 0.5rem;
+        border-right: 2px solid var(--gray-300);
+        border-bottom: 2px solid var(--gray-300);
+        transform: translateY(-70%) rotate(45deg);
+        pointer-events: none;
     }
 
     .timeline {
