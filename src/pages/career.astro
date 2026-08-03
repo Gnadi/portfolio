@@ -180,6 +180,11 @@ const sortedCareer = careerData.sort(
     (a, b) => new Date(b.startDate).valueOf() - new Date(a.startDate).valueOf(),
 );
 
+const typeOrder = ["job", "project", "certification", "leave", "hackathon", "side-project"];
+const presentTypes = typeOrder.filter((type) =>
+    sortedCareer.some((item) => item.type === type),
+);
+
 const getIcon = (type: string) => {
     switch (type) {
         case "job":
@@ -231,10 +236,23 @@ const getTypeLabel = (type: string) => {
                 align="start"
             />
 
+            <div class="filters" role="group" aria-label="Filter by type">
+                <button type="button" class="filter-btn active" data-filter="all" aria-pressed="true">
+                    All
+                </button>
+                {
+                    presentTypes.map((type) => (
+                        <button type="button" class="filter-btn" data-filter={type} aria-pressed="false">
+                            {getTypeLabel(type)}
+                        </button>
+                    ))
+                }
+            </div>
+
             <div class="timeline">
                 {
                     sortedCareer.map((item) => (
-                        <div class="timeline-item">
+                        <div class="timeline-item" data-type={item.type}>
                             <div class="timeline-marker">
                                 <div class="icon-wrapper">
                                     <Icon
@@ -268,7 +286,62 @@ const getTypeLabel = (type: string) => {
     </div>
 </BaseLayout>
 
+<script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
+    const items = document.querySelectorAll<HTMLElement>(".timeline-item");
+
+    buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            buttons.forEach((b) => {
+                b.classList.remove("active");
+                b.setAttribute("aria-pressed", "false");
+            });
+            btn.classList.add("active");
+            btn.setAttribute("aria-pressed", "true");
+
+            const filter = btn.dataset.filter;
+            items.forEach((item) => {
+                const show = filter === "all" || item.dataset.type === filter;
+                item.style.display = show ? "" : "none";
+            });
+        });
+    });
+</script>
+
 <style>
+    .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .filter-btn {
+        font: inherit;
+        cursor: pointer;
+        padding: 0.4rem 1rem;
+        border-radius: 999rem;
+        border: 1px solid var(--gray-800);
+        background-color: transparent;
+        color: var(--gray-300);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        transition:
+            background-color var(--theme-transition),
+            color var(--theme-transition),
+            border-color var(--theme-transition);
+    }
+
+    .filter-btn:hover {
+        border-color: var(--accent-regular);
+        color: var(--gray-0);
+    }
+
+    .filter-btn.active {
+        background-color: var(--accent-regular);
+        border-color: var(--accent-regular);
+        color: var(--accent-text-over);
+    }
+
     .timeline {
         position: relative;
         display: flex;
