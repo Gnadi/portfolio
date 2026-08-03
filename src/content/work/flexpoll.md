@@ -23,22 +23,22 @@ stack:
   - Leaflet
   - Vercel
 screenshots:
-  - src: /assets/projects/flexpoll/landing.webp
+  - src: ../../assets/projects/flexpoll/landing.webp
     alt: FlexPoll landing page with the headline "Every kind of poll. Completely free."
     caption: The landing page. No account is needed to browse or vote.
-  - src: /assets/projects/flexpoll/dashboard.webp
+  - src: ../../assets/projects/flexpoll/dashboard.webp
     alt: FlexPoll dashboard listing polls of several types with live vote counts
     caption: The dashboard, with your own polls, community polls and recent results.
-  - src: /assets/projects/flexpoll/create-types.webp
+  - src: ../../assets/projects/flexpoll/create-types.webp
     alt: Poll type picker showing standard, ranking, schedule, location, custom, priority and image polls
     caption: Picking a format is the first step of creating a poll — the rest of the flow adapts to it.
-  - src: /assets/projects/flexpoll/vote-standard.webp
+  - src: ../../assets/projects/flexpoll/vote-standard.webp
     alt: Voting screen for a standard multiple-choice poll
     caption: A standard poll. Voting works without signing in.
-  - src: /assets/projects/flexpoll/vote-schedule.webp
+  - src: ../../assets/projects/flexpoll/vote-schedule.webp
     alt: Schedule poll showing candidate dates with morning and afternoon slots
     caption: Schedule polls collect availability per slot and surface the widest overlap.
-  - src: /assets/projects/flexpoll/results-priority.webp
+  - src: ../../assets/projects/flexpoll/results-priority.webp
     alt: Priority poll results with a ranked bar chart, insight panel and QR code
     caption: Results update live, and every poll gets a share link and QR code.
 ---

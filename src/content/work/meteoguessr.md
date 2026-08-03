@@ -18,19 +18,19 @@ stack:
   - OpenStreetMap Nominatim
   - Vitest
 screenshots:
-  - src: /assets/projects/meteoguessr/globe.webp
+  - src: ../../assets/projects/meteoguessr/globe.webp
     alt: Interactive 3D globe next to a weather panel showing London's conditions and 5-day forecast
     caption: The globe, with current conditions and a five-day forecast for the selected city.
-  - src: /assets/projects/meteoguessr/overlays.webp
+  - src: ../../assets/projects/meteoguessr/overlays.webp
     alt: Globe with a temperature overlay painted across continents and a colour legend
     caption: Weather overlays paint temperature, rain or wind across the whole globe, built from a 288-point sampling grid.
-  - src: /assets/projects/meteoguessr/layers.webp
+  - src: ../../assets/projects/meteoguessr/layers.webp
     alt: Globe layer view showing country borders and city markers
     caption: The layer toggle cycles between plain, borders, capitals and cities.
-  - src: /assets/projects/meteoguessr/game-difficulty.webp
+  - src: ../../assets/projects/meteoguessr/game-difficulty.webp
     alt: Weather IQ difficulty selection with easy, moderate, hard and extreme cards
     caption: Four difficulty levels, from guessing the country with every hint to guessing the city with almost none.
-  - src: /assets/projects/meteoguessr/game-round.webp
+  - src: ../../assets/projects/meteoguessr/game-round.webp
     alt: A guessing round showing mystery weather data and an input asking which country it is
     caption: A round in progress. The weather data is the only clue you get.
 ---

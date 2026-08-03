@@ -22,28 +22,29 @@ stack:
   - lucide-react
   - Cloudinary
   - Vitest
+ogImage: ../../assets/projects/myfaos/en/og.webp
 screenshots:
-  - src: /assets/projects/myfaos/en/dashboard.webp
+  - src: ../../assets/projects/myfaos/en/dashboard.webp
     alt: myFAOS dashboard showing today's appointments and quick access tiles
     orientation: portrait
     caption: The dashboard answers one question — what does today look like?
-  - src: /assets/projects/myfaos/en/calendar.webp
+  - src: ../../assets/projects/myfaos/en/calendar.webp
     alt: Shared week calendar with per-member filters and two events
     orientation: portrait
     caption: One shared calendar, filterable per family member.
-  - src: /assets/projects/myfaos/en/tasks.webp
+  - src: ../../assets/projects/myfaos/en/tasks.webp
     alt: Task board with a family efficiency score and backlog and planned columns
     orientation: portrait
     caption: Household tasks, assigned and prioritised — with a split so it stays visible who is carrying what.
-  - src: /assets/projects/myfaos/en/shopping.webp
+  - src: ../../assets/projects/myfaos/en/shopping.webp
     alt: Shared shopping list with items to buy and a recently used grid
     orientation: portrait
     caption: A shared shopping list, with recently used items one tap away.
-  - src: /assets/projects/myfaos/en/gifts.webp
+  - src: ../../assets/projects/myfaos/en/gifts.webp
     alt: Gift planner showing budget progress and gift ideas per child
     orientation: portrait
     caption: The gift planner tracks ideas, status and what is left of the budget.
-  - src: /assets/projects/myfaos/en/health.webp
+  - src: ../../assets/projects/myfaos/en/health.webp
     alt: Vaccination record for a child showing an upcoming tetanus booster
     orientation: portrait
     caption: A vaccination record per child, with what is due next and a PDF export.

@@ -1,17 +1,21 @@
 ---
 import '../styles/global.css';
+import { isGermanPath } from '../i18n/utils';
 
 interface Props {
 	title?: string | undefined;
 	description?: string | undefined;
 	/** Whether this page has both an English and a German counterpart. */
 	alternates?: boolean;
+	/** Absolute URL of the social-card image. Defaults to the site-wide one. */
+	image?: string | undefined;
 }
 
 const {
 	title = 'Johannes Gnadlinger: Personal Site',
 	description = 'The personal site of Johannes Gnadlinger',
 	alternates = true,
+	image,
 } = Astro.props;
 
 // Resolve the canonical site origin from astro.config (`site`), with a fallback.
@@ -23,13 +27,13 @@ const canonical = new URL(pathname, site).href;
 
 // Language alternates (hreflang). Derive the language-neutral base path,
 // then build the English and German URLs from it.
-const isDe = pathname === '/de' || pathname.startsWith('/de/');
+const isDe = isGermanPath(pathname);
 const basePath = isDe ? pathname.replace(/^\/de/, '') || '/' : pathname;
 const enHref = new URL(basePath, site).href;
 const deHref = new URL(basePath === '/' ? '/de/' : `/de${basePath}`, site).href;
 
 const ogLocale = isDe ? 'de_DE' : 'en_US';
-const ogImage = new URL('/assets/about.jpg', site).href;
+const ogImage = image ?? new URL('/assets/about.jpg', site).href;
 
 // Person entity — helps search engines connect this site to "Johannes Gnadlinger".
 const personSchema = {
@@ -93,20 +97,12 @@ const personSchema = {
 <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
 
 <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-<link
-	href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap"
-	rel="stylesheet"
-	type="text/css"
-	media="print"
-	onload="this.media='all'"
-/>
-<link
-	href="https://fonts.gstatic.com"
-	rel="stylesheet"
-	type="text/css"
-	media="print"
-	onload="this.media='all'"
-/>
+
+<!-- Public Sans and Rubik are the only webfonts in use — see --font-body and
+     --font-brand in global.css. Open Sans appears in the system-font fallback
+     stack only, so it must not be fetched. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
 	href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,700;1,400&family=Rubik:wght@500;600&display=swap"
 	rel="stylesheet"
@@ -114,6 +110,12 @@ const personSchema = {
 	media="print"
 	onload="this.media='all'"
 />
+<noscript>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,700;1,400&family=Rubik:wght@500;600&display=swap"
+		rel="stylesheet"
+	/>
+</noscript>
 <script is:inline>
 	// This code is inlined in the head to make dark mode instant & blocking.
 	const getThemePreference = () => {

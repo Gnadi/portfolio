@@ -5,7 +5,9 @@ import { glob } from 'astro/loaders';
 export const collections = {
 	work: defineCollection({
 		loader: glob({ pattern: '**/*.md', base: './src/content/work' }),
-		schema: z.object({
+		// `image()` resolves paths relative to the entry file and hands the
+		// build the real asset, so Astro can emit width/height and a srcset.
+		schema: ({ image }) => z.object({
 			title: z.string(),
 			description: z.string(),
 			publishDate: z.coerce.date(),
@@ -24,7 +26,7 @@ export const collections = {
 			screenshots: z
 				.array(
 					z.object({
-						src: z.string(),
+						src: image(),
 						alt: z.string(),
 						caption: z.string().optional(),
 						/** Phone-shaped shots get a narrower column in the gallery. */
@@ -32,6 +34,11 @@ export const collections = {
 					})
 				)
 				.default([]),
+			/**
+			 * Social-card image. Falls back to the first landscape screenshot, so
+			 * this is only needed where every shot is phone-shaped.
+			 */
+			ogImage: image().optional(),
 		})
 	}),
 	contact: defineCollection({

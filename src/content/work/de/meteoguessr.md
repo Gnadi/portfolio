@@ -18,19 +18,19 @@ stack:
   - OpenStreetMap Nominatim
   - Vitest
 screenshots:
-  - src: /assets/projects/meteoguessr/globe.webp
+  - src: ../../../assets/projects/meteoguessr/globe.webp
     alt: Interaktiver 3D-Globus neben einem Wetterpanel mit Londoner Werten und 5-Tage-Prognose
     caption: Der Globus mit aktuellen Werten und Fünf-Tage-Prognose für die gewählte Stadt.
-  - src: /assets/projects/meteoguessr/overlays.webp
+  - src: ../../../assets/projects/meteoguessr/overlays.webp
     alt: Globus mit Temperatur-Overlay über den Kontinenten und Farblegende
     caption: Wetter-Overlays legen Temperatur, Regen oder Wind über den ganzen Globus — berechnet aus einem Raster von 288 Messpunkten.
-  - src: /assets/projects/meteoguessr/layers.webp
+  - src: ../../../assets/projects/meteoguessr/layers.webp
     alt: Globusansicht mit Ländergrenzen und Städtemarkierungen
     caption: Der Layer-Umschalter wechselt zwischen schlicht, Grenzen, Hauptstädten und Städten.
-  - src: /assets/projects/meteoguessr/game-difficulty.webp
+  - src: ../../../assets/projects/meteoguessr/game-difficulty.webp
     alt: Auswahl der Schwierigkeit im Spiel — Easy, Moderate, Hard und Extreme
     caption: Vier Schwierigkeitsgrade — vom Land mit allen Hinweisen bis zur Stadt mit fast keinen.
-  - src: /assets/projects/meteoguessr/game-round.webp
+  - src: ../../../assets/projects/meteoguessr/game-round.webp
     alt: Eine Spielrunde mit unbekannten Wetterdaten und der Frage nach dem Land
     caption: Eine Runde im Spiel. Die Wetterdaten sind der einzige Hinweis.
 ---

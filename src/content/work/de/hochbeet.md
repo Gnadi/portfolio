@@ -18,22 +18,22 @@ stack:
   - Cloud Firestore
   - localStorage
 screenshots:
-  - src: /assets/projects/hochbeet/planner.webp
+  - src: ../../../assets/projects/hochbeet/planner.webp
     alt: Hochbeet-Planer mit maßstabsgetreuen Pflanzenkreisen, Pflanzenpalette links und Tipps rechts
     caption: Der Planer. Jede Pflanze wird mit ihrem echten Abstand gezeichnet — das Beet füllt sich also ehrlich.
-  - src: /assets/projects/hochbeet/conflicts.webp
+  - src: ../../../assets/projects/hochbeet/conflicts.webp
     alt: Konfliktliste mit schlechten Nachbarn wie Karotte und Dill sowie guten Kombinationen
     caption: Schlechte Nachbarn werden mit Begründung angezeigt — hier hemmt reifer Dill die Möhrenkeimung.
-  - src: /assets/projects/hochbeet/dashboard.webp
+  - src: ../../../assets/projects/hochbeet/dashboard.webp
     alt: Dashboard mit Saisonkalender und Karten für zwei Beete
     caption: Das Dashboard mit Saisonkalender und allen Beeten auf einen Blick.
-  - src: /assets/projects/hochbeet/seasons.webp
+  - src: ../../../assets/projects/hochbeet/seasons.webp
     alt: Saisonansicht mit Frühling, Sommer, Herbst und Winter samt Übergangshinweisen
     caption: Jedes Beet hält vier eigene Belegungen — dazu Hinweise, was auf was folgt.
-  - src: /assets/projects/hochbeet/plants.webp
+  - src: ../../../assets/projects/hochbeet/plants.webp
     alt: Pflanzenlexikon mit Sonne, Wasser, Ertrag und Pflegehinweisen
     caption: Das Pflanzenlexikon — Abstand, Sonne, Wasser, erwarteter Ertrag und Pflege für alle 21 Arten.
-  - src: /assets/projects/hochbeet/calendar.webp
+  - src: ../../../assets/projects/hochbeet/calendar.webp
     alt: Monatskalender mit Gartenaufgaben für den ausgewählten Tag
     caption: Ein Kalender für die Arbeiten, die ein Beet erzeugt — säen, ausgeizen, mulchen.
 ---

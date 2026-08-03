@@ -25,22 +25,22 @@ stack:
   - i18next
   - Vitest
 screenshots:
-  - src: /assets/projects/kaydo/home-desktop.webp
+  - src: ../../../assets/projects/kaydo/home-desktop.webp
     alt: Kaydo-Startseite mit Daily-Moments-Kreisen und Erinnerungskarten
     caption: Der Erinnerungs-Feed, oben die Daily Moments für die kleinen Momente des Alltags.
-  - src: /assets/projects/kaydo/scrapbook-desktop.webp
+  - src: ../../../assets/projects/kaydo/scrapbook-desktop.webp
     alt: Freie Scrapbook-Fläche mit Polaroid-Rahmen, Stickern und Text
     caption: Das Scrapbook ist eine freie Fläche — Fotos, Sticker und Text ziehen, fertige Bücher als PDF exportieren.
-  - src: /assets/projects/kaydo/recipe-tree-desktop.webp
+  - src: ../../../assets/projects/kaydo/recipe-tree-desktop.webp
     alt: Rezeptbaum mit einem Familienrezept, seinen Forks und der Versionsgeschichte
     caption: Rezepte sind versioniert und lassen sich forken — Omas Original und die Variante des Enkelkindes bleiben beide erhalten.
-  - src: /assets/projects/kaydo/journal-desktop.webp
+  - src: ../../../assets/projects/kaydo/journal-desktop.webp
     alt: Kindertagebuch mit datierten Einträgen, geschrieben zum späteren Lesen
     caption: Tagebücher und Briefe, datiert und geschrieben für das Kind von morgen.
-  - src: /assets/projects/kaydo/blackbox-desktop.webp
+  - src: ../../../assets/projects/kaydo/blackbox-desktop.webp
     alt: Der Tresor mit Originalen in voller Auflösung und zeitversiegelten Kapseln
     caption: Der Tresor bewahrt Originale in voller Auflösung und zeitversiegelte Kapseln, die erst zum gewählten Datum aufgehen.
-  - src: /assets/projects/kaydo/our-year-mobile.webp
+  - src: ../../../assets/projects/kaydo/our-year-mobile.webp
     alt: Das Ritual "Our Year" am Handy mit den Kapitelfragen für ein Paar
     orientation: portrait
     caption: Our Year ist ein Ritual zu zweit — bewusst für das Handy auf der Couch gebaut.

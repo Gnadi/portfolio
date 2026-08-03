@@ -22,28 +22,29 @@ stack:
   - lucide-react
   - Cloudinary
   - Vitest
+ogImage: ../../../assets/projects/myfaos/de/og.webp
 screenshots:
-  - src: /assets/projects/myfaos/de/dashboard.webp
+  - src: ../../../assets/projects/myfaos/de/dashboard.webp
     alt: myFAOS-Dashboard mit den heutigen Terminen und Schnellzugriff-Kacheln
     orientation: portrait
     caption: Das Dashboard beantwortet eine Frage — wie sieht heute aus?
-  - src: /assets/projects/myfaos/de/calendar.webp
+  - src: ../../../assets/projects/myfaos/de/calendar.webp
     alt: Gemeinsame Wochenansicht mit Filtern pro Familienmitglied und zwei Terminen
     orientation: portrait
     caption: Ein gemeinsamer Kalender, filterbar nach Familienmitglied.
-  - src: /assets/projects/myfaos/de/tasks.webp
+  - src: ../../../assets/projects/myfaos/de/tasks.webp
     alt: Aufgaben-Board mit Familien-Effizienzwert sowie Backlog- und Geplant-Spalte
     orientation: portrait
     caption: Aufgaben mit Zuständigkeit und Priorität — samt Verteilung, damit sichtbar bleibt, wer gerade mehr trägt.
-  - src: /assets/projects/myfaos/de/shopping.webp
+  - src: ../../../assets/projects/myfaos/de/shopping.webp
     alt: Gemeinsame Einkaufsliste mit offenen Posten und zuletzt verwendeten Artikeln
     orientation: portrait
     caption: Eine gemeinsame Einkaufsliste — zuletzt Verwendetes ist einen Tipp entfernt.
-  - src: /assets/projects/myfaos/de/gifts.webp
+  - src: ../../../assets/projects/myfaos/de/gifts.webp
     alt: Geschenkeplaner mit Budget-Fortschritt und Geschenkideen pro Kind
     orientation: portrait
     caption: Der Geschenkeplaner verfolgt Ideen, Status und was vom Budget übrig ist.
-  - src: /assets/projects/myfaos/de/health.webp
+  - src: ../../../assets/projects/myfaos/de/health.webp
     alt: Impfpass eines Kindes mit anstehender Tetanus-Auffrischung
     orientation: portrait
     caption: Eine Gesundheitsakte pro Kind — was als Nächstes ansteht, plus PDF-Export.

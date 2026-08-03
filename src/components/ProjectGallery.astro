@@ -1,6 +1,9 @@
 ---
+import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
 interface Shot {
-	src: string;
+	src: ImageMetadata;
 	alt: string;
 	caption?: string;
 	orientation: 'landscape' | 'portrait';
@@ -13,6 +16,30 @@ interface Props {
 }
 
 const { shots, closeLabel } = Astro.props;
+
+// Grid widths: landscape shots fill a column (max ~40rem), phone shots are
+// capped at 20rem. Both doubled for high-DPI screens.
+const GRID_WIDTHS = {
+	landscape: [400, 640, 800, 1280],
+	portrait: [320, 480, 640],
+} as const;
+
+const GRID_SIZES = {
+	landscape: '(min-width: 50em) 40rem, 100vw',
+	portrait: '(min-width: 50em) 20rem, 100vw',
+} as const;
+
+// The lightbox shows one image at a time, so its full-size variant is built
+// ahead of the grid rather than being the original asset.
+const zoomed = await Promise.all(
+	shots.map((shot) =>
+		getImage({
+			src: shot.src,
+			width: Math.min(shot.src.width, shot.orientation === 'portrait' ? 800 : 1600),
+			format: 'webp',
+		})
+	)
+);
 ---
 
 {
@@ -23,13 +50,15 @@ const { shots, closeLabel } = Astro.props;
 					<button
 						type="button"
 						class="zoom"
-						data-zoom={shot.src}
+						data-zoom={zoomed[i].src}
 						data-zoom-alt={shot.alt}
 						aria-label={shot.alt}
 					>
-						<img
+						<Image
 							src={shot.src}
 							alt={shot.alt}
+							widths={[...GRID_WIDTHS[shot.orientation]]}
+							sizes={GRID_SIZES[shot.orientation]}
 							loading={i < 2 ? 'eager' : 'lazy'}
 							decoding="async"
 						/>
