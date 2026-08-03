@@ -7,24 +7,26 @@ import MainHead from '../components/MainHead.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Analytics from '@vercel/analytics/astro';
+import { getLangFromUrl } from '../i18n/utils';
 
 interface Props {
 	title?: string | undefined;
 	description?: string | undefined;
 	/** Whether this page has both an English and a German counterpart. */
 	alternates?: boolean;
+	/** Absolute URL of the social-card image. Defaults to the site-wide one. */
+	image?: string | undefined;
 }
 
-const { title, description, alternates = true } = Astro.props;
+const { title, description, alternates = true, image } = Astro.props;
 
-const pathname = Astro.url.pathname;
-const lang = pathname === '/de' || pathname.startsWith('/de/') ? 'de' : 'en';
+const lang = getLangFromUrl(Astro.url);
 ---
 
 <html lang={lang}>
 	<head>
 		<link rel="sitemap" href="/sitemap-index.xml"/>
-		<MainHead title={title} description={description} alternates={alternates} />
+		<MainHead title={title} description={description} alternates={alternates} image={image} />
 		<Analytics />
 	</head>
 	<body>

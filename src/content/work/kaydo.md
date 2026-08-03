@@ -25,22 +25,22 @@ stack:
   - i18next
   - Vitest
 screenshots:
-  - src: /assets/projects/kaydo/home-desktop.webp
+  - src: ../../assets/projects/kaydo/home-desktop.webp
     alt: Kaydo home feed with daily moment circles and rich memory cards
     caption: The memory feed, with Daily Moments across the top for quick everyday snapshots.
-  - src: /assets/projects/kaydo/scrapbook-desktop.webp
+  - src: ../../assets/projects/kaydo/scrapbook-desktop.webp
     alt: Freeform scrapbook canvas with polaroid frames, stickers and text
     caption: The scrapbook is a freeform canvas — drag photos, stickers and text, then export the book as a PDF.
-  - src: /assets/projects/kaydo/recipe-tree-desktop.webp
+  - src: ../../assets/projects/kaydo/recipe-tree-desktop.webp
     alt: Recipe tree showing a family recipe with its forks and version history
     caption: Recipes are versioned and can be forked, so a grandmother's original and a grandchild's variation both survive.
-  - src: /assets/projects/kaydo/journal-desktop.webp
+  - src: ../../assets/projects/kaydo/journal-desktop.webp
     alt: Kid journal with dated entries written for a child to read later
     caption: Journals and letters, dated and written for the child to read years from now.
-  - src: /assets/projects/kaydo/blackbox-desktop.webp
+  - src: ../../assets/projects/kaydo/blackbox-desktop.webp
     alt: The Vault, holding high-fidelity originals and time-locked capsules
     caption: The Vault keeps full-resolution originals and time-locked capsules that stay sealed until a chosen date.
-  - src: /assets/projects/kaydo/our-year-mobile.webp
+  - src: ../../assets/projects/kaydo/our-year-mobile.webp
     alt: Our Year review ritual on a phone, showing chapter questions for a couple
     orientation: portrait
     caption: Our Year is a review ritual for two — deliberately built for a phone on a sofa.

@@ -23,22 +23,22 @@ stack:
   - Leaflet
   - Vercel
 screenshots:
-  - src: /assets/projects/flexpoll/landing.webp
+  - src: ../../../assets/projects/flexpoll/landing.webp
     alt: FlexPoll-Startseite mit der Überschrift "Every kind of poll. Completely free."
     caption: Die Startseite. Zum Stöbern und Abstimmen braucht es kein Konto.
-  - src: /assets/projects/flexpoll/dashboard.webp
+  - src: ../../../assets/projects/flexpoll/dashboard.webp
     alt: FlexPoll-Dashboard mit Umfragen mehrerer Typen und laufenden Stimmenzahlen
     caption: Das Dashboard mit eigenen Umfragen, Community-Umfragen und aktuellen Ergebnissen.
-  - src: /assets/projects/flexpoll/create-types.webp
+  - src: ../../../assets/projects/flexpoll/create-types.webp
     alt: Auswahl des Umfragetyps — Standard, Ranking, Termin, Ort, Custom, Priorität und Bild
     caption: Der erste Schritt beim Erstellen ist die Wahl des Formats — der Rest des Ablaufs passt sich daran an.
-  - src: /assets/projects/flexpoll/vote-standard.webp
+  - src: ../../../assets/projects/flexpoll/vote-standard.webp
     alt: Abstimmungsansicht einer klassischen Multiple-Choice-Umfrage
     caption: Eine Standardumfrage. Abstimmen funktioniert ohne Anmeldung.
-  - src: /assets/projects/flexpoll/vote-schedule.webp
+  - src: ../../../assets/projects/flexpoll/vote-schedule.webp
     alt: Terminumfrage mit Kandidatentagen und Vormittags- sowie Nachmittagsslots
     caption: Terminumfragen sammeln Verfügbarkeiten pro Slot und zeigen die größte Überschneidung.
-  - src: /assets/projects/flexpoll/results-priority.webp
+  - src: ../../../assets/projects/flexpoll/results-priority.webp
     alt: Ergebnisse einer Prioritätsumfrage mit Balkenranking, Insight-Panel und QR-Code
     caption: Ergebnisse aktualisieren sich live, und jede Umfrage bekommt Link und QR-Code.
 ---

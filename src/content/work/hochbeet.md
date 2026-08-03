@@ -18,22 +18,22 @@ stack:
   - Cloud Firestore
   - localStorage
 screenshots:
-  - src: /assets/projects/hochbeet/planner.webp
+  - src: ../../assets/projects/hochbeet/planner.webp
     alt: Raised bed planner with plants drawn to scale as circles, a plant palette on the left and tips on the right
     caption: The planner. Every plant is drawn at its real spacing, so the bed fills up honestly.
-  - src: /assets/projects/hochbeet/conflicts.webp
+  - src: ../../assets/projects/hochbeet/conflicts.webp
     alt: Conflict panel listing bad neighbours like carrot versus dill alongside good pairings
     caption: Bad neighbours are flagged with the reason — here, mature dill inhibiting carrot germination.
-  - src: /assets/projects/hochbeet/dashboard.webp
+  - src: ../../assets/projects/hochbeet/dashboard.webp
     alt: Dashboard with a seasonal planting timeline and cards for two beds
     caption: The dashboard, with a seasonal timeline and every bed at a glance.
-  - src: /assets/projects/hochbeet/seasons.webp
+  - src: ../../assets/projects/hochbeet/seasons.webp
     alt: Season view comparing spring, summer, autumn and winter layouts with transition advice
     caption: Each bed holds four separate layouts, plus advice on what follows what.
-  - src: /assets/projects/hochbeet/plants.webp
+  - src: ../../assets/projects/hochbeet/plants.webp
     alt: Plant encyclopedia entries with sun, water, yield and care notes
     caption: The plant library — spacing, sun, water, expected yield and care notes for all 21 species.
-  - src: /assets/projects/hochbeet/calendar.webp
+  - src: ../../assets/projects/hochbeet/calendar.webp
     alt: Month calendar with garden to-dos for the selected day
     caption: A calendar for the jobs a bed generates — sowing, pruning, mulching.
 ---

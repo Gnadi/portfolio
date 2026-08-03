@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ProjectDetail from '../../../components/ProjectDetail.astro';
+import { projectOgImage } from '../../../utils/ogImage';
 
 export async function getStaticPaths() {
 	const entries = await getCollection('work');
@@ -16,11 +17,13 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
+const ogImage = await projectOgImage(entry, Astro.site);
 ---
 
 <BaseLayout
 	title={`${entry.data.title} | Johannes Gnadlinger`}
 	description={entry.data.description}
+	image={ogImage}
 >
 	<ProjectDetail entry={entry} lang="de" />
 </BaseLayout>
