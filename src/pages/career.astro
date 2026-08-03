@@ -139,6 +139,14 @@ const careerData = [
             "Successfully completed the Engineer Certification.",
     },
     {
+        type: "leave",
+        title: "Parental Leave",
+        organization: "Raiffeisen Software GmbH",
+        startDate: "2026-02-01",
+        endDate: "2026-08-01",
+        description: "Parental leave to care for my child.",
+    },
+    {
         type: "hackathon",
         title: "Raiffeisen Arena Hackathon",
         organization: "Developer",
@@ -172,6 +180,11 @@ const sortedCareer = careerData.sort(
     (a, b) => new Date(b.startDate).valueOf() - new Date(a.startDate).valueOf(),
 );
 
+const typeOrder = ["job", "project", "certification", "leave", "hackathon", "side-project"];
+const presentTypes = typeOrder.filter((type) =>
+    sortedCareer.some((item) => item.type === type),
+);
+
 const getIcon = (type: string) => {
     switch (type) {
         case "job":
@@ -184,6 +197,8 @@ const getIcon = (type: string) => {
             return "trophy";
         case "certification":
             return "medal";
+        case "leave":
+            return "heart";
         default:
             return "star";
     }
@@ -201,6 +216,8 @@ const getTypeLabel = (type: string) => {
             return "Hackathon";
         case "certification":
             return "Certification";
+        case "leave":
+            return "Parental Leave";
         default:
             return "Entry";
     }
@@ -219,10 +236,24 @@ const getTypeLabel = (type: string) => {
                 align="start"
             />
 
+            <div class="filters">
+                <label for="career-filter" class="filter-label">Filter by type</label>
+                <div class="select-wrapper">
+                    <select id="career-filter" class="filter-select">
+                        <option value="all">All</option>
+                        {
+                            presentTypes.map((type) => (
+                                <option value={type}>{getTypeLabel(type)}</option>
+                            ))
+                        }
+                    </select>
+                </div>
+            </div>
+
             <div class="timeline">
                 {
                     sortedCareer.map((item) => (
-                        <div class="timeline-item">
+                        <div class="timeline-item" data-type={item.type}>
                             <div class="timeline-marker">
                                 <div class="icon-wrapper">
                                     <Icon
@@ -256,7 +287,70 @@ const getTypeLabel = (type: string) => {
     </div>
 </BaseLayout>
 
+<script>
+    const select = document.querySelector<HTMLSelectElement>(".filter-select");
+    const items = document.querySelectorAll<HTMLElement>(".timeline-item");
+
+    select?.addEventListener("change", () => {
+        const filter = select.value;
+        items.forEach((item) => {
+            const show = filter === "all" || item.dataset.type === filter;
+            item.style.display = show ? "" : "none";
+        });
+    });
+</script>
+
 <style>
+    .filters {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .filter-label {
+        font-size: var(--text-sm);
+        font-weight: 600;
+        color: var(--gray-300);
+    }
+
+    .select-wrapper {
+        position: relative;
+        display: inline-flex;
+    }
+
+    .filter-select {
+        font: inherit;
+        cursor: pointer;
+        appearance: none;
+        padding: 0.5rem 2.5rem 0.5rem 1rem;
+        border-radius: 999rem;
+        border: 1px solid var(--gray-800);
+        background-color: var(--gray-999_40);
+        color: var(--gray-0);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        transition: border-color var(--theme-transition);
+    }
+
+    .filter-select:hover,
+    .filter-select:focus-visible {
+        border-color: var(--accent-regular);
+        outline: none;
+    }
+
+    .select-wrapper::after {
+        content: "";
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        width: 0.5rem;
+        height: 0.5rem;
+        border-right: 2px solid var(--gray-300);
+        border-bottom: 2px solid var(--gray-300);
+        transform: translateY(-70%) rotate(45deg);
+        pointer-events: none;
+    }
+
     .timeline {
         position: relative;
         display: flex;
