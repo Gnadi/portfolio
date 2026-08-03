@@ -140,6 +140,14 @@ const careerData = [
             "Erfolgreicher Abschluss der Ingenieur-Zertifizierung.",
     },
     {
+        type: "leave",
+        title: "Karenz",
+        organization: "Raiffeisen Software GmbH",
+        startDate: "2026-02-01",
+        endDate: "2026-08-01",
+        description: "Karenzzeit zur Betreuung meines Kindes.",
+    },
+    {
         type: "hackathon",
         title: "Raiffeisen Arena Hackathon",
         organization: "Developer",
@@ -185,6 +193,8 @@ const getIcon = (type: string) => {
             return "trophy";
         case "certification":
             return "medal";
+        case "leave":
+            return "heart";
         default:
             return "star";
     }
@@ -202,6 +212,8 @@ const getTypeLabel = (type: string) => {
             return "Hackathon";
         case "certification":
             return "Zertifizierung";
+        case "leave":
+            return "Karenz";
         default:
             return "Eintrag";
     }

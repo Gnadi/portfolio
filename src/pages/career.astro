@@ -139,6 +139,14 @@ const careerData = [
             "Successfully completed the Engineer Certification.",
     },
     {
+        type: "leave",
+        title: "Parental Leave",
+        organization: "Raiffeisen Software GmbH",
+        startDate: "2026-02-01",
+        endDate: "2026-08-01",
+        description: "Parental leave to care for my child.",
+    },
+    {
         type: "hackathon",
         title: "Raiffeisen Arena Hackathon",
         organization: "Developer",
@@ -184,6 +192,8 @@ const getIcon = (type: string) => {
             return "trophy";
         case "certification":
             return "medal";
+        case "leave":
+            return "heart";
         default:
             return "star";
     }
@@ -201,6 +211,8 @@ const getTypeLabel = (type: string) => {
             return "Hackathon";
         case "certification":
             return "Certification";
+        case "leave":
+            return "Parental Leave";
         default:
             return "Entry";
     }
