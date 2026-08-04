@@ -36,7 +36,10 @@ const projects = (await getCollection('work')).map((entry: any) => {
 const contacts = (await getCollection('contact')).slice(0,4);
 ---
 
-<BaseLayout>
+<BaseLayout
+	title="Gnadlinger — Johannes Gnadlinger, Backend Engineer in Linz"
+	description="Gnadlinger — the personal site of Johannes Gnadlinger, Backend Engineer at Raiffeisen Software in Linz, Austria. Corporate payment systems, SEPA and EBICS, plus side projects and a career timeline."
+>
 	<div class="stack gap-20 lg:gap-48">
 		<div class="wrapper stack gap-8 lg:gap-20">
 			<header class="hero">

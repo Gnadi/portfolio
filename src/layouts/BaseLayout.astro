@@ -7,15 +7,32 @@ import MainHead from '../components/MainHead.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Analytics from '@vercel/analytics/astro';
+import type { JsonLdNode } from '../lib/schema';
 
 interface Props {
 	title?: string | undefined;
 	description?: string | undefined;
 	/** Whether this page has both an English and a German counterpart. */
 	alternates?: boolean;
+	/** Extra JSON-LD nodes merged into the site-wide `@graph`. */
+	schema?: JsonLdNode[] | undefined;
+	/** `article` on project detail pages, `website` everywhere else. */
+	ogType?: 'website' | 'article';
+	/** Publication date, for `article:published_time`. */
+	publishedTime?: Date | undefined;
+	/** Keep the page out of the index (404s). */
+	noindex?: boolean;
 }
 
-const { title, description, alternates = true } = Astro.props;
+const {
+	title,
+	description,
+	alternates = true,
+	schema,
+	ogType,
+	publishedTime,
+	noindex,
+} = Astro.props;
 
 const pathname = Astro.url.pathname;
 const lang = pathname === '/de' || pathname.startsWith('/de/') ? 'de' : 'en';
@@ -24,7 +41,15 @@ const lang = pathname === '/de' || pathname.startsWith('/de/') ? 'de' : 'en';
 <html lang={lang}>
 	<head>
 		<link rel="sitemap" href="/sitemap-index.xml"/>
-		<MainHead title={title} description={description} alternates={alternates} />
+		<MainHead
+			title={title}
+			description={description}
+			alternates={alternates}
+			schema={schema}
+			ogType={ogType}
+			publishedTime={publishedTime}
+			noindex={noindex}
+		/>
 		<Analytics />
 	</head>
 	<body>

@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+import ContactCTA from '../../components/ContactCTA.astro';
+import Hero from '../../components/Hero.astro';
+import { breadcrumbNode, canonicalUrl, webPageNode } from '../../lib/schema';
+
+const canonical = canonicalUrl(Astro.url.pathname);
+const schema = [
+	webPageNode(canonical, 'Der Name Gnadlinger', 'de'),
+	breadcrumbNode(canonical, [
+		{ name: 'Gnadlinger', item: canonicalUrl('/de/') },
+		{ name: 'Der Name' },
+	]),
+];
+
+/** Andere Träger des Namens, jeweils mit dem öffentlichen Profil, das sie
+ *  selbst pflegen — damit Besucher, die jemand anderen gesucht haben, mit
+ *  einem Klick dorthin kommen. */
+const namesakes: { name: string; detail: string; href: string; source: string }[] = [
+	{
+		name: 'Florian Gnadlinger',
+		detail:
+			'Wissenschaftlicher Mitarbeiter an der Universität für Weiterbildung Krems im Bereich Weiterbildungsforschung und Bildungsmanagement.',
+		href: 'https://dblp.org/pid/157/5062.html',
+		source: 'dblp',
+	},
+	{
+		name: 'Johann Gnadlinger',
+		detail:
+			'Arbeitet bei IRPAA in Juazeiro, Bahia, Brasilien, zu Wasser und Klima im semiariden Raum.',
+		href: 'https://www.researchgate.net/profile/Johann-Gnadlinger-2',
+		source: 'ResearchGate',
+	},
+	{
+		name: 'Roman Gnadlinger',
+		detail: 'Dienststellenleiter bei der Stadt Wels in Oberösterreich.',
+		href: 'https://at.linkedin.com/in/roman-gnadlinger-393080b9',
+		source: 'LinkedIn',
+	},
+];
+---
+
+<BaseLayout
+	title="Gnadlinger — der Name und die Menschen, die ihn tragen"
+	description="Gnadlinger ist ein seltener österreichischer Familienname. Was es mit dem Namen auf sich hat, wer ihn sonst noch trägt — und warum diese Seite Johannes Gnadlinger gehört, Backend Engineer in Linz."
+	schema={schema}
+>
+	<div class="stack gap-20">
+		<main class="wrapper name-page">
+			<Hero
+				title="Gnadlinger"
+				tagline="Ein seltener österreichischer Familienname — und ziemlich sicher mehr als eine Person, die du gesucht haben könntest."
+			/>
+
+			<section>
+				<h2 class="section-title">Zum Namen</h2>
+				<div class="content">
+					<p>
+						Gnadlinger ist ein seltener Familienname, der fast ausschließlich in
+						Österreich vorkommt, mit Schwerpunkt in Oberösterreich. Namen auf
+						<em>-inger</em> sind ein typisch oberösterreichisches Muster: Sie gehen in
+						der Regel auf einen Ort oder einen Hof zurück und bleiben oft auf eine
+						kleine Region beschränkt, innerhalb derer sie dann vergleichsweise häufig
+						sind.
+					</p>
+					<p>
+						Für die konkrete Herkunft von <em>Gnadlinger</em> habe ich keine belastbare
+						Quelle gefunden — deshalb steht hier auch keine Vermutung. Wer eine
+						dokumentierte Herleitung kennt: Ich freue mich ehrlich über einen Hinweis.
+					</p>
+				</div>
+			</section>
+
+			<section>
+				<h2 class="section-title">Andere Personen namens Gnadlinger</h2>
+				<div class="content">
+					<p>
+						Diese Seite gehört einem bestimmten Gnadlinger. Falls du jemand anderen
+						gesucht hast — das sind die Personen, die am häufigsten auftauchen, jeweils
+						verlinkt auf ein Profil, das sie selbst pflegen:
+					</p>
+					<ul>
+						{
+							namesakes.map(({ name, detail, href, source }) => (
+								<li>
+									<strong>{name}</strong> — {detail}{' '}
+									<a href={href} rel="noopener">
+										Profil auf {source}
+									</a>
+								</li>
+							))
+						}
+					</ul>
+					<p>
+						Die Liste ist nicht vollständig und enthält nur Personen mit einem
+						öffentlichen beruflichen Profil.
+					</p>
+				</div>
+			</section>
+
+			<section>
+				<h2 class="section-title">Dieser Gnadlinger</h2>
+				<div class="content">
+					<p>
+						Ich bin Johannes Gnadlinger, Backend Engineer bei der Raiffeisen Software
+						GmbH in Linz. Ich baue Backend-Services für Corporate Payment Systems —
+						SEPA- und EBICS-Zahlungsflüsse, Transaktionsverarbeitung und jene Art von
+						regulierter Finanzinfrastruktur, bei der Korrektheit wichtiger ist als
+						Features.
+					</p>
+					<p>
+						Mehr dazu, <a href="/de/about/">wer ich bin</a>, mein
+						<a href="/de/career/">bisheriger Werdegang</a> und die
+						<a href="/de/work/">eigenen Projekte</a> neben der Arbeit. Dazu gibt es
+						einen <a href="https://cv.gnadlinger.me/">vollständigen Lebenslauf</a> und
+						einen <a href="https://blog.gnadlinger.me/">Blog</a>.
+					</p>
+				</div>
+			</section>
+		</main>
+
+		<ContactCTA />
+	</div>
+</BaseLayout>
+
+<style>
+	.name-page {
+		display: flex;
+		flex-direction: column;
+		gap: 3.5rem;
+	}
+
+	section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		color: var(--gray-200);
+	}
+
+	.section-title {
+		grid-column-start: 1;
+		font-size: var(--text-xl);
+		color: var(--gray-0);
+	}
+
+	.content {
+		grid-column: 2 / 4;
+	}
+
+	.content ul {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding-left: 1.25rem;
+	}
+
+	.content :global(a) {
+		text-decoration: 1px solid underline transparent;
+		text-underline-offset: 0.25em;
+		transition: text-decoration-color var(--theme-transition);
+	}
+
+	.content :global(a:hover),
+	.content :global(a:focus) {
+		text-decoration-color: currentColor;
+	}
+
+	@media (min-width: 50em) {
+		.name-page {
+			display: grid;
+			grid-template-columns: 1fr 60% 1fr;
+		}
+
+		.name-page > :global(:first-child) {
+			grid-column-start: 2;
+		}
+
+		section {
+			display: contents;
+			font-size: var(--text-lg);
+		}
+	}
+</style>

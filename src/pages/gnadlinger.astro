@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+import ContactCTA from '../components/ContactCTA.astro';
+import Hero from '../components/Hero.astro';
+import { breadcrumbNode, canonicalUrl, webPageNode } from '../lib/schema';
+
+const canonical = canonicalUrl(Astro.url.pathname);
+const schema = [
+	webPageNode(canonical, 'The Gnadlinger name', 'en'),
+	breadcrumbNode(canonical, [
+		{ name: 'Gnadlinger', item: canonicalUrl('/') },
+		{ name: 'The name' },
+	]),
+];
+
+/** Other people who carry the surname, with the public professional profile
+ *  each of them maintains. Listed so visitors who were looking for someone
+ *  else can get there in one click. */
+const namesakes: { name: string; detail: string; href: string; source: string }[] = [
+	{
+		name: 'Florian Gnadlinger',
+		detail:
+			'Research associate at the University for Continuing Education Krems, Austria, in continuing-education research and educational management.',
+		href: 'https://dblp.org/pid/157/5062.html',
+		source: 'dblp',
+	},
+	{
+		name: 'Johann Gnadlinger',
+		detail:
+			'Works with IRPAA in Juazeiro, Bahia, Brazil, on water and climate in the semi-arid region.',
+		href: 'https://www.researchgate.net/profile/Johann-Gnadlinger-2',
+		source: 'ResearchGate',
+	},
+	{
+		name: 'Roman Gnadlinger',
+		detail: 'Department head at the municipality of Wels, Upper Austria.',
+		href: 'https://at.linkedin.com/in/roman-gnadlinger-393080b9',
+		source: 'LinkedIn',
+	},
+];
+---
+
+<BaseLayout
+	title="Gnadlinger — the name, and the people who carry it"
+	description="Gnadlinger is an uncommon Austrian surname. What the name is, who else carries it, and why this site belongs to Johannes Gnadlinger, a Backend Engineer in Linz."
+	schema={schema}
+>
+	<div class="stack gap-20">
+		<main class="wrapper name-page">
+			<Hero
+				title="Gnadlinger"
+				tagline="An uncommon Austrian surname — and, most likely, more than one person you could have been looking for."
+			/>
+
+			<section>
+				<h2 class="section-title">About the name</h2>
+				<div class="content">
+					<p>
+						Gnadlinger is a rare family name that occurs almost exclusively in
+						Austria, with its centre of gravity in Upper Austria. Names ending in
+						<em>-inger</em> are a characteristic Upper Austrian pattern: they are
+						typically derived from a place or a farmstead, and they tend to stay
+						concentrated in a small region while being comparatively frequent inside
+						it.
+					</p>
+					<p>
+						I have not found a reliable published source for the specific origin of
+						<em>Gnadlinger</em>, so this page does not speculate about one. If you know
+						of a documented derivation, I would genuinely like to hear about it.
+					</p>
+				</div>
+			</section>
+
+			<section>
+				<h2 class="section-title">Other people named Gnadlinger</h2>
+				<div class="content">
+					<p>
+						This site belongs to one particular Gnadlinger. If you were looking for
+						somebody else, these are the people who most often come up, each linked to
+						a profile they maintain themselves:
+					</p>
+					<ul>
+						{
+							namesakes.map(({ name, detail, href, source }) => (
+								<li>
+									<strong>{name}</strong> — {detail}{' '}
+									<a href={href} rel="noopener">
+										Profile on {source}
+									</a>
+								</li>
+							))
+						}
+					</ul>
+					<p>
+						The list is not exhaustive, and it only includes people with a public
+						professional profile.
+					</p>
+				</div>
+			</section>
+
+			<section>
+				<h2 class="section-title">This Gnadlinger</h2>
+				<div class="content">
+					<p>
+						I am Johannes Gnadlinger, a Backend Engineer at Raiffeisen Software GmbH in
+						Linz, Austria. I build backend services for corporate payment systems —
+						SEPA and EBICS payment flows, transaction processing, and the kind of
+						regulated financial infrastructure where correctness matters more than
+						features.
+					</p>
+					<p>
+						More on <a href="/about/">who I am</a>, my
+						<a href="/career/">career so far</a>, and the
+						<a href="/work/">side projects</a> I build outside work. There is also a
+						<a href="https://cv.gnadlinger.me/">full CV</a> and a
+						<a href="https://blog.gnadlinger.me/">blog</a>.
+					</p>
+				</div>
+			</section>
+		</main>
+
+		<ContactCTA />
+	</div>
+</BaseLayout>
+
+<style>
+	.name-page {
+		display: flex;
+		flex-direction: column;
+		gap: 3.5rem;
+	}
+
+	section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		color: var(--gray-200);
+	}
+
+	.section-title {
+		grid-column-start: 1;
+		font-size: var(--text-xl);
+		color: var(--gray-0);
+	}
+
+	.content {
+		grid-column: 2 / 4;
+	}
+
+	.content ul {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding-left: 1.25rem;
+	}
+
+	.content :global(a) {
+		text-decoration: 1px solid underline transparent;
+		text-underline-offset: 0.25em;
+		transition: text-decoration-color var(--theme-transition);
+	}
+
+	.content :global(a:hover),
+	.content :global(a:focus) {
+		text-decoration-color: currentColor;
+	}
+
+	@media (min-width: 50em) {
+		.name-page {
+			display: grid;
+			grid-template-columns: 1fr 60% 1fr;
+		}
+
+		.name-page > :global(:first-child) {
+			grid-column-start: 2;
+		}
+
+		section {
+			display: contents;
+			font-size: var(--text-lg);
+		}
+	}
+</style>

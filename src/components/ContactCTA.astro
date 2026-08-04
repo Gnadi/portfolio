@@ -3,17 +3,24 @@ import CallToAction from './CallToAction.astro';
 import Icon from './Icon.astro';
 import { Image } from 'astro:assets';
 import {getLangFromUrl} from "../i18n/utils";
-const title = getLangFromUrl(Astro.url) == "de" ? "Starten wir das nächste Projekt gemeinsam?" : "Interested in working together?";
-const message = getLangFromUrl(Astro.url) == "de" ? "Schreiben Sie mir" : "Send Me a Message";
+// Imported (not a public/ path) so Astro resizes it and serves WebP — the
+// source JPEG is ~470 KB and this runs on every page.
+import logo from '../assets/logo.jpg';
+const isDe = getLangFromUrl(Astro.url) == "de";
+const title = isDe ? "Starten wir das nächste Projekt gemeinsam?" : "Interested in working together?";
+const message = isDe ? "Schreiben Sie mir" : "Send Me a Message";
+const logoAlt = isDe ? "Logo von Johannes Gnadlinger" : "Johannes Gnadlinger’s logo";
 ---
 
 <aside>
 	<h2>{title}</h2>
 	<Image
-		alt="Logo"
-		width="300"
-		height="300"
-		src="/assets/logo.jpg"
+		alt={logoAlt}
+		width={300}
+		height={300}
+		densities={[1, 2]}
+		loading="lazy"
+		src={logo}
 	/>
 	<CallToAction href="mailto:johannes.gnadlinger1997@gmail.com">
 		{message}

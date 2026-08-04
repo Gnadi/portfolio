@@ -4,13 +4,27 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ContactCTA from '../../components/ContactCTA.astro';
 import Hero from '../../components/Hero.astro';
 import BusinessCard from '../../components/BusinessCard.astro';
+import { breadcrumbNode, canonicalUrl, profilePageNode } from '../../lib/schema';
+
+const canonical = canonicalUrl(Astro.url.pathname);
+const schema = [
+	profilePageNode(canonical),
+	breadcrumbNode(canonical, [
+		{ name: 'Gnadlinger', item: canonicalUrl('/de/') },
+		{ name: 'Über mich' },
+	]),
+];
 ---
 
-<BaseLayout title="About | Johannes Gnadlinger" description="About Johannes Gnadlinger">
+<BaseLayout
+	title="Über Johannes Gnadlinger | Gnadlinger"
+	description="Wer Johannes Gnadlinger ist: Backend Engineer bei der Raiffeisen Software GmbH in Linz mit Fokus auf Corporate Payment Systems — dazu Werdegang, Ausbildung und Privates."
+	schema={schema}
+>
 	<div class="stack gap-20">
 		<main class="wrapper about">
 			<Hero
-				title="Hallo!"
+				title="Johannes Gnadlinger"
 				tagline="Schön, dass du vorbeischaust! Hier erfährst du kurz, woran ich arbeite — und wer ich bin, wenn ich gerade nicht programmiere."
 			>
 				<img
@@ -22,7 +36,7 @@ import BusinessCard from '../../components/BusinessCard.astro';
 			</Hero>
 
 			<section>
-				<h2 class="section-title">Background</h2>
+				<h2 class="section-title">Werdegang</h2>
 				<div class="content">
 					<p>
 						Mein Fokus liegt auf Corporate Payment Systems — Backend-Services für Transaktionsverarbeitung, SEPA-Flows und regulierte Finanzinfrastruktur.
@@ -79,6 +93,17 @@ import BusinessCard from '../../components/BusinessCard.astro';
 						<li>Tennis</li>
 						<li>Hackathons (früher mehr als jetzt)</li>
 					</ul>
+				</div>
+			</section>
+
+			<section>
+				<h2 class="section-title">Der Name</h2>
+				<div class="content">
+					<p>
+						Gnadlinger ist ein seltener Familienname — und ich bin nicht der Einzige,
+						der ihn trägt. Es gibt <a href="/de/gnadlinger/">eine kurze Seite über den Namen</a>
+						 und über die anderen Personen, nach denen du vielleicht gesucht hast.
+					</p>
 				</div>
 			</section>
 			<div class="card-section">
