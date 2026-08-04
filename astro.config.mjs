@@ -4,11 +4,11 @@ import tailwind from "@astrojs/tailwind";
 import sitemap from "@astrojs/sitemap";
 
 /** Rough importance ranking for the sitemap. The homepages are the entity
- *  home, the about and name pages are what a "Gnadlinger" search should land
- *  on, everything else follows. */
+ *  home, the about pages are what a "Gnadlinger" search should land on,
+ *  everything else follows. */
 function priorityFor(pathname) {
   if (pathname === '/' || pathname === '/de/') return 1.0;
-  if (/^\/(de\/)?(about|gnadlinger)\/?$/.test(pathname)) return 0.9;
+  if (/^\/(de\/)?about\/?$/.test(pathname)) return 0.9;
   if (/^\/(de\/)?(work|career)\/?$/.test(pathname)) return 0.8;
   if (/^\/(de\/)?work\/.+/.test(pathname)) return 0.7;
   return 0.5;

@@ -6,6 +6,8 @@
 			"has": [{ "type": "host", "value": "gnadlinger.me" }],
 			"destination": "https://www.gnadlinger.me/:path*",
 			"permanent": true
-		}
+		},
+		{ "source": "/gnadlinger", "destination": "/about/", "permanent": true },
+		{ "source": "/de/gnadlinger", "destination": "/de/about/", "permanent": true }
 	]
 }

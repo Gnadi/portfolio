@@ -202,19 +202,6 @@ export function projectNode(input: ProjectSchemaInput): JsonLdNode {
 	};
 }
 
-/** A plain content page that is part of the site. */
-export function webPageNode(canonical: string, name: string, lang: 'en' | 'de'): JsonLdNode {
-	return {
-		'@type': 'WebPage',
-		'@id': `${canonical}#webpage`,
-		url: canonical,
-		name,
-		inLanguage: lang === 'de' ? 'de-AT' : 'en',
-		isPartOf: { '@id': WEBSITE_ID },
-		about: { '@id': PERSON_ID },
-	};
-}
-
 /**
  * Wraps the per-page nodes together with the two nodes every page carries.
  * Returns the serialised graph, ready for `set:html`.

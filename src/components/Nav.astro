@@ -4,7 +4,7 @@ import ThemeToggle from "./ThemeToggle.astro";
 import type { iconPaths } from "./IconPaths";
 import Language from "./Language.astro";
 import { getLangFromUrl } from "../i18n/utils";
-import { BRAND, FULL_NAME } from "../lib/schema";
+import { FULL_NAME } from "../lib/schema";
 
 const lang = getLangFromUrl(Astro.url);
 /** Home link has to follow the current language — `/` would drop German
@@ -53,14 +53,14 @@ const iconLinks: {
 
 <nav>
 	<div class="menu-header">
-		<a href={homeHref} class="site-title" aria-label={FULL_NAME}>
+		<a href={homeHref} class="site-title">
 			<Icon
 				icon="home"
 				color="var(--accent-regular)"
 				size="3em"
 				gradient
 			/>
-			{BRAND}
+			{FULL_NAME}
 		</a>
 		<menu-button>
 			<template>

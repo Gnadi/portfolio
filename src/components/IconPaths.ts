@@ -33,4 +33,6 @@ export const iconPaths = {
 	briefcase: `<rect x="32" y="72" width="192" height="144" rx="16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><path d="M80,72V48a16,16,0,0,1,16-16h64a16,16,0,0,1,16,16V72" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>`,
 	bank: `<path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M28.16 72 128 16l99.84 56ZM56 96v88M104 96v88M152 96v88M200 96v88M32 216h192M40 184h176"/>`,
 	medal: `<circle cx="128" cy="168" r="56" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M88 132 56 24l72 32 72-32-32 108"/>`,
+	copy: `<rect width="128" height="128" x="88" y="40" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" rx="8"/><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M168 168v40a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V96a8 8 0 0 1 8-8h40"/>`,
+	check: `<path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="16" d="M216 72 104 184l-56-56"/>`,
 };

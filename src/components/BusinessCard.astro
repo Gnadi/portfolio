@@ -1,8 +1,62 @@
 ---
 import Icon from './Icon.astro';
+import type { iconPaths } from './IconPaths';
 
 const cardUrl = 'https://www.gnadlinger.me/card';
 const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(cardUrl)}&margin=8`;
+
+/** Contact rows on the back of the card. `copy` is what lands on the clipboard;
+ *  `label` is the shortened text shown on the card. */
+const contacts: {
+	icon: keyof typeof iconPaths;
+	name: string;
+	href: string;
+	label: string;
+	copy: string;
+}[] = [
+	{
+		icon: 'paper-plane-tilt',
+		name: 'email address',
+		href: 'mailto:johannes.gnadlinger1997@gmail.com',
+		label: 'johannes.gnadlinger1997@gmail.com',
+		copy: 'johannes.gnadlinger1997@gmail.com',
+	},
+	{
+		icon: 'github-logo',
+		name: 'GitHub link',
+		href: 'https://github.com/Gnadi',
+		label: 'github.com/Gnadi',
+		copy: 'https://github.com/Gnadi',
+	},
+	{
+		icon: 'linkedin-logo',
+		name: 'LinkedIn link',
+		href: 'https://at.linkedin.com/in/johannes-gnadlinger-842293271',
+		label: 'in/johannes-gnadlinger',
+		copy: 'https://at.linkedin.com/in/johannes-gnadlinger-842293271',
+	},
+	{
+		icon: 'stackoverflow-logo',
+		name: 'Stack Overflow link',
+		href: 'https://stackoverflow.com/users/6504152/johannes-gnadlinger',
+		label: 'johannes-gnadlinger',
+		copy: 'https://stackoverflow.com/users/6504152/johannes-gnadlinger',
+	},
+	{
+		icon: 'external',
+		name: 'CV link',
+		href: 'https://cv.gnadlinger.me/',
+		label: 'cv.gnadlinger.me',
+		copy: 'https://cv.gnadlinger.me/',
+	},
+	{
+		icon: 'pencil-line',
+		name: 'blog link',
+		href: 'https://blog.gnadlinger.me/',
+		label: 'blog.gnadlinger.me',
+		copy: 'https://blog.gnadlinger.me/',
+	},
+];
 ---
 
 <div class="card-scene" tabindex="0" aria-label="Business card for Johannes Gnadlinger – hover or tap to flip">
@@ -50,30 +104,33 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 			<!-- Main: contacts left / QR right -->
 			<div class="back-main">
 				<div class="contact-list">
-					<a href="mailto:johannes.gnadlinger1997@gmail.com" class="contact-item">
-						<Icon icon="paper-plane-tilt" size="1em" />
-						<span>johannes.gnadlinger1997@gmail.com</span>
-					</a>
-					<a href="https://github.com/Gnadi" class="contact-item" target="_blank" rel="noopener noreferrer">
-						<Icon icon="github-logo" size="1em" />
-						<span>github.com/Gnadi</span>
-					</a>
-					<a href="https://at.linkedin.com/in/johannes-gnadlinger-842293271" class="contact-item" target="_blank" rel="noopener noreferrer">
-						<Icon icon="linkedin-logo" size="1em" />
-						<span>in/johannes-gnadlinger</span>
-					</a>
-					<a href="https://stackoverflow.com/users/6504152/johannes-gnadlinger" class="contact-item" target="_blank" rel="noopener noreferrer">
-						<Icon icon="stackoverflow-logo" size="1em" />
-						<span>johannes-gnadlinger</span>
-					</a>
-					<a href="https://cv.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
-						<Icon icon="external" size="1em" />
-						<span>cv.gnadlinger.me</span>
-					</a>
-					<a href="https://blog.gnadlinger.me/" class="contact-item" target="_blank" rel="noopener noreferrer">
-						<Icon icon="pencil-line" size="1em" />
-						<span>blog.gnadlinger.me</span>
-					</a>
+					{
+						contacts.map(({ icon, name, href, label, copy }) => (
+							<div class="contact-row">
+								<a
+									href={href}
+									class="contact-item"
+									{...(href.startsWith('mailto:')
+										? {}
+										: { target: '_blank', rel: 'noopener noreferrer' })}
+								>
+									<Icon icon={icon} size="1em" />
+									<span>{label}</span>
+								</a>
+								<button
+									type="button"
+									class="copy-btn"
+									data-copy={copy}
+									data-name={name}
+									aria-label={`Copy ${name}`}
+									title={`Copy ${name}`}
+								>
+									<span class="copy-icon"><Icon icon="copy" size="1em" /></span>
+									<span class="check-icon"><Icon icon="check" size="1em" /></span>
+								</button>
+							</div>
+						))
+					}
 				</div>
 
 				<!-- QR code: its own clean panel -->
@@ -94,6 +151,7 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 			<!-- Footer -->
 			<div class="back-footer">
 				<span class="card-location-back">📍 Linz, Austria</span>
+				<span class="copy-status" role="status" aria-live="polite"></span>
 			</div>
 		</div>
 
@@ -105,6 +163,7 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 		const card   = scene.querySelector<HTMLElement>('.card');
 		const front  = scene.querySelector<HTMLElement>('.card-front');
 		const back   = scene.querySelector<HTMLElement>('.card-back');
+		const status = scene.querySelector<HTMLElement>('.copy-status');
 		if (!card) return;
 
 		function flip() {
@@ -114,9 +173,65 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 			back?.setAttribute('aria-hidden', String(!flipped));
 		}
 
-		scene.addEventListener('click', flip);
+		/** Interactive elements handle their own clicks — flipping on top of that
+		 *  would yank the card away mid-interaction. */
+		const isInteractive = (target: EventTarget | null) =>
+			target instanceof Element && !!target.closest('a, button');
+
+		scene.addEventListener('click', (e) => {
+			if (isInteractive(e.target)) return;
+			flip();
+		});
 		scene.addEventListener('keydown', (e: KeyboardEvent) => {
+			if (isInteractive(e.target)) return;
 			if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); }
+		});
+
+		let resetTimer: ReturnType<typeof setTimeout>;
+
+		async function copy(text: string) {
+			try {
+				await navigator.clipboard.writeText(text);
+				return true;
+			} catch {
+				// Clipboard API needs a secure context; fall back to a scratch textarea.
+				const scratch = document.createElement('textarea');
+				scratch.value = text;
+				scratch.setAttribute('readonly', '');
+				scratch.style.position = 'fixed';
+				scratch.style.opacity = '0';
+				document.body.appendChild(scratch);
+				scratch.select();
+				let ok = false;
+				try { ok = document.execCommand('copy'); } catch { ok = false; }
+				document.body.removeChild(scratch);
+				return ok;
+			}
+		}
+
+		scene.querySelectorAll<HTMLButtonElement>('.copy-btn').forEach((btn) => {
+			btn.addEventListener('click', async (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+
+				const text = btn.dataset.copy;
+				const name = btn.dataset.name ?? 'Link';
+				if (!text) return;
+
+				const ok = await copy(text);
+
+				scene.querySelectorAll('.copy-btn.is-copied').forEach((el) =>
+					el.classList.remove('is-copied'),
+				);
+				if (ok) btn.classList.add('is-copied');
+				if (status) status.textContent = ok ? `${name} copied` : `Could not copy ${name}`;
+
+				clearTimeout(resetTimer);
+				resetTimer = setTimeout(() => {
+					btn.classList.remove('is-copied');
+					if (status) status.textContent = '';
+				}, 2000);
+			});
 		});
 	});
 </script>
@@ -144,7 +259,10 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 		.card-scene:hover .card { transform: rotateY(180deg); }
 	}
 	.card-scene.is-flipped .card,
-	.card-scene:focus-visible .card { transform: rotateY(180deg); }
+	.card-scene:focus-visible .card,
+	/* Keep the card turned while a copy button or link on the back has focus —
+	   otherwise tabbing to one flips it out of reach. */
+	.card-scene:focus-within .card { transform: rotateY(180deg); }
 
 	/* ── Shared face ────────────────────────────────────── */
 	.card-face {
@@ -158,6 +276,26 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 		flex-direction: column;
 		box-shadow: var(--shadow-lg);
 	}
+
+	/* Only the face turned towards the viewer may take clicks.
+	   `backface-visibility` hides the other face visually, but its children
+	   still sit on top in hit-testing — without this the links and copy
+	   buttons on the back are unreachable, because `.front-body` swallows
+	   every click. Mirrors the flip triggers above. */
+	.card-back { pointer-events: none; }
+
+	@media (hover: hover) {
+		.card-scene:hover .card-front { pointer-events: none; }
+		.card-scene:hover .card-back { pointer-events: auto; }
+	}
+
+	.card-scene.is-flipped .card-front,
+	.card-scene:focus-visible .card-front,
+	.card-scene:focus-within .card-front { pointer-events: none; }
+
+	.card-scene.is-flipped .card-back,
+	.card-scene:focus-visible .card-back,
+	.card-scene:focus-within .card-back { pointer-events: auto; }
 
 	/* ══════════════════════ FRONT ══════════════════════════ */
 	.card-front {
@@ -316,7 +454,15 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 		padding-right: 1.25rem;
 	}
 
+	.contact-row {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		min-width: 0;
+	}
+
 	.contact-item {
+		flex: 1;
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -326,6 +472,61 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 		transition: color var(--theme-transition);
 		white-space: nowrap;
 		overflow: hidden;
+		min-width: 0;
+	}
+
+	/* ── Copy buttons ───────────────────────────────────── */
+	.copy-btn {
+		flex-shrink: 0;
+		display: grid;
+		place-items: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		padding: 0;
+		border: 1px solid transparent;
+		border-radius: 0.4rem;
+		background: transparent;
+		color: var(--gray-400);
+		cursor: pointer;
+		/* Always present so the affordance is discoverable — the card is already
+		   behind a flip, hiding the buttons behind a second hover would bury
+		   them. Dimmed so they stay secondary to the links themselves. */
+		opacity: 0.55;
+		transition:
+			opacity var(--theme-transition),
+			color var(--theme-transition),
+			background-color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+
+	.contact-row:hover .copy-btn,
+	.copy-btn:focus-visible,
+	.copy-btn.is-copied {
+		opacity: 1;
+	}
+
+	.copy-btn:hover {
+		color: var(--accent-regular);
+		background-color: var(--accent-subtle-overlay);
+		border-color: var(--gray-800);
+	}
+
+	.copy-btn:focus-visible {
+		outline: 2px solid var(--accent-regular);
+		outline-offset: 1px;
+	}
+
+	.copy-btn .check-icon { display: none; }
+	.copy-btn.is-copied {
+		color: var(--accent-regular);
+		border-color: var(--accent-regular);
+	}
+	.copy-btn.is-copied .copy-icon { display: none; }
+	.copy-btn.is-copied .check-icon { display: block; }
+
+	.copy-status {
+		font-size: var(--text-sm);
+		color: var(--accent-regular);
 	}
 
 	.contact-item span {
@@ -377,6 +578,10 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 	/* Footer */
 	.back-footer {
 		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
 		padding-top: 0.75rem;
 		border-top: 1px solid var(--gray-800);
 	}
@@ -403,6 +608,9 @@ const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${e
 		.back-portrait { width: 2.5rem; height: 2.5rem; }
 
 		.contact-item { font-size: var(--text-sm); }
+
+		.copy-btn { width: 1.5rem; height: 1.5rem; }
+		.copy-status { font-size: 0.7rem; }
 
 		.qr-code { width: 80px; height: 80px; }
 		.qr-label { font-size: 0.7rem; }

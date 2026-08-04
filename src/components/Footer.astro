@@ -6,16 +6,12 @@ const currentYear = new Date().getFullYear();
 const lang = getLangFromUrl(Astro.url);
 const isDe = lang === 'de';
 
-/** Links out to the sibling hosts and to the surname page. These run on every
- *  page so the three gnadlinger.me hosts stay mutually reachable. */
+/** Links out to the sibling hosts. These run on every page so the three
+ *  gnadlinger.me hosts stay mutually reachable. */
 const siteLinks: { label: string; href: string }[] = [
-	{ label: isDe ? 'Portfolio' : 'Portfolio', href: isDe ? '/de/' : '/' },
+	{ label: 'Portfolio', href: isDe ? '/de/' : '/' },
 	{ label: isDe ? 'Lebenslauf' : 'CV', href: CV_URL },
 	{ label: 'Blog', href: BLOG_URL },
-	{
-		label: isDe ? 'Der Name Gnadlinger' : 'The Gnadlinger name',
-		href: isDe ? '/de/gnadlinger/' : '/gnadlinger/',
-	},
 ];
 ---
 

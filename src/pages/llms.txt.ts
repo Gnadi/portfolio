@@ -14,8 +14,8 @@ const llmsTxt = `
 > regulated financial infrastructure — SEPA and EBICS payment flows,
 > transaction processing, and private banking platforms.
 
-Gnadlinger is an uncommon Austrian surname. This site belongs to Johannes
-Gnadlinger; other people carrying the name are listed on the name page below.
+Gnadlinger is an uncommon Austrian surname; this site belongs to Johannes
+Gnadlinger, not to any of the other people who carry it.
 
 The site is available in English (default) and German (under /de/).
 
@@ -23,7 +23,6 @@ The site is available in English (default) and German (under /de/).
 
 - [Home](${SITE_ORIGIN}/): Introduction, areas of expertise, featured projects.
 - [About](${SITE_ORIGIN}/about/): Background, education, and personal notes.
-- [The Gnadlinger name](${SITE_ORIGIN}/gnadlinger/): The surname, and other people who carry it.
 - [Career](${SITE_ORIGIN}/career/): Timeline of roles and projects since 2018.
 - [Projects](${SITE_ORIGIN}/work/): Side projects with stack and source links.
 - [Digital business card](${SITE_ORIGIN}/card/): Contact details.
