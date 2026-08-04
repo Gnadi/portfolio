@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ProjectDetail from '../../../components/ProjectDetail.astro';
+import { breadcrumbNode, canonicalUrl, projectNode } from '../../../lib/schema';
 
 export async function getStaticPaths() {
 	const entries = await getCollection('work');
@@ -16,11 +17,34 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
+
+const canonical = canonicalUrl(Astro.url.pathname);
+const schema = [
+	projectNode({
+		canonical,
+		name: entry.data.title,
+		description: entry.data.description,
+		datePublished: entry.data.publishDate,
+		url: entry.data.url,
+		repo: entry.data.repo,
+		stack: entry.data.stack,
+		image: entry.data.img ? canonicalUrl(entry.data.img) : undefined,
+		lang: 'de',
+	}),
+	breadcrumbNode(canonical, [
+		{ name: 'Gnadlinger', item: canonicalUrl('/de/') },
+		{ name: 'Projekte', item: canonicalUrl('/de/work/') },
+		{ name: entry.data.title },
+	]),
+];
 ---
 
 <BaseLayout
-	title={`${entry.data.title} | Johannes Gnadlinger`}
+	title={`${entry.data.title} | Gnadlinger`}
 	description={entry.data.description}
+	schema={schema}
+	ogType="article"
+	publishedTime={entry.data.publishDate}
 >
 	<ProjectDetail entry={entry} lang="de" />
 </BaseLayout>

@@ -1,17 +1,30 @@
 ---
 import '../styles/global.css';
+import { buildGraph, BRAND, FULL_NAME, type JsonLdNode } from '../lib/schema';
 
 interface Props {
 	title?: string | undefined;
 	description?: string | undefined;
 	/** Whether this page has both an English and a German counterpart. */
 	alternates?: boolean;
+	/** Extra JSON-LD nodes merged into the site-wide `@graph`. */
+	schema?: JsonLdNode[] | undefined;
+	/** `article` on project detail pages, `website` everywhere else. */
+	ogType?: 'website' | 'article';
+	/** Publication date, for `article:published_time`. */
+	publishedTime?: Date | undefined;
+	/** Keep the page out of the index (404s). */
+	noindex?: boolean;
 }
 
 const {
-	title = 'Johannes Gnadlinger: Personal Site',
-	description = 'The personal site of Johannes Gnadlinger',
+	title = `${BRAND} — ${FULL_NAME}, Backend Engineer`,
+	description = 'Johannes Gnadlinger — Backend Engineer for corporate payment systems and financial infrastructure, based in Linz, Austria.',
 	alternates = true,
+	schema = [],
+	ogType = 'website',
+	publishedTime,
+	noindex = false,
 } = Astro.props;
 
 // Resolve the canonical site origin from astro.config (`site`), with a fallback.
@@ -29,33 +42,15 @@ const enHref = new URL(basePath, site).href;
 const deHref = new URL(basePath === '/' ? '/de/' : `/de${basePath}`, site).href;
 
 const ogLocale = isDe ? 'de_DE' : 'en_US';
-const ogImage = new URL('/assets/about.jpg', site).href;
+const ogImage = new URL('/assets/og-card.png', site).href;
+const ogImageAlt = isDe
+	? 'Gnadlinger — Johannes Gnadlinger, Backend Engineer in Linz'
+	: 'Gnadlinger — Johannes Gnadlinger, Backend Engineer in Linz, Austria';
 
-// Person entity — helps search engines connect this site to "Johannes Gnadlinger".
-const personSchema = {
-	'@context': 'https://schema.org',
-	'@type': 'Person',
-	name: 'Johannes Gnadlinger',
-	givenName: 'Johannes',
-	familyName: 'Gnadlinger',
-	url: new URL('/', site).href,
-	image: new URL('/assets/portrait.webp', site).href,
-	jobTitle: 'Backend Engineer',
-	worksFor: {
-		'@type': 'Organization',
-		name: 'Raiffeisen Software GmbH',
-	},
-	address: {
-		'@type': 'PostalAddress',
-		addressLocality: 'Linz',
-		addressCountry: 'AT',
-	},
-	sameAs: [
-		'https://github.com/Gnadi',
-		'https://at.linkedin.com/in/johannes-gnadlinger-842293271',
-		'https://stackoverflow.com/users/6504152/johannes-gnadlinger',
-	],
-};
+// Site-wide entity graph (WebSite + Person + employer), plus any page-specific
+// nodes. The `@id` anchors are shared with the CV and blog subdomains so all
+// three hosts resolve to one person. See src/lib/schema.ts.
+const jsonLd = buildGraph(isDe ? 'de' : 'en', schema);
 ---
 
 <meta charset="UTF-8" />
@@ -63,6 +58,8 @@ const personSchema = {
 <meta name="generator" content={Astro.generator} />
 <title>{title}</title>
 <meta name="description" content={description} />
+<meta name="author" content={FULL_NAME} />
+{noindex && <meta name="robots" content="noindex, follow" />}
 
 <link rel="canonical" href={canonical} />
 {
@@ -76,32 +73,43 @@ const personSchema = {
 }
 
 <!-- Open Graph -->
-<meta property="og:type" content="website" />
-<meta property="og:site_name" content="Johannes Gnadlinger" />
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content={BRAND} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:locale" content={ogLocale} />
+<meta property="og:locale:alternate" content={isDe ? 'en_US' : 'de_DE'} />
 <meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={ogImageAlt} />
+{
+	ogType === 'article' && publishedTime && (
+		<>
+			<meta property="article:published_time" content={publishedTime.toISOString()} />
+			<meta property="article:author" content={FULL_NAME} />
+		</>
+	)
+}
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={ogImageAlt} />
 
-<script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+<script type="application/ld+json" set:html={jsonLd} />
 
 <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#7611a6" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
 	href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap"
-	rel="stylesheet"
-	type="text/css"
-	media="print"
-	onload="this.media='all'"
-/>
-<link
-	href="https://fonts.gstatic.com"
 	rel="stylesheet"
 	type="text/css"
 	media="print"

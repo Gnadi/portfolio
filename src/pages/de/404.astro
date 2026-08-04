@@ -3,6 +3,14 @@ import Hero from '../../components/Hero.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Not Found" description="404 Error — this page was not found DE">
-	<Hero title="Page Not Found" tagline="Not found" />
+<BaseLayout
+	title="Seite nicht gefunden | Gnadlinger"
+	description="404 — diese Seite existiert nicht."
+	alternates={false}
+	noindex
+>
+	<Hero
+		title="Seite nicht gefunden"
+		tagline="Diese Seite gibt es nicht. Nutze am besten die Navigation oben."
+	/>
 </BaseLayout>

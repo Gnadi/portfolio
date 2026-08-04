@@ -4,13 +4,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ContactCTA from '../components/ContactCTA.astro';
 import Hero from '../components/Hero.astro';
 import BusinessCard from '../components/BusinessCard.astro';
+import { breadcrumbNode, canonicalUrl, profilePageNode } from '../lib/schema';
+
+const canonical = canonicalUrl(Astro.url.pathname);
+const schema = [
+	profilePageNode(canonical),
+	breadcrumbNode(canonical, [
+		{ name: 'Gnadlinger', item: canonicalUrl('/') },
+		{ name: 'About' },
+	]),
+];
 ---
 
-<BaseLayout title="About | Johannes Gnadlinger" description="About Johannes Gnadlinger">
+<BaseLayout
+	title="About Johannes Gnadlinger | Gnadlinger"
+	description="Who Johannes Gnadlinger is: Backend Engineer at Raiffeisen Software GmbH in Linz, Austria, working on corporate payment systems — plus background, education and life outside work."
+	schema={schema}
+>
 	<div class="stack gap-20">
 		<main class="wrapper about">
 			<Hero
-				title="Hi!"
+				title="Johannes Gnadlinger"
 				tagline="Thanks for stopping by. A short note on what I work on, and who I am off-duty."
 			>
 				<img
@@ -59,6 +73,29 @@ import BusinessCard from '../components/BusinessCard.astro';
 					</p>
 				</div>
 			</section>
+
+			<section>
+				<h2 class="section-title">Education</h2>
+				<div class="content">
+					<ul>
+						<li>HTL (Austrian technical secondary college)</li>
+						<li>Civilian service</li>
+						<li>Trainee programme @ Raiffeisen Software GmbH</li>
+					</ul>
+				</div>
+			</section>
+
+			<section>
+				<h2 class="section-title">Off-duty</h2>
+				<div class="content">
+					<ul>
+						<li>Family</li>
+						<li>Tennis</li>
+						<li>Hackathons (more so in the past)</li>
+					</ul>
+				</div>
+			</section>
+
 			<div class="card-section">
 				<BusinessCard />
 			</div>

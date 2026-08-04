@@ -4,15 +4,21 @@ import ThemeToggle from "./ThemeToggle.astro";
 import type { iconPaths } from "./IconPaths";
 import Language from "./Language.astro";
 import { getLangFromUrl } from "../i18n/utils";
+import { FULL_NAME } from "../lib/schema";
+
+const lang = getLangFromUrl(Astro.url);
+/** Home link has to follow the current language — `/` would drop German
+ *  visitors onto the English homepage. */
+const homeHref = lang == "de" ? "/de/" : "/";
 
 /** Main menu items */
 const textLinks: { label: string; href: string }[] =
-	getLangFromUrl(Astro.url) == "de"
+	lang == "de"
 		? [
 				{ label: "Home", href: "/de/" },
-				{ label: "Projekte", href: "/de/work" },
-				{ label: "Karriere", href: "/de/career" },
-				{ label: "About", href: "/de/about" },
+				{ label: "Projekte", href: "/de/work/" },
+				{ label: "Karriere", href: "/de/career/" },
+				{ label: "Über mich", href: "/de/about/" },
 				{ label: "Lebenslauf", href: "https://cv.gnadlinger.me/" },
 				{ label: "Blog", href: "https://blog.gnadlinger.me/" },
 			]
@@ -47,14 +53,14 @@ const iconLinks: {
 
 <nav>
 	<div class="menu-header">
-		<a href="/" class="site-title">
+		<a href={homeHref} class="site-title">
 			<Icon
 				icon="home"
 				color="var(--accent-regular)"
 				size="3em"
 				gradient
 			/>
-			Johannes Gnadlinger
+			{FULL_NAME}
 		</a>
 		<menu-button>
 			<template>
