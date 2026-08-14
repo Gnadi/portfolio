@@ -68,27 +68,36 @@ import Icon from './Icon.astro';
 </style>
 
 <script>
+	import { applyTheme, isDark, storeTheme } from '../lib/theme';
+
 	class ThemeToggle extends HTMLElement {
 		constructor() {
 			super();
 
 			const button = this.querySelector('button')!;
 
-			/** Set the theme to dark/light mode. */
-			const setTheme = (dark: boolean) => {
-				document.documentElement.classList[dark ? 'add' : 'remove']('theme-dark');
-				button.setAttribute('aria-pressed', String(dark));
-			};
+			/** Mirror whatever theme the document currently carries. */
+			const reflect = () => button.setAttribute('aria-pressed', String(isDark()));
 
-			// Toggle the theme when a user clicks the button.
-			button.addEventListener('click', () => setTheme(!this.isDark()));
+			// Toggle the theme when a user clicks the button, and persist it so the
+			// CV and the blog pick the same one up — see src/lib/theme.ts.
+			button.addEventListener('click', () => {
+				const next = isDark() ? 'light' : 'dark';
+				applyTheme(next);
+				storeTheme(next);
+				reflect();
+			});
+
+			// The head script switches the theme on its own when a sibling site
+			// changed it while this tab was in the background, so follow the class
+			// rather than assume this button is the only thing that moves it.
+			new MutationObserver(reflect).observe(document.documentElement, {
+				attributes: true,
+				attributeFilter: ['class'],
+			});
 
 			// Initialize button state to reflect current theme.
-			setTheme(this.isDark());
-		}
-
-		isDark() {
-			return document.documentElement.classList.contains('theme-dark');
+			reflect();
 		}
 	}
 	customElements.define('theme-toggle', ThemeToggle);
