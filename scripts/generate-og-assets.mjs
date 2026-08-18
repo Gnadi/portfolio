@@ -4,8 +4,12 @@
  *   - assets/og-card.png   1200×630 Open Graph / Twitter card
  *   - assets/icons/icon-192.png, icon-512.png  PWA icons
  *
- * Sources live outside `public/` (src/assets/logo.jpg) so they are not
- * deployed at full size; the site itself loads the logo through astro:assets.
+ * Sources live outside `public/` (src/assets/) so they are not deployed at
+ * full size; the site itself loads the logo through astro:assets.
+ *
+ * The PWA icons come from src/assets/icon.png — the same tent mark as
+ * favicon.ico, so the browser tab and the home-screen icon match. The Linz
+ * artwork in logo.jpg is the footer illustration, not the site icon.
  *
  * Run with `node scripts/generate-og-assets.mjs` after changing the source
  * images or the card copy. The output is committed, so this is not part of the
@@ -19,7 +23,7 @@ import sharp from 'sharp';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const assets = path.join(root, 'public', 'assets');
 const icons = path.join(assets, 'icons');
-const logoSource = path.join(root, 'src', 'assets', 'logo.jpg');
+const iconSource = path.join(root, 'src', 'assets', 'icon.png');
 
 const WIDTH = 1200;
 const HEIGHT = 630;
@@ -86,9 +90,15 @@ async function buildOgCard() {
 async function buildIcons() {
 	await mkdir(icons, { recursive: true });
 	for (const size of [192, 512]) {
-		await sharp(logoSource)
-			.resize(size, size, { fit: 'cover' })
-			.png({ compressionLevel: 9, palette: true })
+		// The source is a 48x48 icon, so it is upscaled; lanczos3 keeps the flat
+		// shapes clean and `contain` preserves the transparent background.
+		await sharp(iconSource)
+			.resize(size, size, {
+				kernel: 'lanczos3',
+				fit: 'contain',
+				background: { r: 0, g: 0, b: 0, alpha: 0 },
+			})
+			.png({ compressionLevel: 9 })
 			.toFile(path.join(icons, `icon-${size}.png`));
 	}
 }
