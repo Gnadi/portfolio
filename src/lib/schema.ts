@@ -23,6 +23,12 @@ export const BLOG_URL = 'https://blog.gnadlinger.me/';
 export const BRAND = 'Gnadlinger';
 export const FULL_NAME = 'Johannes Gnadlinger';
 
+/** Fallback `<title>` and description for pages that set neither. Shared so
+ *  the head and the AI prompt below the fold describe the same page. */
+export const DEFAULT_TITLE = `${BRAND} — ${FULL_NAME}, Backend Engineer`;
+export const DEFAULT_DESCRIPTION =
+	'Johannes Gnadlinger — Backend Engineer for corporate payment systems and financial infrastructure, based in Linz, Austria.';
+
 export type JsonLdNode = Record<string, unknown>;
 
 /** Absolute URL for a page path — matches the `<link rel="canonical">` value. */

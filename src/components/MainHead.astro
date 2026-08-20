@@ -1,6 +1,13 @@
 ---
 import '../styles/global.css';
-import { buildGraph, BRAND, FULL_NAME, type JsonLdNode } from '../lib/schema';
+import {
+	buildGraph,
+	BRAND,
+	DEFAULT_DESCRIPTION,
+	DEFAULT_TITLE,
+	FULL_NAME,
+	type JsonLdNode,
+} from '../lib/schema';
 import { themeInitScript } from '../lib/theme';
 
 interface Props {
@@ -19,8 +26,8 @@ interface Props {
 }
 
 const {
-	title = `${BRAND} — ${FULL_NAME}, Backend Engineer`,
-	description = 'Johannes Gnadlinger — Backend Engineer for corporate payment systems and financial infrastructure, based in Linz, Austria.',
+	title = DEFAULT_TITLE,
+	description = DEFAULT_DESCRIPTION,
 	alternates = true,
 	schema = [],
 	ogType = 'website',

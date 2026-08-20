@@ -1,0 +1,113 @@
+---
+/**
+ * A row of AI assistants, each linking out with a summary of the current page
+ * already prefilled. See src/lib/askAi.ts for the prompt and the link formats.
+ */
+import { getLangFromUrl } from '../i18n/utils';
+import { buildPrompt, labels, providers } from '../lib/askAi';
+
+interface Props {
+	/** The page's `<title>`, same value BaseLayout passes to MainHead. */
+	title: string;
+	/** The page's meta description. */
+	description: string;
+}
+
+const { title, description } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const copy = labels[lang];
+
+// Same resolution as the canonical link in MainHead: `Astro.url` carries the
+// build server's origin, so the public origin comes from astro.config.
+const site = Astro.site ?? new URL('https://www.gnadlinger.me/');
+const url = new URL(Astro.url.pathname, site).href;
+
+const prompt = encodeURIComponent(buildPrompt({ lang, title, description, url }));
+---
+
+<aside class="ask-ai" aria-label={copy.heading}>
+	<p class="heading">{copy.heading}</p>
+	<ul class="row" role="list">
+		{
+			providers.map(({ name, glyph, href }) => {
+				const action = copy.action.replace('%s', name);
+				return (
+					<li>
+						<a href={href(prompt)} target="_blank" rel="noopener noreferrer" title={action}>
+							<span class="sr-only">{action}</span>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox={glyph.viewBox}
+								fill="currentcolor"
+								aria-hidden="true"
+							>
+								<path d={glyph.path} />
+							</svg>
+						</a>
+					</li>
+				);
+			})
+		}
+	</ul>
+</aside>
+
+<style>
+	.ask-ai {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		margin-top: auto;
+		padding: 3rem 2rem 0;
+		text-align: center;
+	}
+
+	.heading {
+		color: var(--gray-400);
+		font-size: var(--text-sm);
+	}
+
+	.row {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.75rem;
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}
+
+	a {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 999rem;
+		background-color: var(--gray-999);
+		box-shadow: inset 0 0 0 1px var(--accent-overlay);
+		/* `--link-color` rather than the raw accent: it is the one that stays
+		   legible against the dark theme's near-black background. */
+		color: var(--link-color);
+	}
+
+	svg {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
+
+	a:hover,
+	a:focus-visible {
+		background-color: var(--accent-regular);
+		color: var(--accent-text-over);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		a {
+			transition:
+				background-color var(--theme-transition),
+				color var(--theme-transition);
+		}
+	}
+</style>
