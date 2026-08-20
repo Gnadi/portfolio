@@ -6,8 +6,9 @@
 import MainHead from '../components/MainHead.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import AskAi from '../components/AskAi.astro';
 import Analytics from '@vercel/analytics/astro';
-import type { JsonLdNode } from '../lib/schema';
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, type JsonLdNode } from '../lib/schema';
 
 interface Props {
 	title?: string | undefined;
@@ -22,6 +23,9 @@ interface Props {
 	publishedTime?: Date | undefined;
 	/** Keep the page out of the index (404s). */
 	noindex?: boolean;
+	/** Offer the “summarise with AI” links. Off where there is nothing to
+	 *  summarise, i.e. the 404s. */
+	askAi?: boolean;
 }
 
 const {
@@ -32,6 +36,7 @@ const {
 	ogType,
 	publishedTime,
 	noindex,
+	askAi = true,
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
@@ -56,6 +61,7 @@ const lang = pathname === '/de' || pathname.startsWith('/de/') ? 'de' : 'en';
 		<div class="stack backgrounds">
 			<Nav />
 			<slot />
+			{askAi && <AskAi title={title ?? DEFAULT_TITLE} description={description ?? DEFAULT_DESCRIPTION} />}
 			<Footer />
 		</div>
 
