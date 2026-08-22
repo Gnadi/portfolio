@@ -61,8 +61,10 @@ const lang = pathname === '/de' || pathname.startsWith('/de/') ? 'de' : 'en';
 		<div class="stack backgrounds">
 			<Nav />
 			<slot />
-			{askAi && <AskAi title={title ?? DEFAULT_TITLE} description={description ?? DEFAULT_DESCRIPTION} />}
-			<Footer />
+			<div class="page-end">
+				{askAi && <AskAi title={title ?? DEFAULT_TITLE} description={description ?? DEFAULT_DESCRIPTION} />}
+				<Footer />
+			</div>
 		</div>
 
 		<script>
@@ -71,6 +73,13 @@ const lang = pathname === '/de' || pathname.startsWith('/de/') ? 'de' : 'en';
 		</script>
 
 		<style>
+			/* Leiste und Footer bleiben zusammen: Ein Auto-Margin für den ganzen
+			   Block, statt je eines pro Element — sonst teilt Flexbox den freien
+			   Platz einer kurzen Seite gleichmäßig zwischen beiden auf. */
+			.page-end {
+				margin-top: auto;
+			}
+
 			:root {
 				--_placeholder-bg: linear-gradient(transparent, transparent);
 				--bg-image-main: url('/assets/backgrounds/bg-main-light-800w.jpg');
