@@ -118,6 +118,14 @@
 html,
 body {
 	height: 100%;
+}
+
+/* Only the root may clip horizontally. `overflow-x` on an element forces its
+   `overflow-y` to compute to `auto`, so setting it on html *and* body turns
+   each into its own scroll container: you reach the bottom of one and the
+   other carries on scrolling through empty space. The root's overflow is
+   propagated to the viewport, which is the single scroller we want. */
+html {
 	overflow-x: hidden;
 }
 
