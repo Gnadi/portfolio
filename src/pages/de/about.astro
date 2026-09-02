@@ -98,6 +98,7 @@ const schema = [
 
 			<div class="card-section">
 				<BusinessCard />
+				<a class="card-link" href="/de/card/">Die Karte als eigene Seite öffnen →</a>
 			</div>
 		</main>
 
@@ -144,6 +145,25 @@ const schema = [
 	.content :global(a:hover),
 	.content :global(a:focus) {
 		text-decoration-color: currentColor;
+	}
+
+	.card-section {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.card-link {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+		text-decoration: none;
+		transition: color var(--theme-transition);
+	}
+
+	.card-link:hover,
+	.card-link:focus-visible {
+		color: var(--accent-regular);
 	}
 
 	@media (min-width: 50em) {

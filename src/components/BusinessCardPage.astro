@@ -1,0 +1,173 @@
+---
+/**
+ * The digital business card as its own page. Shared by `/card/` and
+ * `/de/card/`; the card itself is also embedded on the about pages, but only
+ * this page offers the print/PDF route.
+ */
+import BusinessCard from './BusinessCard.astro';
+import type { SiteLang } from '../data/career';
+
+interface Props {
+	lang: SiteLang;
+}
+
+const { lang } = Astro.props;
+
+const copy = {
+	en: {
+		title: 'Digital Business Card',
+		sub: 'Backend Engineer \u00b7 Linz, Austria \ud83c\udde6\ud83c\uddf9',
+		hint: 'Hover or tap to flip',
+		back: '\u2190 About page',
+		print: 'Print / Save as PDF',
+		aboutHref: '/about/',
+	},
+	de: {
+		title: 'Digitale Visitenkarte',
+		sub: 'Backend Engineer \u00b7 Linz, \u00d6sterreich \ud83c\udde6\ud83c\uddf9',
+		hint: 'Zum Umdrehen dar\u00fcberfahren oder tippen',
+		back: '\u2190 \u00dcber mich',
+		print: 'Drucken / Als PDF speichern',
+		aboutHref: '/de/about/',
+	},
+}[lang];
+---
+
+<div class="card-page wrapper">
+	<div class="page-header">
+		<h1 class="page-title">{copy.title}</h1>
+		<p class="page-sub">{copy.sub}</p>
+	</div>
+
+	<div class="card-stage">
+		<BusinessCard />
+		<p class="hint" aria-hidden="true">{copy.hint}</p>
+	</div>
+
+	<div class="actions">
+		<a href={copy.aboutHref} class="back-link">{copy.back}</a>
+		<button class="print-btn" id="print-btn">{copy.print}</button>
+	</div>
+</div>
+
+<script>
+	document.getElementById('print-btn')?.addEventListener('click', () => window.print());
+</script>
+
+<style>
+	.card-page {
+		min-height: 70vh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 2.5rem;
+		padding-block: 4rem;
+	}
+
+	.page-header {
+		text-align: center;
+	}
+
+	.page-title {
+		font-family: var(--font-brand);
+		font-size: var(--text-2xl);
+		color: var(--gray-0);
+	}
+
+	.page-sub {
+		margin-top: 0.4rem;
+		font-size: var(--text-md);
+		color: var(--gray-400);
+	}
+
+	.card-stage {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.75rem;
+		width: 100%;
+	}
+
+	.hint {
+		font-size: var(--text-sm);
+		color: var(--gray-500);
+		font-style: italic;
+	}
+
+	.actions {
+		display: flex;
+		gap: 1.25rem;
+		align-items: center;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.back-link {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+		text-decoration: none;
+		transition: color var(--theme-transition);
+	}
+
+	.back-link:hover {
+		color: var(--accent-regular);
+	}
+
+	.print-btn {
+		padding: 0.55rem 1.5rem;
+		border-radius: 999rem;
+		border: 1px solid var(--accent-regular);
+		background: var(--accent-regular);
+		color: var(--accent-text-over);
+		font-family: var(--font-brand);
+		font-size: var(--text-sm);
+		cursor: pointer;
+		transition: box-shadow var(--theme-transition), opacity var(--theme-transition);
+	}
+
+	.print-btn:hover {
+		box-shadow: var(--shadow-md);
+		opacity: 0.88;
+	}
+
+	/* Print: hide chrome, show only the card back */
+	@media print {
+		:global(nav),
+		:global(footer),
+		.page-header,
+		.hint,
+		.actions {
+			display: none !important;
+		}
+
+		.card-page {
+			min-height: unset;
+			padding: 0;
+			justify-content: flex-start;
+		}
+
+		:global(.card-scene) {
+			width: 85.6mm;
+			height: 54mm;
+			perspective: none;
+		}
+
+		:global(.card) {
+			transform: none !important;
+			transition: none !important;
+		}
+
+		:global(.card-front) {
+			display: none !important;
+		}
+
+		:global(.card-back) {
+			transform: none !important;
+			backface-visibility: visible !important;
+			-webkit-backface-visibility: visible !important;
+			position: relative !important;
+			inset: unset !important;
+		}
+	}
+</style>
