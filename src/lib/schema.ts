@@ -8,7 +8,7 @@
  * search engines merge the three hosts into one entity.
  */
 
-import { CAREER, sortedCareer, translate } from '../data/career';
+import { CAREER, entrySummary, sortedCareer, translate } from '../data/career';
 
 /** Canonical origin of the main site. Keep in sync with `site` in astro.config.mjs. */
 export const SITE_ORIGIN = 'https://www.gnadlinger.me';
@@ -42,6 +42,7 @@ export type JsonLdNode = Record<string, unknown>;
 function awardsFromCareer(lang: 'en' | 'de'): string[] {
 	return CAREER.filter((entry) => entry.type === 'hackathon')
 		.map((entry) => {
+			if (!entry.description) return '';
 			const placement = translate(entry.description, lang).split('.')[0].trim();
 			return `${placement} — ${translate(entry.title, lang)}`;
 		})
@@ -245,7 +246,9 @@ export function careerListNode(canonical: string, lang: 'en' | 'de'): JsonLdNode
 			'@type': 'ListItem',
 			position: index + 1,
 			name: translate(entry.title, lang),
-			description: translate(entry.description, lang),
+			// Phased entries carry their text in the phases, not in a description
+			// of their own; entrySummary resolves whichever applies.
+			description: entrySummary(entry, lang),
 		})),
 	};
 }

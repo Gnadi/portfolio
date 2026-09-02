@@ -24,6 +24,21 @@ export type CareerType =
 	| 'certification'
 	| 'leave';
 
+/**
+ * A role held inside one entry. The tenure at Raiffeisen Software covers two
+ * distinct phases with different teams and different work, but it is one
+ * employment — so it stays one timeline entry with the phases listed inside,
+ * rather than two entries that would read as a change of employer.
+ */
+export interface CareerPhase {
+	title: Text;
+	/** ISO date. */
+	startDate: string;
+	/** ISO date, or the `ongoing` marker. */
+	endDate: string;
+	description: Text;
+}
+
 export interface CareerEntry {
 	type: CareerType;
 	title: Text;
@@ -33,7 +48,10 @@ export interface CareerEntry {
 	startDate: string;
 	/** ISO date, or the `ongoing` marker for entries with no end yet. */
 	endDate: string;
-	description: Text;
+	/** The entry's own text. Omitted when `phases` carries it instead. */
+	description?: Text;
+	/** Roles held within this one entry, newest first. */
+	phases?: CareerPhase[];
 }
 
 /** Entries that have not ended carry this instead of a date. */
@@ -47,14 +65,33 @@ export function translate(value: Text, lang: SiteLang): string {
 export const CAREER: CareerEntry[] = [
 	{
 		type: 'job',
-		title: 'Software Developer',
+		// The employer is what this entry is about; the roles are the phases.
+		title: 'Raiffeisen Software GmbH',
 		organization: 'Raiffeisen Software GmbH',
 		startDate: '2018-07-01',
 		endDate: ONGOING,
-		description: {
-			en: 'Developing scalable web applications using Angular and Java.',
-			de: 'Entwicklung skalierbarer Webanwendungen mit Angular und Java.',
-		},
+		// Wording taken verbatim from RESUME_DATA on the CV, so the two sites
+		// describe the same two phases in the same words.
+		phases: [
+			{
+				title: 'Payments & Backend Engineer',
+				startDate: '2023-01-01',
+				endDate: ONGOING,
+				description: {
+					en: 'Developing backend systems for corporate payment and financial services in a regulated banking environment.',
+					de: 'Entwicklung von Backend-Systemen für Zahlungsverkehr und Finanzdienstleistungen im Firmenkundengeschäft — in einem regulierten Bankenumfeld.',
+				},
+			},
+			{
+				title: 'Full Stack Developer & Product Owner',
+				startDate: '2018-07-01',
+				endDate: '2022-12-31',
+				description: {
+					en: 'Built digital banking products across private and corporate banking, progressing from hands-on full-stack development into product ownership.',
+					de: 'Entwicklung digitaler Banking-Produkte im Privat- und Firmenkundengeschäft — vom Full-Stack-Development bis in die Product Ownership.',
+				},
+			},
+		],
 	},
 	{
 		type: 'project',
@@ -350,6 +387,28 @@ export const typeOrder: CareerType[] = [
 ];
 
 export const isOngoing = (entry: CareerEntry) => entry.endDate === ONGOING;
+
+/** `2024` from an ISO date, or the localised "Present" for ongoing entries. */
+export function yearLabel(value: string, lang: SiteLang): string {
+	return value === ONGOING ? careerUi.ongoing[lang] : value.slice(0, 4);
+}
+
+/**
+ * The entry as one line of prose, for the structured data. Phased entries have
+ * no description of their own, so their phases supply it — the ItemList still
+ * carries one item per card, which is what the page shows.
+ */
+export function entrySummary(entry: CareerEntry, lang: SiteLang): string {
+	if (entry.phases?.length) {
+		return entry.phases
+			.map((phase) => {
+				const range = `${yearLabel(phase.startDate, lang)}–${yearLabel(phase.endDate, lang)}`;
+				return `${translate(phase.title, lang)} (${range}): ${translate(phase.description, lang)}`;
+			})
+			.join(' ');
+	}
+	return entry.description ? translate(entry.description, lang) : '';
+}
 
 /** Ongoing entries first, everything else newest start date first. */
 export function sortedCareer(): CareerEntry[] {

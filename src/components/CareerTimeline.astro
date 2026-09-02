@@ -11,6 +11,7 @@ import {
 	typeIcons,
 	typeLabels,
 	typeOrder,
+	yearLabel,
 	type CareerType,
 	type SiteLang,
 } from '../data/career';
@@ -26,9 +27,7 @@ const presentTypes = typeOrder.filter((type) =>
 	entries.some((entry) => entry.type === type)
 );
 
-/** `2024` from an ISO date, or the localised "Present" for ongoing entries. */
-const year = (value: string) =>
-	value.includes('-') ? value.split('-')[0] : careerUi.ongoing[lang];
+const year = (value: string) => yearLabel(value, lang);
 ---
 
 <div class="filters">
@@ -62,8 +61,30 @@ const year = (value: string) =>
 						</span>
 					</div>
 					<h2>{translate(entry.title, lang)}</h2>
-					<p class="organization">{translate(entry.organization, lang)}</p>
-					<p>{translate(entry.description, lang)}</p>
+					{
+						entry.phases ? (
+							/* One employer, several roles: the phases sit inside the one
+							   card so the timeline cannot be read as a change of employer. */
+							<ol class="phases">
+								{entry.phases.map((phase) => (
+									<li class="phase">
+										<div class="phase-header">
+											<h3>{translate(phase.title, lang)}</h3>
+											<span class="phase-date">
+												{year(phase.startDate)} - {year(phase.endDate)}
+											</span>
+										</div>
+										<p>{translate(phase.description, lang)}</p>
+									</li>
+								))}
+							</ol>
+						) : (
+							<Fragment>
+								<p class="organization">{translate(entry.organization, lang)}</p>
+								{entry.description && <p>{translate(entry.description, lang)}</p>}
+							</Fragment>
+						)
+					}
 				</div>
 			</div>
 		))
@@ -216,5 +237,43 @@ const year = (value: string) =>
 		font-weight: bold;
 		color: var(--accent-regular);
 		margin-bottom: 0.5rem;
+	}
+
+	/* ── Phases within one entry ───────────────────────────────── */
+
+	.phases {
+		list-style: none;
+		margin: 0.75rem 0 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	/* A rule between phases, not around each one: they belong to the same
+	   card, and boxing them would undo that. */
+	.phase + .phase {
+		padding-top: 1.25rem;
+		border-top: 1px solid var(--gray-800);
+	}
+
+	.phase-header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.25rem 1rem;
+		margin-bottom: 0.35rem;
+	}
+
+	.phase h3 {
+		font-size: var(--text-md);
+		font-weight: bold;
+		color: var(--accent-regular);
+	}
+
+	.phase-date {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
 	}
 </style>
