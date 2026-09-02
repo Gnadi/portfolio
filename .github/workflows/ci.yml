@@ -13,7 +13,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Astro 6 declares engines.node ">=22.12.0" and refuses to start
+          # below it. Keep this at or above whatever the installed Astro
+          # requires — `node -p "require('astro/package.json').engines.node"`.
+          node-version: 22
           cache: npm
 
       - run: npm ci
