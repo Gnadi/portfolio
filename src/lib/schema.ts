@@ -40,7 +40,7 @@ export function canonicalUrl(pathname: string): string {
  *  the visible links can never drift apart. */
 export const SAME_AS = [
 	'https://github.com/Gnadi',
-	'https://at.linkedin.com/in/johannes-gnadlinger-842293271',
+	'https://www.linkedin.com/in/johannes-gnadlinger-842293271',
 	'https://stackoverflow.com/users/6504152/johannes-gnadlinger',
 	CV_URL,
 	BLOG_URL,
@@ -52,7 +52,7 @@ export function employerNode(): JsonLdNode {
 		'@type': 'Organization',
 		'@id': EMPLOYER_ID,
 		name: 'Raiffeisen Software GmbH',
-		url: 'https://www.raiffeisensoftware.at/',
+		url: 'https://r-software.at',
 		address: {
 			'@type': 'PostalAddress',
 			addressLocality: 'Linz',

@@ -32,7 +32,7 @@ The site is available in English (default) and German (under /de/).
 - [CV](${CV_URL}): Full curriculum vitae.
 - [Blog](${BLOG_URL}): Writing on software engineering.
 - [GitHub](https://github.com/Gnadi)
-- [LinkedIn](https://at.linkedin.com/in/johannes-gnadlinger-842293271)
+- [LinkedIn](https://www.linkedin.com/in/johannes-gnadlinger-842293271)
 - [Stack Overflow](https://stackoverflow.com/users/6504152/johannes-gnadlinger)
 `.trim();
 
