@@ -8,6 +8,12 @@ import PortfolioPreview from '../components/PortfolioPreview.astro';
 import Hero from '../components/Hero.astro';
 import Grid from '../components/Grid.astro';
 import {getLangFromUrl} from "../i18n/utils";
+import {
+	breadcrumbNode,
+	canonicalUrl,
+	collectionPageNode,
+	projectListNode,
+} from '../lib/schema';
 import {defaultLang} from "../i18n/ui";
 const lang = getLangFromUrl(Astro.url);
 
@@ -21,11 +27,32 @@ const projects = (await getCollection('work')).map(entry =>{
 		if (aPreview !== bPreview) return aPreview - bPreview;
 		return b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf();
 	});
+
+const canonical = canonicalUrl(Astro.url.pathname);
+const schema = [
+	collectionPageNode(canonical, 'Projects', 'Side projects built by Johannes Gnadlinger — web apps, tooling and experiments, with the stack and source for each.'),
+	projectListNode(
+		canonical,
+		projects.map((project) => ({
+			name: project.props.data.title,
+			description: project.props.data.description,
+			url: canonicalUrl(
+				`/work/${project.params.slug ?? ''}/`
+			),
+		})),
+		'en'
+	),
+	breadcrumbNode(canonical, [
+		{ name: 'Gnadlinger', item: canonicalUrl('/') },
+		{ name: 'Projects' },
+	]),
+];
 ---
 
 <BaseLayout
 	title="Projects | Gnadlinger"
 	description="Side projects built by Johannes Gnadlinger — web apps, tooling and experiments, with the stack and source for each."
+	schema={schema}
 >
 	<div class="stack gap-20">
 		<main class="wrapper stack gap-8">
