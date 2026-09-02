@@ -21,8 +21,10 @@
     "@astrojs/vercel": "^10.0.8",
     "@fontsource/public-sans": "^5.3.0",
     "@fontsource/rubik": "^5.3.0",
+    "@types/qrcode": "^1.5.6",
     "@vercel/analytics": "^1.6.1",
     "astro": "^6.4.5",
+    "qrcode": "^1.5.4",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3"
   }
