@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import aboutPhoto from '../assets/about.jpg';
 
 import ContactCTA from '../components/ContactCTA.astro';
 import Hero from '../components/Hero.astro';
@@ -27,10 +29,12 @@ const schema = [
 				title="Johannes Gnadlinger"
 				tagline="Thanks for stopping by. A short note on what I work on, and who I am off-duty."
 			>
-				<img
-					width="1600"
-					height="1200"
-					src="/assets/about.jpg"
+				<Image
+					src={aboutPhoto}
+					widths={[480, 800, 1200, 1600]}
+					sizes="(min-width: 50em) 60vw, 100vw"
+					loading="eager"
+					fetchpriority="high"
 					alt="Johannes Gnadlinger"
 				/>
 			</Hero>

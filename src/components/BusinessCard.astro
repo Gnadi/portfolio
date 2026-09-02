@@ -1,8 +1,14 @@
 ---
+import { getImage } from 'astro:assets';
 import Icon from './Icon.astro';
 import type { iconPaths } from './IconPaths';
+import aboutPhoto from '../assets/about.jpg';
 
-const cardUrl = 'https://www.gnadlinger.me/card';
+// The card front is a cropped, veiled thumbnail — it never needs the full
+// 1600px source, so it goes through the image pipeline like everything else.
+const frontPhoto = await getImage({ src: aboutPhoto, width: 640, format: 'webp' });
+
+const cardUrl = 'https://www.gnadlinger.me/card/';
 const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(cardUrl)}&margin=8`;
 
 /** Contact rows on the back of the card. `copy` is what lands on the clipboard;
@@ -65,7 +71,11 @@ const contacts: {
 		<!-- ═══ FRONT ═══════════════════════════════════════ -->
 		<div class="card-face card-front">
 			<!-- Layered background: photo + gradient veil -->
-			<div class="front-bg-photo" aria-hidden="true"></div>
+			<div
+			class="front-bg-photo"
+			aria-hidden="true"
+			style={`--front-photo: url('${frontPhoto.src}')`}
+		></div>
 			<div class="front-bg-veil" aria-hidden="true"></div>
 
 			<div class="front-body">
@@ -307,7 +317,7 @@ const contacts: {
 	.front-bg-photo {
 		position: absolute;
 		inset: 0;
-		background-image: url('/assets/about.jpg');
+		background-image: var(--front-photo);
 		background-size: cover;
 		background-position: center 15%;
 		z-index: 0;

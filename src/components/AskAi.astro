@@ -23,18 +23,26 @@ const copy = labels[lang];
 const site = Astro.site ?? new URL('https://www.gnadlinger.me/');
 const url = new URL(Astro.url.pathname, site).href;
 
-const prompt = encodeURIComponent(buildPrompt({ lang, title, description, url }));
+// Carried once on the <aside> rather than five times inside the hrefs; the
+// inline script below appends it to each link's base.
+const prompt = buildPrompt({ lang, title, description, url });
 ---
 
-<aside class="ask-ai" aria-label={copy.heading}>
+<aside class="ask-ai" aria-label={copy.heading} data-ask-ai data-prompt={prompt}>
 	<p class="heading">{copy.heading}</p>
 	<ul class="row" role="list">
 		{
-			providers.map(({ name, glyph, href }) => {
+			providers.map(({ name, glyph, base }) => {
 				const action = copy.action.replace('%s', name);
 				return (
 					<li>
-						<a href={href(prompt)} target="_blank" rel="noopener noreferrer" title={action}>
+						<a
+							href={base}
+							data-base={base}
+							target="_blank"
+							rel="noopener noreferrer"
+							title={action}
+						>
 							<span class="sr-only">{action}</span>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -53,6 +61,24 @@ const prompt = encodeURIComponent(buildPrompt({ lang, title, description, url })
 		}
 	</ul>
 </aside>
+
+<script>
+	// Idempotent: the base is read from data-base, never from the current href,
+	// so a re-run (view transitions, bfcache) cannot append the prompt twice.
+	function fillAiPrompts() {
+		document.querySelectorAll<HTMLElement>('[data-ask-ai]').forEach((bar) => {
+			const prompt = bar.dataset.prompt;
+			if (!prompt) return;
+			const encoded = encodeURIComponent(prompt);
+			bar.querySelectorAll<HTMLAnchorElement>('a[data-base]').forEach((link) => {
+				link.href = link.dataset.base + encoded;
+			});
+		});
+	}
+
+	fillAiPrompts();
+	document.addEventListener('astro:after-swap', fillAiPrompts);
+</script>
 
 <style>
 	.ask-ai {
