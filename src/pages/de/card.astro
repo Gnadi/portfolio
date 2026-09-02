@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BusinessCardPage from '../../components/BusinessCardPage.astro';
+import { breadcrumbNode, canonicalUrl } from '../../lib/schema';
+
+const canonical = canonicalUrl(Astro.url.pathname);
+const schema = [
+	breadcrumbNode(canonical, [
+		{ name: 'Gnadlinger', item: canonicalUrl('/de/') },
+		{ name: 'Über mich', item: canonicalUrl('/de/about/') },
+		{ name: 'Visitenkarte' },
+	]),
+];
+---
+
+<BaseLayout
+	title="Visitenkarte | Gnadlinger"
+	description="Digitale Visitenkarte von Johannes Gnadlinger — Backend Engineer bei der Raiffeisen Software GmbH in Linz, Österreich."
+	schema={schema}
+>
+	<BusinessCardPage lang="de" />
+</BaseLayout>

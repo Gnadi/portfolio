@@ -1,9 +1,31 @@
 ---
+import QRCode from 'qrcode';
+import { getImage } from 'astro:assets';
 import Icon from './Icon.astro';
 import type { iconPaths } from './IconPaths';
+import aboutPhoto from '../assets/about.jpg';
 
-const cardUrl = 'https://www.gnadlinger.me/card';
-const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(cardUrl)}&margin=8`;
+// The card front is a cropped, veiled thumbnail — it never needs the full
+// 1600px source, so it goes through the image pipeline like everything else.
+const frontPhoto = await getImage({ src: aboutPhoto, width: 640, format: 'webp' });
+
+const cardUrl = 'https://www.gnadlinger.me/card/';
+
+// Generated at build time and inlined, rather than fetched from
+// api.qrserver.com when the card is rendered. That request went out on four
+// pages — both about pages and both card pages — and handed every visitor's IP
+// to a third party for an image whose content never changes. Inline it is also
+// one fewer request, and it stays sharp at any size.
+//
+// `margin: 1` keeps the quiet zone tight because .qr-code adds white padding
+// of its own; the SVG paints its own white background, so the code stays
+// scannable in dark mode.
+const qrSvg = await QRCode.toString(cardUrl, {
+	type: 'svg',
+	errorCorrectionLevel: 'M',
+	margin: 1,
+	color: { dark: '#000000', light: '#ffffff' },
+});
 
 /** Contact rows on the back of the card. `copy` is what lands on the clipboard;
  *  `label` is the shortened text shown on the card. */
@@ -31,9 +53,9 @@ const contacts: {
 	{
 		icon: 'linkedin-logo',
 		name: 'LinkedIn link',
-		href: 'https://at.linkedin.com/in/johannes-gnadlinger-842293271',
+		href: 'https://www.linkedin.com/in/johannes-gnadlinger-842293271',
 		label: 'in/johannes-gnadlinger',
-		copy: 'https://at.linkedin.com/in/johannes-gnadlinger-842293271',
+		copy: 'https://www.linkedin.com/in/johannes-gnadlinger-842293271',
 	},
 	{
 		icon: 'stackoverflow-logo',
@@ -65,7 +87,11 @@ const contacts: {
 		<!-- ═══ FRONT ═══════════════════════════════════════ -->
 		<div class="card-face card-front">
 			<!-- Layered background: photo + gradient veil -->
-			<div class="front-bg-photo" aria-hidden="true"></div>
+			<div
+			class="front-bg-photo"
+			aria-hidden="true"
+			style={`--front-photo: url('${frontPhoto.src}')`}
+		></div>
 			<div class="front-bg-veil" aria-hidden="true"></div>
 
 			<div class="front-body">
@@ -135,13 +161,11 @@ const contacts: {
 
 				<!-- QR code: its own clean panel -->
 				<div class="qr-panel">
-					<img
-						src={qrSrc}
-						alt={`QR code – ${cardUrl}`}
+					<div
 						class="qr-code"
-						width="110"
-						height="110"
-						loading="lazy"
+						role="img"
+						aria-label={`QR code – ${cardUrl}`}
+						set:html={qrSvg}
 					/>
 					<span class="qr-label">Scan to share</span>
 					<span class="qr-url">gnadlinger.me/card</span>
@@ -307,7 +331,7 @@ const contacts: {
 	.front-bg-photo {
 		position: absolute;
 		inset: 0;
-		background-image: url('/assets/about.jpg');
+		background-image: var(--front-photo);
 		background-size: cover;
 		background-position: center 15%;
 		z-index: 0;
@@ -561,6 +585,13 @@ const contacts: {
 		/* white container so QR is always scannable regardless of theme */
 		background: #fff;
 		padding: 6px;
+	}
+
+	/* The inlined SVG carries only a viewBox, so it takes its size from here. */
+	.qr-code :global(svg) {
+		display: block;
+		width: 100%;
+		height: 100%;
 	}
 
 	.qr-label {

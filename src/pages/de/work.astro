@@ -7,6 +7,12 @@ import ContactCTA from '../../components/ContactCTA.astro';
 import PortfolioPreview from '../../components/PortfolioPreview.astro';
 import Hero from '../../components/Hero.astro';
 import Grid from '../../components/Grid.astro';
+import {
+	breadcrumbNode,
+	canonicalUrl,
+	collectionPageNode,
+	projectListNode,
+} from '../../lib/schema';
 
 const projects = (await getCollection('work')).map(entry =>{
 	const [lang, ...slug] = entry.id.replace(/\.md$/, '').split('/');
@@ -18,11 +24,34 @@ const projects = (await getCollection('work')).map(entry =>{
 		if (aPreview !== bPreview) return aPreview - bPreview;
 		return b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf();
 	});
+
+const canonical = canonicalUrl(Astro.url.pathname);
+const schema = [
+	collectionPageNode(
+		canonical,
+		'Projekte',
+		'Eigene Projekte von Johannes Gnadlinger — Web-Apps, Tools und Experimente, jeweils mit Tech-Stack und Quellcode.'
+	),
+	projectListNode(
+		canonical,
+		projects.map((project) => ({
+			name: project.props.data.title,
+			description: project.props.data.description,
+			url: canonicalUrl(`/de/work/${project.params.slug ?? ''}/`),
+		})),
+		'de'
+	),
+	breadcrumbNode(canonical, [
+		{ name: 'Gnadlinger', item: canonicalUrl('/de/') },
+		{ name: 'Projekte' },
+	]),
+];
 ---
 
 <BaseLayout
 	title="Projekte | Gnadlinger"
 	description="Eigene Projekte von Johannes Gnadlinger — Web-Apps, Tools und Experimente, jeweils mit Tech-Stack und Quellcode."
+	schema={schema}
 >
 	<div class="stack gap-20">
 		<main class="wrapper stack gap-8">

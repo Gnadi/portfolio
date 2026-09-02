@@ -36,8 +36,19 @@ export default defineConfig({
     filter: (page) => !/\/404\/?$/.test(new URL(page).pathname),
     serialize(item) {
       const { pathname } = new URL(item.url);
+
+      // The pages emit hreflang="x-default" in their <head>; the sitemap has
+      // to agree, or the two signals describe different alternate sets. The
+      // English URL is the default, same as in MainHead.astro.
+      const links = item.links ?? [];
+      const english = links.find((link) => link.lang === 'en');
+      if (english && !links.some((link) => link.lang === 'x-default')) {
+        links.push({ lang: 'x-default', url: english.url });
+      }
+
       return {
         ...item,
+        ...(links.length ? { links } : {}),
         changefreq: 'monthly',
         priority: priorityFor(pathname),
       };

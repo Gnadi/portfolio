@@ -1,5 +1,15 @@
 ---
 import '../styles/global.css';
+// The two families global.css actually applies — `--font-body` and
+// `--font-brand`. Served from the site's own origin via Fontsource rather than
+// fetched from fonts.googleapis.com at runtime, which removes two third-party
+// connections from the critical path. Only the cuts the stylesheet uses are
+// imported; adding a weight here means adding it in global.css too.
+import '@fontsource/public-sans/400.css';
+import '@fontsource/public-sans/400-italic.css';
+import '@fontsource/public-sans/700.css';
+import '@fontsource/rubik/500.css';
+import '@fontsource/rubik/600.css';
 import {
 	buildGraph,
 	BRAND,
@@ -114,22 +124,6 @@ const jsonLd = buildGraph(isDe ? 'de' : 'en', schema);
 <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
 <link rel="manifest" href="/site.webmanifest" />
 <meta name="theme-color" content="#7611a6" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-	href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap"
-	rel="stylesheet"
-	type="text/css"
-	media="print"
-	onload="this.media='all'"
-/>
-<link
-	href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,700;1,400&family=Rubik:wght@500;600&display=swap"
-	rel="stylesheet"
-	type="text/css"
-	media="print"
-	onload="this.media='all'"
-/>
 <!-- Inlined in the head to make dark mode instant & blocking. Shares the
      choice with the CV and the blog — see src/lib/theme.ts. -->
 <script is:inline set:html={themeInitScript} />

@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import aboutPhoto from '../../assets/about.jpg';
 
 import ContactCTA from '../../components/ContactCTA.astro';
 import Hero from '../../components/Hero.astro';
@@ -27,10 +29,12 @@ const schema = [
 				title="Johannes Gnadlinger"
 				tagline="Schön, dass du vorbeischaust! Hier erfährst du kurz, woran ich arbeite — und wer ich bin, wenn ich gerade nicht programmiere."
 			>
-				<img
-					width="1600"
-					height="1200"
-					src="/assets/about.jpg"
+				<Image
+					src={aboutPhoto}
+					widths={[480, 800, 1200, 1600]}
+					sizes="(min-width: 50em) 60vw, 100vw"
+					loading="eager"
+					fetchpriority="high"
 					alt="Johannes Gnadlinger"
 				/>
 			</Hero>
@@ -57,7 +61,7 @@ const schema = [
 						Ich gebe zu, das Bild ist etwas älter ;) Aber es beschreibt mich immer noch gut — ein fröhlicher Mensch, der gerne reist und neue Leute kennenlernt.
 					</p>
 					<p>
-						Aufgewachsen in Wels, bin ich vor einigen Jahren nach Linz gezogen und lebe seitdem hier mit meiner Frau und unserer kleinen Tochter.
+						Aufgewachsen in Wels, bin ich vor einigen Jahren nach Linz gezogen und lebe seitdem hier mit meiner Frau und unseren beiden Töchtern.
 					</p>
 					<p>
 						Meine Leidenschaft für das Programmieren entdeckte ich als Teenager. Mit 16 schrieb ich mein erstes „Hello World", und mit 20 begann ich meine Karriere bei der Raiffeisen Software GmbH, wo ich jeden Tag Neues lerne.
@@ -98,6 +102,7 @@ const schema = [
 
 			<div class="card-section">
 				<BusinessCard />
+				<a class="card-link" href="/de/card/">Die Karte als eigene Seite öffnen →</a>
 			</div>
 		</main>
 
@@ -144,6 +149,25 @@ const schema = [
 	.content :global(a:hover),
 	.content :global(a:focus) {
 		text-decoration-color: currentColor;
+	}
+
+	.card-section {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.card-link {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+		text-decoration: none;
+		transition: color var(--theme-transition);
+	}
+
+	.card-link:hover,
+	.card-link:focus-visible {
+		color: var(--accent-regular);
 	}
 
 	@media (min-width: 50em) {

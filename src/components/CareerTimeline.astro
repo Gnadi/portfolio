@@ -1,0 +1,279 @@
+---
+/**
+ * The career timeline. Shared by `/career/` and `/de/career/`, which differ
+ * only in the language they resolve the entries for.
+ */
+import Icon from './Icon.astro';
+import {
+	careerUi,
+	sortedCareer,
+	translate,
+	typeIcons,
+	typeLabels,
+	typeOrder,
+	yearLabel,
+	type CareerType,
+	type SiteLang,
+} from '../data/career';
+
+interface Props {
+	lang: SiteLang;
+}
+
+const { lang } = Astro.props;
+
+const entries = sortedCareer();
+const presentTypes = typeOrder.filter((type) =>
+	entries.some((entry) => entry.type === type)
+);
+
+const year = (value: string) => yearLabel(value, lang);
+---
+
+<div class="filters">
+	<label for="career-filter" class="filter-label">{careerUi.filterLabel[lang]}</label>
+	<div class="select-wrapper">
+		<select id="career-filter" class="filter-select">
+			<option value="all">{careerUi.filterAll[lang]}</option>
+			{
+				presentTypes.map((type: CareerType) => (
+					<option value={type}>{typeLabels[type][lang]}</option>
+				))
+			}
+		</select>
+	</div>
+</div>
+
+<div class="timeline">
+	{
+		entries.map((entry) => (
+			<div class="timeline-item" data-type={entry.type}>
+				<div class="timeline-marker">
+					<div class="icon-wrapper">
+						<Icon icon={typeIcons[entry.type] as any} size="1.2em" />
+					</div>
+				</div>
+				<div class="timeline-content card">
+					<div class="header">
+						<span class="type-badge">{typeLabels[entry.type][lang]}</span>
+						<span class="date">
+							{year(entry.startDate)} - {year(entry.endDate)}
+						</span>
+					</div>
+					<h2>{translate(entry.title, lang)}</h2>
+					{
+						entry.phases ? (
+							/* One employer, several roles: the phases sit inside the one
+							   card so the timeline cannot be read as a change of employer. */
+							<ol class="phases">
+								{entry.phases.map((phase) => (
+									<li class="phase">
+										<div class="phase-header">
+											<h3>{translate(phase.title, lang)}</h3>
+											<span class="phase-date">
+												{year(phase.startDate)} - {year(phase.endDate)}
+											</span>
+										</div>
+										<p>{translate(phase.description, lang)}</p>
+									</li>
+								))}
+							</ol>
+						) : (
+							<Fragment>
+								<p class="organization">{translate(entry.organization, lang)}</p>
+								{entry.description && <p>{translate(entry.description, lang)}</p>}
+							</Fragment>
+						)
+					}
+				</div>
+			</div>
+		))
+	}
+</div>
+
+<script>
+	const select = document.querySelector<HTMLSelectElement>('.filter-select');
+	const items = document.querySelectorAll<HTMLElement>('.timeline-item');
+
+	select?.addEventListener('change', () => {
+		const filter = select.value;
+		items.forEach((item) => {
+			const show = filter === 'all' || item.dataset.type === filter;
+			item.style.display = show ? '' : 'none';
+		});
+	});
+</script>
+
+<style>
+	.filters {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.filter-label {
+		font-size: var(--text-sm);
+		font-weight: 600;
+		color: var(--gray-300);
+	}
+
+	.select-wrapper {
+		position: relative;
+		display: inline-flex;
+	}
+
+	.filter-select {
+		font: inherit;
+		cursor: pointer;
+		appearance: none;
+		padding: 0.5rem 2.5rem 0.5rem 1rem;
+		border-radius: 999rem;
+		border: 1px solid var(--gray-800);
+		background-color: var(--gray-999_40);
+		color: var(--gray-0);
+		font-size: var(--text-sm);
+		font-weight: 600;
+		transition: border-color var(--theme-transition);
+	}
+
+	.filter-select:hover,
+	.filter-select:focus-visible {
+		border-color: var(--accent-regular);
+		outline: none;
+	}
+
+	.select-wrapper::after {
+		content: '';
+		position: absolute;
+		right: 1rem;
+		top: 50%;
+		width: 0.5rem;
+		height: 0.5rem;
+		border-right: 2px solid var(--gray-300);
+		border-bottom: 2px solid var(--gray-300);
+		transform: translateY(-70%) rotate(45deg);
+		pointer-events: none;
+	}
+
+	.timeline {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+		padding-left: 2rem;
+		border-left: 2px solid var(--gray-800);
+	}
+
+	.timeline-item {
+		position: relative;
+	}
+
+	.timeline-marker {
+		position: absolute;
+		left: -2rem; /* Adjust based on padding-left of timeline */
+		top: 0;
+		transform: translateX(-50%);
+		width: 3rem;
+		height: 3rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--gray-999);
+		border: 2px solid var(--gray-800);
+		border-radius: 50%;
+		z-index: 1;
+	}
+
+	.icon-wrapper {
+		color: var(--accent-regular);
+	}
+
+	.timeline-content {
+		margin-left: 1.5rem;
+	}
+
+	.card {
+		border: 1px solid var(--gray-800);
+		border-radius: 0.75rem;
+		padding: 1.5rem;
+		background-color: var(--gray-999_40);
+		box-shadow: var(--shadow-sm);
+		transition: box-shadow var(--theme-transition);
+	}
+
+	.card:hover {
+		box-shadow: var(--shadow-md);
+	}
+
+	.header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.5rem;
+		font-size: var(--text-sm);
+	}
+
+	.type-badge {
+		background-color: var(--accent-regular);
+		color: var(--accent-text-over);
+		padding: 0.2rem 0.5rem;
+		border-radius: 999rem;
+		font-weight: bold;
+		font-size: 0.8em;
+		text-transform: uppercase;
+	}
+
+	.date {
+		color: var(--gray-400);
+	}
+
+	.card h2 {
+		font-size: var(--text-xl);
+		color: var(--gray-0);
+		margin-bottom: 0.25rem;
+	}
+
+	.organization {
+		font-weight: bold;
+		color: var(--accent-regular);
+		margin-bottom: 0.5rem;
+	}
+
+	/* ── Phases within one entry ───────────────────────────────── */
+
+	.phases {
+		list-style: none;
+		margin: 0.75rem 0 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	/* A rule between phases, not around each one: they belong to the same
+	   card, and boxing them would undo that. */
+	.phase + .phase {
+		padding-top: 1.25rem;
+		border-top: 1px solid var(--gray-800);
+	}
+
+	.phase-header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.25rem 1rem;
+		margin-bottom: 0.35rem;
+	}
+
+	.phase h3 {
+		font-size: var(--text-md);
+		font-weight: bold;
+		color: var(--accent-regular);
+	}
+
+	.phase-date {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+	}
+</style>
