@@ -15,7 +15,7 @@ import PortfolioPreview from '../../components/PortfolioPreview.astro';
 
 // Page section components
 import ContactCTA from '../../components/ContactCTA.astro';
-import SkillsDE from '../../components/SkillsDE.astro';
+import Skills from '../../components/Skills.astro';
 import ContactPreview from "../../components/ContactPreview.astro";
 
 const projects = (await getCollection('work')).map((entry: any) =>{
@@ -68,7 +68,7 @@ const contacts = (await getCollection('contact')).slice(0,4);
 					<h2>Meine Spezialisierungen</h2>
 					<p>Backend-Systeme für Privat- und Corporate-Banking — Zahlungsflüsse, Transaktionssicherheit, Betriebsstabilität.</p>
 				</header>
-				<SkillsDE />
+				<Skills lang="de" />
 				<p class="tech-line">Primary technologies: Java, Jakarta EE, REST APIs, Angular</p>
 			</section>
 		</div>
