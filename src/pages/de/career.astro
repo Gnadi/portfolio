@@ -176,10 +176,15 @@ const careerData = [
     },
 ];
 
-// Sort by start date (newest first)
-const sortedCareer = careerData.sort(
-    (a, b) => new Date(b.startDate).valueOf() - new Date(a.startDate).valueOf(),
-);
+// Entries without a concrete end date (e.g. "Present") are still ongoing
+const isOngoing = (item: { endDate?: string }) =>
+    !item.endDate || Number.isNaN(new Date(item.endDate).valueOf());
+
+// Ongoing entries first, everything else sorted by start date (newest first)
+const sortedCareer = [...careerData].sort((a, b) => {
+    if (isOngoing(a) !== isOngoing(b)) return isOngoing(a) ? -1 : 1;
+    return new Date(b.startDate).valueOf() - new Date(a.startDate).valueOf();
+});
 
 const typeOrder = ["job", "project", "certification", "leave", "hackathon", "side-project"];
 const presentTypes = typeOrder.filter((type) =>
