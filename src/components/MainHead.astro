@@ -18,6 +18,7 @@ import {
 	FULL_NAME,
 	type JsonLdNode,
 } from '../lib/schema';
+import { slamInitScript } from '../lib/slam';
 import { themeInitScript } from '../lib/theme';
 
 interface Props {
@@ -127,3 +128,6 @@ const jsonLd = buildGraph(isDe ? 'de' : 'en', schema);
 <!-- Inlined in the head to make dark mode instant & blocking. Shares the
      choice with the CV and the blog — see src/lib/theme.ts. -->
 <script is:inline set:html={themeInitScript} />
+<!-- Same reason, for the Grand Slam palette: it depends on today's date, so
+     a static build cannot bake it in — see src/lib/slam.ts. -->
+<script is:inline set:html={slamInitScript} />

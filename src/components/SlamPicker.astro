@@ -1,0 +1,259 @@
+---
+/**
+ * Picks which Grand Slam's colours the site wears. "Auto" — the default —
+ * follows the calendar: whichever major is being played, or the next one up.
+ * See src/lib/slam.ts for the palettes' schedule and storage.
+ */
+import { getLangFromUrl } from '../i18n/utils';
+import { slams, slamUi } from '../lib/slam';
+
+const lang = getLangFromUrl(Astro.url);
+const copy = slamUi[lang];
+
+/* The button's label is painted by CSS keyed on `data-slam`, which the head
+   script sets before first paint. That way the right code is on the button
+   in the first frame — a label written by this component's script would
+   have to wait for hydration — and it stays the same width in every
+   language, which the nav row has no slack for. */
+const codeRules = slams
+	.map((slam) => `:root[data-slam='${slam.id}'] .slam-code::after { content: '${slam.short}'; }`)
+	.join('\n');
+---
+
+<style is:global set:html={codeRules} />
+
+<slam-picker class="slam-picker" data-auto-label={copy.auto}>
+	<button
+		type="button"
+		class="trigger"
+		aria-expanded="false"
+		aria-haspopup="menu"
+		aria-label={copy.label}
+	>
+		<span class="dot" aria-hidden="true"></span>
+		<span class="slam-code" aria-hidden="true"></span>
+		<svg class="chevron" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+			<path
+				fill-rule="evenodd"
+				d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+				clip-rule="evenodd"></path>
+		</svg>
+	</button>
+
+	<div class="menu" role="menu" hidden>
+		<button type="button" class="option" role="menuitemradio" aria-checked="false" data-slam="auto">
+			<span class="dot auto" aria-hidden="true"></span>
+			<span class="labels">
+				<span class="name">{copy.auto}</span>
+				<span class="hint">{copy.autoHint}</span>
+			</span>
+		</button>
+		{
+			slams.map((slam) => (
+				<button
+					type="button"
+					class="option"
+					role="menuitemradio"
+					aria-checked="false"
+					data-slam={slam.id}
+				>
+					<span class="dot" aria-hidden="true" style={`--dot: ${slam.swatch}`} />
+					<span class="labels">
+						<span class="name">{slam.name}</span>
+					</span>
+				</button>
+			))
+		}
+	</div>
+</slam-picker>
+
+<script>
+	import {
+		applySlam,
+		readStoredSlam,
+		resolveSlam,
+		slams,
+		storeSlam,
+		type SlamPreference,
+	} from '../lib/slam';
+
+	class SlamPicker extends HTMLElement {
+		constructor() {
+			super();
+
+			const trigger = this.querySelector<HTMLButtonElement>('.trigger')!;
+			const menu = this.querySelector<HTMLElement>('.menu')!;
+			const options = [...this.querySelectorAll<HTMLButtonElement>('.option')];
+			const autoLabel = this.dataset.autoLabel ?? 'Auto';
+			const groupLabel = trigger.getAttribute('aria-label') ?? '';
+
+			const setExpanded = (expand: boolean) => {
+				trigger.setAttribute('aria-expanded', String(expand));
+				menu.hidden = !expand;
+			};
+
+			/** Mirrors the stored choice onto the button and the menu. */
+			const reflect = (preference: SlamPreference) => {
+				const slam = slams.find((entry) => entry.id === resolveSlam(preference));
+
+				// The code on the button comes from CSS; what the script adds is
+				// the long form — which tournament, and whether it was picked or
+				// is simply the one on this week.
+				const name = preference === 'auto' ? `${slam?.name} (${autoLabel})` : slam?.name;
+				trigger.title = name ?? '';
+				trigger.setAttribute('aria-label', `${groupLabel}: ${name ?? ''}`);
+				for (const option of options) {
+					option.setAttribute('aria-checked', String(option.dataset.slam === preference));
+				}
+			};
+
+			for (const option of options) {
+				option.addEventListener('click', () => {
+					const preference = (option.dataset.slam ?? 'auto') as SlamPreference;
+					storeSlam(preference);
+					applySlam(resolveSlam(preference));
+					reflect(preference);
+					setExpanded(false);
+					trigger.focus();
+				});
+			}
+
+			trigger.addEventListener('click', () => setExpanded(menu.hidden));
+
+			// Anywhere else, or Escape, closes it.
+			document.addEventListener('click', (event) => {
+				if (!menu.hidden && !this.contains(event.target as Node)) setExpanded(false);
+			});
+			this.addEventListener('keydown', (event: KeyboardEvent) => {
+				if (event.key !== 'Escape' || menu.hidden) return;
+				setExpanded(false);
+				trigger.focus();
+			});
+
+			// The head script has already applied the palette; this only catches
+			// the button up with it.
+			reflect(readStoredSlam());
+		}
+	}
+
+	customElements.define('slam-picker', SlamPicker);
+</script>
+
+<style>
+	.slam-picker {
+		position: relative;
+		display: inline-block;
+	}
+
+	.trigger {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.5rem 0.6rem 0.5rem 0.7rem;
+		font: inherit;
+		font-size: var(--text-sm);
+		font-weight: 600;
+		line-height: 1.2;
+		color: var(--accent-text-over);
+		background-color: var(--accent-regular);
+		border: 1px solid var(--accent-regular);
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+		/* Widest of the four codes, so the row does not shift when the
+		   palette changes. */
+		min-width: 5.25rem;
+		transition:
+			background-color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+
+	.trigger:hover,
+	.trigger:focus-visible {
+		background-color: var(--accent-hover);
+		border-color: var(--accent-hover);
+	}
+
+	.dot {
+		width: 0.55rem;
+		height: 0.55rem;
+		flex-shrink: 0;
+		border-radius: var(--radius-full);
+		background-color: var(--dot, currentcolor);
+	}
+
+	/* "Auto" has no colour of its own — it borrows whichever is on. */
+	.menu .dot.auto {
+		background-color: var(--accent-regular);
+	}
+
+	.chevron {
+		width: 1rem;
+		height: 1rem;
+		margin-right: -0.15rem;
+	}
+
+	.menu {
+		position: absolute;
+		right: 0;
+		top: calc(100% + 0.4rem);
+		z-index: 10;
+		display: flex;
+		flex-direction: column;
+		min-width: 12.5rem;
+		padding: 0.25rem;
+		background-color: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-md);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.menu[hidden] {
+		display: none;
+	}
+
+	.option {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		width: 100%;
+		padding: 0.45rem 0.55rem;
+		font: inherit;
+		font-size: var(--text-sm);
+		text-align: start;
+		color: var(--gray-200);
+		background-color: transparent;
+		border: 0;
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+		transition:
+			color var(--theme-transition),
+			background-color var(--theme-transition);
+	}
+
+	.option:hover,
+	.option:focus-visible {
+		color: var(--accent-regular);
+		background-color: var(--accent-subtle-overlay);
+	}
+
+	.option[aria-checked='true'] {
+		color: var(--accent-regular);
+		font-weight: 600;
+	}
+
+	.labels {
+		display: flex;
+		flex-direction: column;
+		gap: 0.05rem;
+		min-width: 0;
+	}
+
+	.hint {
+		font-size: 0.75rem;
+		font-weight: 400;
+		color: var(--gray-400);
+		/* The menu grows to fit instead of wrapping this onto a second line,
+		   which would knock the dot out of line with the name. */
+		white-space: nowrap;
+	}
+</style>

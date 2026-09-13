@@ -1,5 +1,6 @@
 ---
 import { getLangFromUrl } from '../i18n/utils';
+import TennisGame from './TennisGame.astro';
 import { BLOG_URL, CV_URL, FULL_NAME } from '../lib/schema';
 
 const currentYear = new Date().getFullYear();
@@ -25,12 +26,15 @@ const siteLinks: { label: string; href: string }[] = [
 	<nav class="site-links" aria-label={isDe ? 'Weitere Seiten' : 'More pages'}>
 		{siteLinks.map(({ label, href }) => <a href={href}>{label}</a>)}
 	</nav>
+
+	<TennisGame />
 </footer>
 <style>
 	footer {
 		display: flex;
 		flex-direction: column;
-		gap: 3rem;
+		align-items: center;
+		gap: 2rem;
 		margin-top: auto;
 		padding: 3rem 2rem 3rem;
 		text-align: center;
@@ -73,7 +77,9 @@ const siteLinks: { label: string; href: string }[] = [
 	@media (min-width: 50em) {
 		footer {
 			flex-direction: row;
+			align-items: center;
 			justify-content: space-between;
+			gap: 1.5rem;
 			padding: 2.5rem 5rem;
 		}
 
