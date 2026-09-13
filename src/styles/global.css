@@ -1,56 +1,60 @@
 /* Global variables */
 :root {
-	/* Colors */
-	--gray-0: #090b11;
-	--gray-50: #141925;
-	--gray-100: #283044;
-	--gray-200: #3d4663;
-	--gray-300: #505d84;
-	--gray-400: #6474a2;
-	--gray-500: #8490b5;
-	--gray-600: #a3acc8;
-	--gray-700: #c3cadb;
-	--gray-800: #e3e6ee;
-	--gray-900: #f3f4f7;
-	--gray-999-basis: 0, 0%, 100%;
-	--gray-999_40: hsla(var(--gray-999-basis), 0.4);
-	--gray-999: #ffffff;
+	/* ── Brand: US Open blue on white ──────────────────────────────
+	   One blue ramp, used for every accent on the site. `--blue-600` is
+	   the workhorse: it is what a link, a button and a badge are painted
+	   in, and white text clears AA on top of it. */
+	/* The anchor the rest is derived from. Nothing in this stylesheet paints
+	   with it directly — it shows up as the veil on the business card and as
+	   the social-card ground in scripts/generate-og-assets.mjs. */
+	--blue-800: #002d72; /* US Open navy */
+	--blue-700: #003c8f;
+	--blue-600: #0057b8; /* primary */
+	--blue-500: #1d6fd0;
+	--blue-300: #7fb3ee; /* court blue, for text on navy */
+	--blue-100: #dceafa;
 
-	--accent-light: #c561f6;
-	--accent-regular: #7611a6;
-	--accent-dark: #1c0056;
-	--accent-overlay: hsla(280, 89%, 67%, 0.33);
-	--accent-subtle-overlay: var(--accent-overlay);
-	--accent-text-over: var(--gray-999);
+	/* Neutrals. Cool, very slightly blue so they sit next to the ramp
+	   above without reading as a second hue. */
+	--gray-0: #08182b;
+	--gray-50: #0f2540;
+	--gray-100: #17324f;
+	--gray-200: #24425f;
+	--gray-300: #3d5a78;
+	--gray-400: #556f8c;
+	--gray-500: #7e96af;
+	--gray-600: #a3b6c9;
+	--gray-700: #c5d3e0;
+	--gray-800: #dbe5f0;
+	--gray-900: #eef3f9;
+	--gray-999: #f7fafd;
+
+	/* Surfaces. The page is a near-white blue tint, cards are plain
+	   white with a hairline border — no shadow stack doing the work. */
+	--surface: #ffffff;
+	--border: var(--gray-800);
+	--border-strong: var(--gray-700);
+
+	--accent-regular: var(--blue-600);
+	--accent-hover: var(--blue-700);
+	/* Tinted fill behind hovered nav items, inline code and stack chips. */
+	--accent-subtle-overlay: var(--blue-100);
+	--accent-text-over: #ffffff;
 
 	--link-color: var(--accent-regular);
+	--focus-ring: var(--blue-500);
 
-	/* Gradients */
-	--gradient-stop-1: var(--accent-light);
-	--gradient-stop-2: var(--accent-regular);
-	--gradient-stop-3: var(--accent-dark);
-	--gradient-subtle: linear-gradient(150deg, var(--gray-900) 19%, var(--gray-999) 150%);
-	--gradient-accent: linear-gradient(
-		150deg,
-		var(--gradient-stop-1),
-		var(--gradient-stop-2),
-		var(--gradient-stop-3)
-	);
-	--gradient-accent-orange: linear-gradient(
-		150deg,
-		#ca7879,
-		var(--accent-regular),
-		var(--accent-dark)
-	);
-	--gradient-stroke: linear-gradient(180deg, var(--gray-900), var(--gray-700));
+	/* Shadows — present, but only enough to lift a card off the page by a
+	   hair. Depth is carried by borders and surface colour instead. */
+	--shadow-sm: 0 1px 2px rgba(0, 45, 114, 0.06);
+	--shadow-md: 0 2px 8px rgba(0, 45, 114, 0.08);
+	--shadow-lg: 0 8px 24px rgba(0, 45, 114, 0.1);
 
-	/* Shadows */
-	--shadow-sm: 0px 6px 3px rgba(9, 11, 17, 0.01), 0px 4px 2px rgba(9, 11, 17, 0.01),
-		0px 2px 2px rgba(9, 11, 17, 0.02), 0px 0px 1px rgba(9, 11, 17, 0.03);
-	--shadow-md: 0px 28px 11px rgba(9, 11, 17, 0.01), 0px 16px 10px rgba(9, 11, 17, 0.03),
-		0px 7px 7px rgba(9, 11, 17, 0.05), 0px 2px 4px rgba(9, 11, 17, 0.06);
-	--shadow-lg: 0px 62px 25px rgba(9, 11, 17, 0.01), 0px 35px 21px rgba(9, 11, 17, 0.05),
-		0px 16px 16px rgba(9, 11, 17, 0.1), 0px 4px 9px rgba(9, 11, 17, 0.12);
+	/* Radii */
+	--radius-sm: 0.375rem;
+	--radius-md: 0.625rem;
+	--radius-lg: 0.875rem;
+	--radius-full: 999rem;
 
 	/* Text Sizes */
 	--text-sm: 0.875rem;
@@ -74,45 +78,39 @@
 }
 
 :root.theme-dark {
+	/* The night session: the same blue, on navy instead of white. */
 	--gray-0: #ffffff;
-	--gray-50: #f3f4f7;
-	--gray-100: #e3e6ee;
-	--gray-200: #c3cadb;
-	--gray-300: #a3acc8;
-	--gray-400: #8490b5;
-	--gray-500: #6474a2;
-	--gray-600: #505d84;
-	--gray-700: #3d4663;
-	--gray-800: #283044;
-	--gray-900: #141925;
-	--gray-999-basis: 225, 31%, 5%;
-	--gray-999: #090b11;
+	--gray-50: #f3f7fb;
+	--gray-100: #e4edf7;
+	--gray-200: #c8d8ea;
+	--gray-300: #a2b8d1;
+	--gray-400: #8ba1ba;
+	--gray-500: #5f748d;
+	--gray-600: #45596f;
+	--gray-700: #33475f;
+	--gray-800: #23374f;
+	--gray-900: #12253c;
+	--gray-999: #0a1a2f;
 
-	--accent-light: #1c0056;
-	--accent-regular: #7611a6;
-	--accent-dark: #c561f6;
-	--accent-overlay: hsla(280, 89%, 67%, 0.33);
-	--accent-subtle-overlay: hsla(281, 81%, 36%, 0.33);
-	--accent-text-over: var(--gray-0);
+	--surface: #0f2237;
+	--border: var(--gray-800);
+	--border-strong: var(--gray-700);
 
-	--link-color: var(--accent-dark);
+	/* Lifted a step so the fill clears 3:1 against the navy page, and so
+	   link text clears AA without turning pale. */
+	--accent-regular: var(--blue-500);
+	--accent-hover: var(--blue-600);
+	--accent-subtle-overlay: #1b3552;
+	--accent-text-over: #ffffff;
 
-	--gradient-stop-1: #4c11c6;
-	--gradient-subtle: linear-gradient(150deg, var(--gray-900) 19%, var(--gray-999) 81%);
-	--gradient-accent-orange: linear-gradient(
-		150deg,
-		#ca7879,
-		var(--accent-regular),
-		var(--accent-light)
-	);
-	--gradient-stroke: linear-gradient(180deg, var(--gray-600), var(--gray-800));
+	--link-color: var(--blue-300);
+	--focus-ring: var(--blue-300);
 
-	--shadow-sm: 0px 6px 3px rgba(255, 255, 255, 0.01), 0px 4px 2px rgba(255, 255, 255, 0.01),
-		0px 2px 2px rgba(255, 255, 255, 0.02), 0px 0px 1px rgba(255, 255, 255, 0.03);
-	--shadow-md: 0px 28px 11px rgba(255, 255, 255, 0.01), 0px 16px 10px rgba(255, 255, 255, 0.03),
-		0px 7px 7px rgba(255, 255, 255, 0.05), 0px 2px 4px rgba(255, 255, 255, 0.06);
-	--shadow-lg: 0px 62px 25px rgba(255, 255, 255, 0.01), 0px 35px 21px rgba(255, 255, 255, 0.05),
-		0px 16px 16px rgba(255, 255, 255, 0.1), 0px 4px 9px rgba(255, 255, 255, 0.12);
+	/* Dark surfaces get their separation from borders; the shadows stay
+	   faint so nothing glows. */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
+	--shadow-md: 0 2px 8px rgba(0, 0, 0, 0.34);
+	--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.42);
 }
 
 html,
@@ -153,6 +151,12 @@ a {
 	color: var(--link-color);
 }
 
+/* One focus style for the whole site, in the brand blue. */
+:focus-visible {
+	outline: 2px solid var(--focus-ring);
+	outline-offset: 2px;
+}
+
 h1,
 h2,
 h3,
@@ -162,6 +166,7 @@ h5 {
 	font-family: var(--font-brand);
 	font-weight: 600;
 	color: var(--gray-100);
+	letter-spacing: -0.01em;
 }
 
 h1 {

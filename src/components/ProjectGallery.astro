@@ -63,19 +63,17 @@ const { shots, closeLabel } = Astro.props;
 	.zoom {
 		display: block;
 		padding: 0;
-		border: 1px solid var(--gray-800);
-		border-radius: 0.75rem;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-md);
 		overflow: hidden;
-		background: var(--gray-999_40);
-		box-shadow: var(--shadow-sm);
+		background-color: var(--surface);
 		cursor: zoom-in;
-		transition: box-shadow var(--theme-transition), transform var(--theme-transition);
+		transition: border-color var(--theme-transition);
 	}
 
 	.zoom:hover,
 	.zoom:focus-visible {
-		box-shadow: var(--shadow-md);
-		transform: translateY(-2px);
+		border-color: var(--accent-regular);
 	}
 
 	.zoom img {
@@ -114,7 +112,7 @@ const { shots, closeLabel } = Astro.props;
 	.lightbox::backdrop {
 		/* Deliberately dark in both themes — a white scrim over a light page
 		   does not read as a modal. */
-		background: hsla(225, 31%, 5%, 0.82);
+		background: hsla(212, 65%, 8%, 0.84);
 	}
 
 	.lightbox img {
@@ -123,7 +121,7 @@ const { shots, closeLabel } = Astro.props;
 		height: auto;
 		max-width: 92vw;
 		max-height: 90vh;
-		border-radius: 0.75rem;
+		border-radius: var(--radius-md);
 	}
 
 	.close {
@@ -138,10 +136,9 @@ const { shots, closeLabel } = Astro.props;
 		font-size: 1.5rem;
 		line-height: 1;
 		color: var(--gray-0);
-		background: var(--gray-999);
-		border: 1px solid var(--gray-800);
-		border-radius: 999rem;
-		box-shadow: var(--shadow-sm);
+		background-color: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
 		cursor: pointer;
 	}
 
@@ -168,11 +165,6 @@ const { shots, closeLabel } = Astro.props;
 	@media (prefers-reduced-motion: reduce) {
 		.zoom {
 			transition: none;
-		}
-
-		.zoom:hover,
-		.zoom:focus-visible {
-			transform: none;
 		}
 	}
 </style>

@@ -111,24 +111,26 @@ const copy = {
 	}
 
 	.back-link:hover {
-		color: var(--accent-regular);
+		color: var(--link-color);
 	}
 
 	.print-btn {
 		padding: 0.55rem 1.5rem;
-		border-radius: 999rem;
+		border-radius: var(--radius-full);
 		border: 1px solid var(--accent-regular);
-		background: var(--accent-regular);
+		background-color: var(--accent-regular);
 		color: var(--accent-text-over);
 		font-family: var(--font-brand);
 		font-size: var(--text-sm);
 		cursor: pointer;
-		transition: box-shadow var(--theme-transition), opacity var(--theme-transition);
+		transition:
+			background-color var(--theme-transition),
+			border-color var(--theme-transition);
 	}
 
 	.print-btn:hover {
-		box-shadow: var(--shadow-md);
-		opacity: 0.88;
+		background-color: var(--accent-hover);
+		border-color: var(--accent-hover);
 	}
 
 	/* Print: hide chrome, show only the card back */
