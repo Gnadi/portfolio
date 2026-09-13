@@ -35,34 +35,27 @@ const PORTRAIT_Y = (HEIGHT - PORTRAIT_H) / 2;
 /** Escapes text for safe inclusion in the SVG source. */
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// Flat US Open navy with a blue rule, matching the site's palette — no
+// gradient wash. The hex values are the `--gray-999` / `--blue-*` tokens
+// from src/styles/global.css in their dark-theme reading.
 const background = Buffer.from(`
 <svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#090b11"/>
-      <stop offset="60%" stop-color="#1c0056"/>
-      <stop offset="100%" stop-color="#7611a6"/>
-    </linearGradient>
-    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#c561f6"/>
-      <stop offset="100%" stop-color="#7611a6"/>
-    </linearGradient>
-  </defs>
-  <rect width="${WIDTH}" height="${HEIGHT}" fill="url(#bg)"/>
+  <rect width="${WIDTH}" height="${HEIGHT}" fill="#0a1a2f"/>
+  <rect width="${WIDTH}" height="10" fill="#0057b8"/>
   <g font-family="Liberation Sans, DejaVu Sans, sans-serif">
     <text x="70" y="250" fill="#ffffff" font-size="96" font-weight="bold"
           letter-spacing="-2">${esc('Gnadlinger')}</text>
-    <rect x="72" y="285" width="120" height="6" rx="3" fill="url(#rule)"/>
-    <text x="70" y="360" fill="#e2e4e9" font-size="40" font-weight="bold">
+    <rect x="72" y="285" width="120" height="6" rx="3" fill="#0057b8"/>
+    <text x="70" y="360" fill="#e4edf7" font-size="40" font-weight="bold">
       ${esc('Johannes Gnadlinger')}
     </text>
-    <text x="70" y="412" fill="#a3a8b8" font-size="30">
+    <text x="70" y="412" fill="#a2b8d1" font-size="30">
       ${esc('Backend Engineer · Linz, Austria')}
     </text>
-    <text x="70" y="460" fill="#a3a8b8" font-size="30">
+    <text x="70" y="460" fill="#a2b8d1" font-size="30">
       ${esc('Corporate payment systems')}
     </text>
-    <text x="70" y="556" fill="#c561f6" font-size="26" font-weight="bold"
+    <text x="70" y="556" fill="#7fb3ee" font-size="26" font-weight="bold"
           letter-spacing="1">${esc('gnadlinger.me')}</text>
   </g>
 </svg>

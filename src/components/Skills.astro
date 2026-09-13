@@ -45,7 +45,7 @@ const areas = [
 	{
 		areas.map((area) => (
 			<div class="stack gap-2 lg:gap-4">
-				<Icon icon={area.icon as any} color="var(--accent-regular)" size="2.5rem" gradient />
+				<Icon icon={area.icon as any} color="var(--accent-regular)" size="2.5rem" />
 				<h3>{area.title}</h3>
 				<p>{area.body[lang]}</p>
 			</div>
@@ -54,12 +54,13 @@ const areas = [
 </section>
 
 <style>
+	/* Three flat panels on the page surface: hairline border, white (or navy)
+	   fill, no shadow stack. */
 	.box {
-		border: 1px solid var(--gray-800);
-		border-radius: 0.75rem;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
 		padding: 1.5rem;
-		background-color: var(--gray-999_40);
-		box-shadow: var(--shadow-sm);
+		background-color: var(--surface);
 	}
 
 	.skills {
@@ -73,23 +74,22 @@ const areas = [
 	}
 
 	.skills p {
-		color: var(--gray-400);
+		color: var(--gray-300);
 	}
 
 	@media (min-width: 50em) {
 		.box {
-			border-radius: 1.5rem;
 			padding: 2.5rem;
 		}
 
 		.skills {
 			display: grid;
 			grid-template-columns: repeat(3, 1fr);
-			gap: 5rem;
+			gap: 3.5rem;
 		}
 
 		.skills h3 {
-			font-size: var(--text-2xl);
+			font-size: var(--text-xl);
 		}
 	}
 </style>

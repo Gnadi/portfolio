@@ -127,9 +127,9 @@ const year = (value: string) => yearLabel(value, lang);
 		cursor: pointer;
 		appearance: none;
 		padding: 0.5rem 2.5rem 0.5rem 1rem;
-		border-radius: 999rem;
-		border: 1px solid var(--gray-800);
-		background-color: var(--gray-999_40);
+		border-radius: var(--radius-full);
+		border: 1px solid var(--border);
+		background-color: var(--surface);
 		color: var(--gray-0);
 		font-size: var(--text-sm);
 		font-weight: 600;
@@ -139,7 +139,6 @@ const year = (value: string) => yearLabel(value, lang);
 	.filter-select:hover,
 	.filter-select:focus-visible {
 		border-color: var(--accent-regular);
-		outline: none;
 	}
 
 	.select-wrapper::after {
@@ -149,8 +148,8 @@ const year = (value: string) => yearLabel(value, lang);
 		top: 50%;
 		width: 0.5rem;
 		height: 0.5rem;
-		border-right: 2px solid var(--gray-300);
-		border-bottom: 2px solid var(--gray-300);
+		border-right: 2px solid var(--gray-400);
+		border-bottom: 2px solid var(--gray-400);
 		transform: translateY(-70%) rotate(45deg);
 		pointer-events: none;
 	}
@@ -161,7 +160,7 @@ const year = (value: string) => yearLabel(value, lang);
 		flex-direction: column;
 		gap: 2rem;
 		padding-left: 2rem;
-		border-left: 2px solid var(--gray-800);
+		border-left: 2px solid var(--border);
 	}
 
 	.timeline-item {
@@ -178,8 +177,8 @@ const year = (value: string) => yearLabel(value, lang);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: var(--gray-999);
-		border: 2px solid var(--gray-800);
+		background-color: var(--surface);
+		border: 2px solid var(--accent-regular);
 		border-radius: 50%;
 		z-index: 1;
 	}
@@ -193,16 +192,15 @@ const year = (value: string) => yearLabel(value, lang);
 	}
 
 	.card {
-		border: 1px solid var(--gray-800);
-		border-radius: 0.75rem;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
 		padding: 1.5rem;
-		background-color: var(--gray-999_40);
-		box-shadow: var(--shadow-sm);
-		transition: box-shadow var(--theme-transition);
+		background-color: var(--surface);
+		transition: border-color var(--theme-transition);
 	}
 
 	.card:hover {
-		box-shadow: var(--shadow-md);
+		border-color: var(--accent-regular);
 	}
 
 	.header {
@@ -213,13 +211,15 @@ const year = (value: string) => yearLabel(value, lang);
 		font-size: var(--text-sm);
 	}
 
+	/* Flat blue badge, no shadow, no gradient. */
 	.type-badge {
 		background-color: var(--accent-regular);
 		color: var(--accent-text-over);
-		padding: 0.2rem 0.5rem;
-		border-radius: 999rem;
-		font-weight: bold;
+		padding: 0.2rem 0.6rem;
+		border-radius: var(--radius-full);
+		font-weight: 600;
 		font-size: 0.8em;
+		letter-spacing: 0.03em;
 		text-transform: uppercase;
 	}
 
@@ -234,8 +234,8 @@ const year = (value: string) => yearLabel(value, lang);
 	}
 
 	.organization {
-		font-weight: bold;
-		color: var(--accent-regular);
+		font-weight: 600;
+		color: var(--link-color);
 		margin-bottom: 0.5rem;
 	}
 
@@ -254,7 +254,7 @@ const year = (value: string) => yearLabel(value, lang);
 	   card, and boxing them would undo that. */
 	.phase + .phase {
 		padding-top: 1.25rem;
-		border-top: 1px solid var(--gray-800);
+		border-top: 1px solid var(--border);
 	}
 
 	.phase-header {
@@ -268,8 +268,8 @@ const year = (value: string) => yearLabel(value, lang);
 
 	.phase h3 {
 		font-size: var(--text-md);
-		font-weight: bold;
-		color: var(--accent-regular);
+		font-weight: 600;
+		color: var(--link-color);
 	}
 
 	.phase-date {

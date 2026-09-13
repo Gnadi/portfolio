@@ -119,8 +119,8 @@ const schema = [
 
 	img {
 		margin-top: 1.5rem;
-		border-radius: 1.5rem;
-		box-shadow: var(--shadow-md);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--border);
 	}
 
 	section {
@@ -167,7 +167,7 @@ const schema = [
 
 	.card-link:hover,
 	.card-link:focus-visible {
-		color: var(--accent-regular);
+		color: var(--link-color);
 	}
 
 	@media (min-width: 50em) {

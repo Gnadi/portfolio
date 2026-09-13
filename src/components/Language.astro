@@ -6,10 +6,10 @@ import {getLangFromUrl} from "../i18n/utils";
     <div class="relative inline-block text-left">
         <div>
             <button type="button"
-                    class="nav-items inline-flex w-full justify-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                    class="nav-items inline-flex w-full justify-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold"
                     id="menu-button" aria-expanded="true" aria-haspopup="true">
                 <span class="cur-language" id="currentLanguage">{getLangFromUrl(Astro.url).toUpperCase()}</span>
-                <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg class="-mr-1 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd"
                           d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
                           clip-rule="evenodd"/>
@@ -18,7 +18,7 @@ import {getLangFromUrl} from "../i18n/utils";
         </div>
 
         <div id="menu-elements"
-             class="nav-items1 absolute right-0 z-10 mt-2 w-35 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+             class="nav-items1 absolute right-0 z-10 mt-2 w-35 origin-top-right rounded-md focus:outline-none"
              role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
             <div class="d-flex justify-center py-1" role="none">
                 <a href={getRelativeLocaleUrl('de', '/')} class="block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
@@ -52,18 +52,40 @@ import {getLangFromUrl} from "../i18n/utils";
     #menu-elements {
         display: none;
     }
+
+    /* The trigger is a solid blue chip; the menu is a plain bordered panel.
+       Both used to be radial gradients, and the panel was pinned to white —
+       which broke outright in the dark theme. */
     .nav-items {
-        background: radial-gradient(var(--accent-regular), var(--gray-800) 900%);
-        box-shadow: var(--shadow-sm);
+        background-color: var(--accent-regular);
+        border: 1px solid var(--accent-regular);
         color: var(--accent-text-over);
+        transition: background-color var(--theme-transition);
     }
-    .text-white{
-        color: white;
+
+    .nav-items:hover,
+    .nav-items:focus-visible {
+        background-color: var(--accent-hover);
+        border-color: var(--accent-hover);
     }
+
     .nav-items1 {
-        background: radial-gradient(var(--gray-900), var(--gray-800) 150%);
+        background-color: var(--surface);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .nav-items1 a {
+        color: var(--gray-200);
+        text-decoration: none;
         transition:
-        color var(--theme-transition),
-        background-color var(--theme-transition)
+            color var(--theme-transition),
+            background-color var(--theme-transition);
+    }
+
+    .nav-items1 a:hover,
+    .nav-items1 a:focus-visible {
+        color: var(--accent-regular);
+        background-color: var(--accent-subtle-overlay);
     }
 </style>

@@ -86,7 +86,7 @@ const contacts: {
 
 		<!-- ═══ FRONT ═══════════════════════════════════════ -->
 		<div class="card-face card-front">
-			<!-- Layered background: photo + gradient veil -->
+			<!-- Layered background: photo + navy veil -->
 			<div
 			class="front-bg-photo"
 			aria-hidden="true"
@@ -294,11 +294,11 @@ const contacts: {
 		inset: 0;
 		backface-visibility: hidden;
 		-webkit-backface-visibility: hidden;
-		border-radius: 1.25rem;
+		border-radius: var(--radius-lg);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
-		box-shadow: var(--shadow-lg);
+		box-shadow: var(--shadow-md);
 	}
 
 	/* Only the face turned towards the viewer may take clicks.
@@ -337,16 +337,12 @@ const contacts: {
 		z-index: 0;
 	}
 
-	/* Purple gradient veil over the photo */
+	/* One flat US Open navy veil over the photo — enough to carry white type,
+	   without the three-stop wash that used to sit here. */
 	.front-bg-veil {
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(
-			125deg,
-			rgba(28, 0, 86, 0.82) 0%,
-			rgba(118, 17, 166, 0.58) 55%,
-			rgba(28, 0, 86, 0.72) 100%
-		);
+		background-color: rgba(0, 45, 114, 0.86);
 		z-index: 1;
 	}
 
@@ -371,7 +367,6 @@ const contacts: {
 		font-weight: 700;
 		line-height: 1.15;
 		color: #fff;
-		text-shadow: 0 1px 8px rgba(0,0,0,0.4);
 	}
 
 	.card-title {
@@ -382,35 +377,35 @@ const contacts: {
 
 	.card-company {
 		font-size: var(--text-base);
-		color: rgba(255, 255, 255, 0.72);
+		color: rgba(255, 255, 255, 0.82);
 	}
 
 	.card-location {
 		margin-top: 0.4rem;
 		font-size: var(--text-base);
-		color: rgba(255, 255, 255, 0.65);
+		color: rgba(255, 255, 255, 0.78);
 	}
 
 	.front-footer {
 		position: relative;
 		z-index: 2;
 		padding: 0.65rem 2.5rem;
-		background: rgba(0, 0, 0, 0.25);
+		background-color: rgba(0, 26, 69, 0.55);
 		display: flex;
 		justify-content: flex-end;
 	}
 
 	.flip-hint {
 		font-size: var(--text-sm);
-		color: rgba(255, 255, 255, 0.52);
+		color: rgba(255, 255, 255, 0.72);
 		letter-spacing: 0.02em;
 	}
 
 	/* ══════════════════════ BACK ═══════════════════════════ */
 	.card-back {
 		transform: rotateY(180deg);
-		background: var(--gray-999);
-		border: 1px solid var(--gray-800);
+		background-color: var(--surface);
+		border: 1px solid var(--border);
 		color: var(--gray-0);
 		padding: 1.75rem 2rem;
 		gap: 1rem;
@@ -422,7 +417,7 @@ const contacts: {
 		align-items: center;
 		gap: 1rem;
 		padding-bottom: 1rem;
-		border-bottom: 1px solid var(--gray-800);
+		border-bottom: 1px solid var(--border);
 		flex-shrink: 0;
 	}
 
@@ -433,7 +428,7 @@ const contacts: {
 		border-radius: 50%;
 		object-fit: cover;
 		object-position: center top;
-		border: 2px solid var(--gray-800);
+		border: 2px solid var(--border);
 	}
 
 	.back-name-block {
@@ -532,7 +527,7 @@ const contacts: {
 	.copy-btn:hover {
 		color: var(--accent-regular);
 		background-color: var(--accent-subtle-overlay);
-		border-color: var(--gray-800);
+		border-color: var(--border);
 	}
 
 	.copy-btn:focus-visible {
@@ -542,7 +537,7 @@ const contacts: {
 
 	.copy-btn .check-icon { display: none; }
 	.copy-btn.is-copied {
-		color: var(--accent-regular);
+		color: var(--link-color);
 		border-color: var(--accent-regular);
 	}
 	.copy-btn.is-copied .copy-icon { display: none; }
@@ -550,7 +545,7 @@ const contacts: {
 
 	.copy-status {
 		font-size: var(--text-sm);
-		color: var(--accent-regular);
+		color: var(--link-color);
 	}
 
 	.contact-item span {
@@ -558,11 +553,11 @@ const contacts: {
 		text-overflow: ellipsis;
 	}
 
-	.contact-item:hover { color: var(--accent-regular); }
+	.contact-item:hover { color: var(--link-color); }
 
 	.contact-item :global(svg) {
 		flex-shrink: 0;
-		color: var(--accent-regular);
+		color: var(--link-color);
 	}
 
 	/* QR panel: its own column with left border */
@@ -574,14 +569,14 @@ const contacts: {
 		justify-content: center;
 		gap: 0.4rem;
 		padding-left: 1.25rem;
-		border-left: 1px solid var(--gray-800);
+		border-left: 1px solid var(--border);
 	}
 
 	.qr-code {
 		display: block;
 		width: 110px;
 		height: 110px;
-		border-radius: 0.6rem;
+		border-radius: var(--radius-md);
 		/* white container so QR is always scannable regardless of theme */
 		background: #fff;
 		padding: 6px;
@@ -614,7 +609,7 @@ const contacts: {
 		justify-content: space-between;
 		gap: 1rem;
 		padding-top: 0.75rem;
-		border-top: 1px solid var(--gray-800);
+		border-top: 1px solid var(--border);
 	}
 
 	.card-location-back {

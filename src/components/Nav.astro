@@ -54,12 +54,7 @@ const iconLinks: {
 <nav>
 	<div class="menu-header">
 		<a href={homeHref} class="site-title">
-			<Icon
-				icon="home"
-				color="var(--accent-regular)"
-				size="3em"
-				gradient
-			/>
+			<Icon icon="home" color="var(--accent-regular)" size="3em" />
 			{FULL_NAME}
 		</a>
 		<menu-button>
@@ -245,35 +240,25 @@ const iconLinks: {
 	}
 
 	.menu-button {
-		position: relative;
 		display: flex;
-		border: 0;
-		border-radius: 999rem;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
 		padding: 0.5rem;
 		font-size: 1.5rem;
 		color: var(--gray-300);
-		background: radial-gradient(var(--gray-900), var(--gray-800) 150%);
-		box-shadow: var(--shadow-md);
+		background-color: var(--surface);
+		transition:
+			color var(--theme-transition),
+			border-color var(--theme-transition);
 	}
 
-	.menu-button[aria-expanded="true"] {
-		color: var(--gray-0);
-		background:
-			linear-gradient(180deg, var(--gray-600), transparent),
-			radial-gradient(var(--gray-900), var(--gray-800) 150%);
+	.menu-button[aria-expanded='true'] {
+		color: var(--accent-regular);
+		border-color: var(--accent-regular);
 	}
 
 	.menu-button[hidden] {
 		display: none;
-	}
-
-	.menu-button::before {
-		position: absolute;
-		inset: -1px;
-		content: "";
-		background: var(--gradient-stroke);
-		border-radius: 999rem;
-		z-index: -1;
 	}
 
 	.menu-content {
@@ -291,14 +276,20 @@ const iconLinks: {
 		line-height: 1.2;
 		list-style: none;
 		padding: 2rem;
-		background-color: var(--gray-999);
-		border-bottom: 1px solid var(--gray-800);
+		background-color: var(--surface);
+		border-bottom: 1px solid var(--border);
 	}
 
 	.link {
 		display: inline-block;
 		color: var(--gray-300);
 		text-decoration: none;
+		transition: color var(--theme-transition);
+	}
+
+	.link:hover,
+	.link:focus-visible {
+		color: var(--accent-regular);
 	}
 
 	.link.active {
@@ -313,9 +304,9 @@ const iconLinks: {
 		justify-content: space-between;
 		gap: 0.75rem;
 		padding: 1.5rem 2rem 1.5rem 1.5rem;
-		background-color: var(--gray-999);
-		border-radius: 0 0 0.75rem 0.75rem;
-		box-shadow: var(--shadow-lg);
+		background-color: var(--surface);
+		border-bottom: 1px solid var(--border);
+		border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 	}
 
 	.socials {
@@ -329,13 +320,13 @@ const iconLinks: {
 		display: flex;
 		padding: var(--icon-padding);
 		text-decoration: none;
-		color: var(--accent-dark);
+		color: var(--gray-400);
 		transition: color var(--theme-transition);
 	}
 
 	.social:hover,
 	.social:focus {
-		color: var(--accent-text-over);
+		color: var(--accent-regular);
 	}
 
 	.theme-toggle {
@@ -365,43 +356,40 @@ const iconLinks: {
 			display: contents;
 		}
 
+		/* A single flat pill: one border, one surface colour, no stroke
+		   gradient underneath it. */
 		.nav-items {
-			position: relative;
 			flex-direction: row;
 			font-size: var(--text-sm);
-			border-radius: 999rem;
-			border: 0;
-			padding: 0.5rem 0.5625rem;
-			background: radial-gradient(var(--gray-900), var(--gray-800) 150%);
-			box-shadow: var(--shadow-md);
-		}
-
-		.nav-items::before {
-			position: absolute;
-			inset: -1px;
-			content: "";
-			background: var(--gradient-stroke);
-			border-radius: 999rem;
-			z-index: -1;
+			border: 1px solid var(--border);
+			border-radius: var(--radius-full);
+			padding: 0.375rem;
+			background-color: var(--surface);
 		}
 
 		.link {
 			padding: 0.5rem 1rem;
-			border-radius: 999rem;
+			border-radius: var(--radius-full);
 			transition:
 				color var(--theme-transition),
 				background-color var(--theme-transition);
 		}
 
 		.link:hover,
-		.link:focus {
-			color: var(--gray-100);
+		.link:focus-visible {
+			color: var(--accent-regular);
 			background-color: var(--accent-subtle-overlay);
 		}
 
 		.link.active {
 			color: var(--accent-text-over);
 			background-color: var(--accent-regular);
+		}
+
+		.link.active:hover,
+		.link.active:focus-visible {
+			color: var(--accent-text-over);
+			background-color: var(--accent-hover);
 		}
 
 		.menu-footer {
@@ -411,7 +399,7 @@ const iconLinks: {
 			align-items: center;
 			padding: 0;
 			background-color: transparent;
-			box-shadow: none;
+			border-bottom: 0;
 		}
 
 		.socials {

@@ -4,8 +4,8 @@
 	"description": "Personal site of Johannes Gnadlinger, Backend Engineer in Linz, Austria.",
 	"start_url": "/",
 	"display": "standalone",
-	"background_color": "#090b11",
-	"theme_color": "#7611a6",
+	"background_color": "#0a1a2f",
+	"theme_color": "#0057b8",
 	"icons": [
 		{
 			"src": "/assets/icons/icon-192.png",
