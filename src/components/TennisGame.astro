@@ -29,8 +29,12 @@ const copy = {
 		opponent: 'Machine',
 		serve: 'Space or tap to serve',
 		hint: 'Mouse, finger or ↑ ↓ to move · first to four games takes the match',
+		hintTiebreak: 'Slide to move · first to seven points, two clear',
+		tiebreak: 'Tie-break',
 		youWin: 'Game, set and match, ' + surname + '.',
 		cpuWin: 'Game, set and match, Machine.',
+		youWinTiebreak: 'Tie-break, ' + surname + '.',
+		cpuWinTiebreak: 'Tie-break, Machine.',
 		again: 'Tap or press space for a new match',
 		deuce: 'Deuce',
 	},
@@ -41,8 +45,12 @@ const copy = {
 		opponent: 'Maschine',
 		serve: 'Leertaste oder tippen zum Aufschlag',
 		hint: 'Maus, Finger oder ↑ ↓ zum Bewegen · wer vier Spiele holt, gewinnt',
+		hintTiebreak: 'Zum Bewegen wischen · wer sieben Punkte holt, mit zwei Vorsprung',
+		tiebreak: 'Tie-Break',
 		youWin: 'Spiel, Satz und Sieg, ' + surname + '.',
 		cpuWin: 'Spiel, Satz und Sieg, Maschine.',
+		youWinTiebreak: 'Tie-Break, ' + surname + '.',
+		cpuWinTiebreak: 'Tie-Break, Maschine.',
 		again: 'Tippen oder Leertaste für ein neues Match',
 		deuce: 'Einstand',
 	},
@@ -60,6 +68,11 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 	data-cpu-win={copy.cpuWin}
 	data-again={copy.again}
 	data-deuce={copy.deuce}
+	data-tiebreak={copy.tiebreak}
+	data-you-win-tiebreak={copy.youWinTiebreak}
+	data-cpu-win-tiebreak={copy.cpuWinTiebreak}
+	data-hint={copy.hint}
+	data-hint-tiebreak={copy.hintTiebreak}
 >
 	<button type="button" class="open">
 		<svg class="ball" viewBox="0 0 24 24" aria-hidden="true">
@@ -73,10 +86,11 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 	<dialog class="stage" aria-label={copy.title}>
 		<div class="frame">
 			<!-- The tournament's own board: name, server, games, points. -->
-			<div class="board">
+			<div class="board" data-board data-format="match">
 				<div class="brand">
 					<span class="tournament" data-tournament>US Open</span>
 					<span class="venue" data-venue></span>
+					<span class="format" data-format-label>{copy.tiebreak}</span>
 				</div>
 				<div class="rows">
 					<div class="row">
@@ -101,7 +115,7 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				<p class="overlay" data-overlay>{copy.serve}</p>
 			</div>
 
-			<p class="hint">{copy.hint}</p>
+			<p class="hint" data-hint-label>{copy.hint}</p>
 		</div>
 	</dialog>
 </tennis-game>
@@ -174,6 +188,7 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			const dialog = this.querySelector<HTMLDialogElement>('dialog')!;
 			const canvas = this.querySelector<HTMLCanvasElement>('canvas')!;
 			const overlay = this.querySelector<HTMLElement>('[data-overlay]')!;
+			const courtBox = this.querySelector<HTMLElement>('.court')!;
 			const context = canvas.getContext('2d')!;
 
 			const out = {
@@ -185,14 +200,20 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				servingCpu: this.querySelector<HTMLElement>('[data-serving-cpu]')!,
 				tournament: this.querySelector<HTMLElement>('[data-tournament]')!,
 				venue: this.querySelector<HTMLElement>('[data-venue]')!,
+				board: this.querySelector<HTMLElement>('[data-board]')!,
+				hint: this.querySelector<HTMLElement>('[data-hint-label]')!,
 			};
 
 			const text = {
 				serve: this.dataset.serve ?? '',
 				youWin: this.dataset.youWin ?? '',
 				cpuWin: this.dataset.cpuWin ?? '',
+				youWinTiebreak: this.dataset.youWinTiebreak ?? '',
+				cpuWinTiebreak: this.dataset.cpuWinTiebreak ?? '',
 				again: this.dataset.again ?? '',
 				deuce: this.dataset.deuce ?? '',
+				hint: this.dataset.hint ?? '',
+				hintTiebreak: this.dataset.hintTiebreak ?? '',
 			};
 			const names: Record<string, string> = JSON.parse(this.dataset.names ?? '{}');
 
@@ -444,8 +465,21 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			let pointerY: number | null = null;
 			const keys = new Set<string>();
 
+			/**
+			 * A phone held upright has no room for a court lying on its side,
+			 * so the whole scene is turned a quarter turn and the match becomes
+			 * a tie-break — first to seven, two clear — which is the right
+			 * length for a game played standing up.
+			 */
+			const upright = matchMedia('(orientation: portrait)');
+			let portrait = upright.matches;
+			let format: 'match' | 'tiebreak' = portrait ? 'tiebreak' : 'match';
+			/** Who started the tie-break: the serve order is counted from it. */
+			let opener: Side = 'player';
+
 			const LADDER = ['0', '15', '30', '40'];
 			function pointLabel(mine: number, theirs: number) {
+				if (format === 'tiebreak') return String(mine); // a tie-break counts plainly
 				if (mine < 3 || theirs < 3) return LADDER[Math.min(mine, 3)]!;
 				if (mine === theirs) return '40';
 				return mine > theirs ? 'AD' : '40';
@@ -480,7 +514,12 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				const other: Side = to === 'player' ? 'cpu' : 'player';
 				points[to] += 1;
 
-				if (points[to] >= 4 && points[to] - points[other] >= 2) {
+				if (format === 'tiebreak') {
+					// One point on the opening serve, two each after that.
+					const played = points.player + points.cpu;
+					const flipped = Math.floor((played + 1) / 2) % 2 === 1;
+					server = flipped ? (opener === 'player' ? 'cpu' : 'player') : opener;
+				} else if (points[to] >= 4 && points[to] - points[other] >= 2) {
 					games[to] += 1;
 					points = { player: 0, cpu: 0 };
 					server = server === 'player' ? 'cpu' : 'player';
@@ -488,10 +527,23 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 
 				paintScore();
 
-				if (games[to] >= 4) {
+				const won =
+					format === 'tiebreak'
+						? points[to] >= 7 && points[to] - points[other] >= 2
+						: games[to] >= 4;
+
+				if (won) {
 					over = true;
 					serving = true;
-					overlay.innerHTML = `<strong>${to === 'player' ? text.youWin : text.cpuWin}</strong><span>${text.again}</span>`;
+					const line =
+						format === 'tiebreak'
+							? to === 'player'
+								? text.youWinTiebreak
+								: text.cpuWinTiebreak
+							: to === 'player'
+								? text.youWin
+								: text.cpuWin;
+					overlay.innerHTML = `<strong>${line}</strong><span>${text.again}</span>`;
 					overlay.hidden = false;
 					return;
 				}
@@ -499,7 +551,9 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				serving = true;
 				ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
 				overlay.textContent =
-					points.player >= 3 && points.player === points.cpu ? text.deuce : text.serve;
+					format === 'match' && points.player >= 3 && points.player === points.cpu
+						? text.deuce
+						: text.serve;
 				overlay.hidden = false;
 			}
 
@@ -507,6 +561,7 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				points = { player: 0, cpu: 0 };
 				games = { player: 0, cpu: 0 };
 				server = 'player';
+				opener = 'player';
 				over = false;
 				serving = true;
 				ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
@@ -520,10 +575,10 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				if (pointerY !== null) {
 					playerY = pointerY - PADDLE_H / 2;
 				} else {
-					if (keys.has('ArrowUp') || keys.has('w') || keys.has('W')) {
+					if (keys.has('ArrowUp') || keys.has('ArrowLeft') || keys.has('w') || keys.has('W')) {
 						playerY -= PLAYER_SPEED * seconds;
 					}
-					if (keys.has('ArrowDown') || keys.has('s') || keys.has('S')) {
+					if (keys.has('ArrowDown') || keys.has('ArrowRight') || keys.has('s') || keys.has('S')) {
 						playerY += PLAYER_SPEED * seconds;
 					}
 				}
@@ -592,6 +647,16 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			}
 
 			function draw() {
+				// Everything below is drawn in the court's own landscape
+				// coordinates; upright, the whole scene is turned a quarter
+				// turn so the player's end is at the bottom of the screen.
+				context.setTransform(1, 0, 0, 1, 0, 0);
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				if (portrait) {
+					context.translate(0, canvas.height);
+					context.rotate(-Math.PI / 2);
+				}
+
 				if (scene) context.drawImage(scene, 0, 0);
 
 				// Deliberately not the theme colours: these two have to stay
@@ -637,11 +702,65 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				return Math.max(min, Math.min(max, value));
 			}
 
+			/**
+			 * Fits the canvas to the orientation and picks the format that
+			 * goes with it. Returns true when the format changed, because a
+			 * match and a tie-break cannot be continued into one another.
+			 */
+			function applyLayout() {
+				portrait = upright.matches;
+				canvas.width = portrait ? H : W;
+				canvas.height = portrait ? W : H;
+
+				const next = portrait ? 'tiebreak' : 'match';
+				const changed = next !== format;
+				format = next;
+				out.board.dataset.format = format;
+				out.hint.textContent = format === 'tiebreak' ? text.hintTiebreak : text.hint;
+				return changed;
+			}
+
+			/**
+			 * Sizes the canvas to the largest box the court area can hold
+			 * without distorting the drawing. Done here rather than in CSS
+			 * because the element's box has to match what is painted exactly:
+			 * a letterboxed canvas would put every tap out by the margin.
+			 */
+			function fitCanvas() {
+				const box = courtBox.getBoundingClientRect();
+				if (!box.width || !box.height) return;
+
+				const ratio = canvas.width / canvas.height;
+				let width = box.width;
+				let height = width / ratio;
+				if (height > box.height) {
+					height = box.height;
+					width = height * ratio;
+				}
+
+				const next = `${Math.round(width)}px`;
+				if (canvas.style.width === next) return; // already settled
+				canvas.style.width = next;
+				canvas.style.height = `${Math.round(height)}px`;
+			}
+
+			new ResizeObserver(fitCanvas).observe(courtBox);
+
 			function refresh() {
 				colors = readColors();
 				paintScene();
 				paintScore();
 			}
+
+			// Turning the phone changes the match being played, so it starts
+			// the new one rather than carrying a half-finished score across.
+			upright.addEventListener('change', () => {
+				const changed = applyLayout();
+				if (!dialog.open) return;
+				fitCanvas();
+				if (changed) reset();
+				else draw();
+			});
 
 			// The stadium follows the theme and the tournament, even mid-match.
 			new MutationObserver(() => {
@@ -653,9 +772,11 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 
 			// ── Wiring ────────────────────────────────────────────────────
 			this.querySelector<HTMLButtonElement>('.open')!.addEventListener('click', () => {
+				applyLayout();
 				refresh();
 				reset();
 				dialog.showModal();
+				fitCanvas();
 				start();
 			});
 
@@ -681,7 +802,11 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 
 			function track(event: PointerEvent) {
 				const box = canvas.getBoundingClientRect();
-				pointerY = ((event.clientY - box.top) / box.height) * H;
+				// Upright, the court's length runs down the screen, so the
+				// racket is moved across it — the finger's x, not its y.
+				pointerY = portrait
+					? ((event.clientX - box.left) / box.width) * H
+					: ((event.clientY - box.top) / box.height) * H;
 			}
 
 			dialog.addEventListener('keydown', (event: KeyboardEvent) => {
@@ -690,7 +815,7 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 					serveOrRestart();
 					return;
 				}
-				if (['ArrowUp', 'ArrowDown', 'w', 'W', 's', 'S'].includes(event.key)) {
+				if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 's', 'S'].includes(event.key)) {
 					event.preventDefault();
 					pointerY = null; // hand control back to the keyboard
 					keys.add(event.key);
@@ -705,6 +830,7 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				else start();
 			});
 
+			applyLayout();
 			paintScore();
 		}
 	}
@@ -800,6 +926,32 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 	.venue {
 		font-size: 0.7rem;
 		color: var(--board-muted);
+	}
+
+	.format {
+		display: none;
+		align-self: flex-start;
+		margin-top: 0.2rem;
+		padding: 0.05rem 0.4rem;
+		border-radius: calc(var(--board-radius) / 2);
+		background-color: rgba(255, 255, 255, 0.16);
+		font-size: 0.65rem;
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	/* A tie-break has no games to show, and says so instead. */
+	.board[data-format='tiebreak'] .format {
+		display: inline-block;
+	}
+
+	.board[data-format='tiebreak'] .games {
+		display: none;
+	}
+
+	.board[data-format='tiebreak'] .row {
+		grid-template-columns: 0.6rem 8.5rem 2.75rem;
 	}
 
 	.rows {
@@ -930,7 +1082,95 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 		text-align: center;
 	}
 
-	@media (max-width: 40em) {
+	/* On a phone the match takes the whole screen: a dialog floating in the
+	   middle of a small viewport wastes the only space the court has. */
+	@media (max-width: 48em), (max-height: 32em), (orientation: portrait) and (max-width: 64em) {
+		.stage {
+			width: 100%;
+			max-width: 100%;
+			height: 100%;
+			max-height: 100%;
+			margin: 0;
+			border: 0;
+			border-radius: 0;
+		}
+
+		.frame {
+			height: 100%;
+			padding: 0.75rem;
+			gap: 0.6rem;
+		}
+
+		/* The court takes whatever the board and the hint leave; the canvas
+		   itself is sized in script, to the largest box that fits without
+		   distorting the drawing. */
+		.court {
+			flex: 1;
+			display: grid;
+			place-items: center;
+			min-height: 0;
+		}
+
+		canvas {
+			width: auto;
+			height: auto;
+			max-width: 100%;
+			max-height: 100%;
+		}
+
+		.hint {
+			font-size: 0.75rem;
+			flex-shrink: 0;
+		}
+	}
+
+	/* A phone on its side has ~390px of height for everything: the board
+	   gives up what it can so the court keeps the rest. */
+	@media (max-height: 32em) {
+		.frame {
+			padding: 0.5rem;
+			gap: 0.4rem;
+		}
+
+		.board {
+			padding: 0.35rem 3rem 0.35rem 0.7rem;
+		}
+
+		.venue {
+			display: none;
+		}
+
+		.row {
+			font-size: 0.8rem;
+		}
+
+		.points {
+			font-size: var(--text-sm);
+		}
+
+		.overlay {
+			font-size: var(--text-sm);
+		}
+
+		.overlay :global(strong) {
+			font-size: var(--text-md);
+		}
+
+		.hint {
+			font-size: 0.7rem;
+		}
+
+		.close {
+			top: 0.35rem;
+			right: 0.35rem;
+			width: 1.9rem;
+			height: 1.9rem;
+			font-size: 1.25rem;
+		}
+	}
+
+	/* Upright, the board has no room to run along one line. */
+	@media (orientation: portrait) and (max-width: 64em) {
 		.board {
 			flex-direction: column;
 			align-items: stretch;
@@ -940,15 +1180,22 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 		.row {
 			grid-template-columns: 0.6rem 1fr 1.75rem 2.75rem;
 		}
+
+		.board[data-format='tiebreak'] .row {
+			grid-template-columns: 0.6rem 1fr 2.75rem;
+		}
 	}
 
 	@media (max-width: 30em) {
-		.frame {
-			padding: 0.75rem;
+		.brand {
+			flex-direction: row;
+			align-items: baseline;
+			gap: 0.5rem;
+			flex-wrap: wrap;
 		}
 
-		.hint {
-			font-size: 0.75rem;
+		.venue {
+			flex: 1;
 		}
 	}
 </style>
