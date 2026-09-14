@@ -13,7 +13,7 @@
  * and its loop exist once per page and only run while it is open.
  */
 import { getLangFromUrl } from '../i18n/utils';
-import { FULL_NAME } from '../lib/schema';
+import { FULL_NAME, SITE_ORIGIN } from '../lib/schema';
 import { slams } from '../lib/slam';
 
 const lang = getLangFromUrl(Astro.url);
@@ -41,6 +41,17 @@ const copy = {
 		winTiebreak: 'Tie-break, %s.',
 		again: 'Tap or press space for a new match',
 		deuce: 'Deuce',
+		/* The winner's card, and what to do with it. */
+		champion: 'Champion',
+		beat: 'beat %o %s',
+		saveImage: 'Save image',
+		share: 'Share',
+		sendLinkedIn: 'Send it to ' + surname,
+		playAgain: 'Play again',
+		copied: 'Result copied — paste it into your message on LinkedIn.',
+		copiedText: 'Result copied to the clipboard.',
+		shareText: 'I beat ' + FULL_NAME + ' %s at tennis on ' + SITE_ORIGIN.replace('https://', ''),
+		cardAlt: '%p beat %o %s at tennis on ' + SITE_ORIGIN.replace('https://', ''),
 	},
 	de: {
 		play: 'Einen Punkt spielen',
@@ -60,11 +71,24 @@ const copy = {
 		winTiebreak: 'Tie-Break, %s.',
 		again: 'Tippen oder Leertaste für ein neues Match',
 		deuce: 'Einstand',
+		champion: 'Sieger',
+		beat: 'schlägt %o %s',
+		saveImage: 'Bild speichern',
+		share: 'Teilen',
+		sendLinkedIn: 'An ' + surname + ' schicken',
+		playAgain: 'Nochmal spielen',
+		copied: 'Ergebnis kopiert — füge es in deine Nachricht auf LinkedIn ein.',
+		copiedText: 'Ergebnis in die Zwischenablage kopiert.',
+		shareText: 'Ich habe ' + FULL_NAME + ' %s im Tennis geschlagen — auf ' + SITE_ORIGIN.replace('https://', ''),
+		cardAlt: '%p schlägt %o %s im Tennis auf ' + SITE_ORIGIN.replace('https://', ''),
 	},
 }[lang];
 
 /** Tournament names for the board, keyed by the `data-slam` attribute. */
 const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
+
+/** Where a winner is sent to gloat. Same profile the nav and the card link to. */
+const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 ---
 
 <tennis-game
@@ -79,6 +103,15 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 	data-hint={copy.hint}
 	data-hint-tiebreak={copy.hintTiebreak}
 	data-you={copy.you}
+	data-champion={copy.champion}
+	data-beat={copy.beat}
+	data-share-text={copy.shareText}
+	data-card-alt={copy.cardAlt}
+	data-copied={copy.copied}
+	data-copied-text={copy.copiedText}
+	data-opponent={copy.opponent}
+	data-lang={lang}
+	data-host={SITE_ORIGIN.replace('https://', '')}
 >
 	<button type="button" class="open">
 		<svg class="ball" viewBox="0 0 24 24" aria-hidden="true">
@@ -121,6 +154,24 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			<div class="court">
 				<canvas width="960" height="620"></canvas>
 				<p class="overlay" data-overlay>{copy.serve}</p>
+
+				<!-- The winner's card: a result worth keeping, and the ways out
+				     of the page it can leave by. -->
+				<div class="result" data-result hidden>
+					<img class="result-card" data-result-image alt="" />
+					<div class="result-actions">
+						<a class="act primary" data-save download="tennis.png">{copy.saveImage}</a>
+						<button type="button" class="act" data-share hidden>{copy.share}</button>
+						<a
+							class="act"
+							data-linkedin
+							href={LINKEDIN}
+							target="_blank"
+							rel="noopener noreferrer">{copy.sendLinkedIn}</a>
+						<button type="button" class="act ghost" data-play-again>{copy.playAgain}</button>
+					</div>
+					<p class="result-note" data-result-note role="status" aria-live="polite"></p>
+				</div>
 
 				<!-- The card for the match: who is on the other side of the net. -->
 				<form class="entry" data-entry hidden>
@@ -243,7 +294,16 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				hint: this.dataset.hint ?? '',
 				hintTiebreak: this.dataset.hintTiebreak ?? '',
 				you: this.dataset.you ?? 'You',
+				tiebreak: this.dataset.tiebreak ?? 'Tie-break',
+				champion: this.dataset.champion ?? 'Champion',
+				beat: this.dataset.beat ?? 'beat %o %s',
+				shareText: this.dataset.shareText ?? '',
+				cardAlt: this.dataset.cardAlt ?? '',
+				copied: this.dataset.copied ?? '',
+				copiedText: this.dataset.copiedText ?? '',
 			};
+			const locale = this.dataset.lang === 'de' ? 'de-AT' : 'en-GB';
+			const host = this.dataset.host ?? '';
 
 			/**
 			 * Who is at this end of the court. Kept in localStorage so a
@@ -273,6 +333,138 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 
 			let playerName = readName();
 			const displayName = () => playerName || text.you;
+
+			// ── The winner's card ─────────────────────────────────────────
+			const result = this.querySelector<HTMLElement>('[data-result]')!;
+			const resultImage = this.querySelector<HTMLImageElement>('[data-result-image]')!;
+			const resultNote = this.querySelector<HTMLElement>('[data-result-note]')!;
+			const saveLink = this.querySelector<HTMLAnchorElement>('[data-save]')!;
+			const shareButton = this.querySelector<HTMLButtonElement>('[data-share]')!;
+			const linkedInLink = this.querySelector<HTMLAnchorElement>('[data-linkedin]')!;
+			const card = document.createElement('canvas');
+			card.width = 1200;
+			card.height = 630; // the ratio every social preview crops to
+
+			/** The score as it goes on the card: games for a match, points for a tie-break. */
+			const scoreLine = () =>
+				format === 'tiebreak'
+					? `${points.player}–${points.cpu}`
+					: `${games.player}–${games.cpu}`;
+
+			/** Shrinks the font until the text fits the width it is given. */
+			function fitText(
+				paint: CanvasRenderingContext2D,
+				value: string,
+				weight: string,
+				start: number,
+				maxWidth: number
+			) {
+				let size = start;
+				do {
+					paint.font = `${weight} ${size}px Rubik, system-ui, sans-serif`;
+					size -= 2;
+				} while (paint.measureText(value).width > maxWidth && size > 20);
+			}
+
+			function paintCard() {
+				const paint = card.getContext('2d')!;
+				const venue = VENUES[currentSlam()];
+				const { width, height } = card;
+
+				paint.fillStyle = shade(colors.stand, -0.2);
+				paint.fillRect(0, 0, width, height);
+
+				// The stadium behind the result — held back on the left, where
+				// the text sits, and left to show on the right, which is what
+				// makes a clay card look like clay and a grass one like grass.
+				if (scene) {
+					paint.drawImage(scene, 0, 0, scene.width, scene.height, 60, -30, width, 700);
+					const veil = paint.createLinearGradient(0, 0, width, 0);
+					veil.addColorStop(0, 'rgba(6, 14, 24, 0.92)');
+					veil.addColorStop(0.48, 'rgba(6, 14, 24, 0.78)');
+					veil.addColorStop(1, 'rgba(6, 14, 24, 0.18)');
+					paint.fillStyle = veil;
+					paint.fillRect(0, 0, width, height);
+				}
+
+				// The tournament's stripe across the top.
+				paint.fillStyle = colors.ink;
+				paint.fillRect(0, 0, width, 10);
+
+				const left = 72;
+				paint.textAlign = 'left';
+				paint.textBaseline = 'alphabetic';
+
+				paint.fillStyle = colors.ink;
+				paint.letterSpacing = '6px';
+				paint.font = '600 26px Rubik, system-ui, sans-serif';
+				paint.fillText((names[currentSlam()] ?? '').toUpperCase(), left, 96);
+				paint.letterSpacing = '0px';
+
+				paint.fillStyle = 'rgba(255, 255, 255, 0.62)';
+				paint.font = '400 24px Rubik, system-ui, sans-serif';
+				paint.fillText(venue.venue, left, 132);
+
+				// Champion.
+				paint.fillStyle = 'rgba(255, 255, 255, 0.68)';
+				paint.letterSpacing = '10px';
+				paint.font = '600 22px Rubik, system-ui, sans-serif';
+				paint.fillText(text.champion.toUpperCase(), left, 232);
+				paint.letterSpacing = '0px';
+
+				paint.fillStyle = '#ffffff';
+				fitText(paint, displayName(), '700', 96, width - left * 2 - 120);
+				paint.fillText(displayName(), left, 330);
+
+				paint.fillStyle = colors.ink;
+				paint.fillRect(left, 348, 96, 6);
+
+				// … beat Gnadlinger 4–2.
+				const line = text.beat.replace('%o', opponentName).replace('%s', scoreLine());
+				paint.fillStyle = 'rgba(255, 255, 255, 0.92)';
+				fitText(paint, line, '400', 40, width - left * 2 - 120);
+				paint.fillText(line, left, 412);
+
+				if (format === 'tiebreak') {
+					paint.font = '600 20px Rubik, system-ui, sans-serif';
+					const label = text.tiebreak.toUpperCase();
+					const pad = 14;
+					const chipWidth = paint.measureText(label).width + pad * 2;
+					paint.fillStyle = 'rgba(255, 255, 255, 0.16)';
+					paint.beginPath();
+					paint.roundRect(left, 442, chipWidth, 36, 8);
+					paint.fill();
+					paint.fillStyle = '#ffffff';
+					paint.letterSpacing = '2px';
+					paint.fillText(label, left + pad, 467);
+					paint.letterSpacing = '0px';
+				}
+
+				// The ball, oversized, as the card's mark.
+				paint.fillStyle = '#d8f000';
+				paint.beginPath();
+				paint.arc(width - 132, 158, 46, 0, Math.PI * 2);
+				paint.fill();
+				paint.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+				paint.lineWidth = 5;
+                paint.beginPath();
+				paint.arc(width - 132, 158, 34, Math.PI * 0.72, Math.PI * 1.45);
+				paint.stroke();
+
+				// Footer: where the match was played, and when.
+				const when = new Date().toLocaleDateString(locale, {
+					day: 'numeric',
+					month: 'long',
+					year: 'numeric',
+				});
+				paint.font = '400 24px Rubik, system-ui, sans-serif';
+				paint.fillStyle = 'rgba(255, 255, 255, 0.62)';
+				paint.fillText(when, left, height - 60);
+				const dateWidth = paint.measureText(`${when}   `).width;
+				paint.font = '600 26px Rubik, system-ui, sans-serif';
+				paint.fillStyle = colors.ink;
+				paint.fillText(host, left + dateWidth, height - 60);
+			}
 			const names: Record<string, string> = JSON.parse(this.dataset.names ?? '{}');
 
 			const currentSlam = () => {
@@ -294,6 +486,9 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 					stand: value('--stand', '#0e2a4d'),
 					seat: value('--stand-seat', '#16406f'),
 					accent: value('--stand-accent', '#0057b8'),
+					// The board's accent is the one picked to read on a dark
+					// panel, which is exactly what the card is.
+					ink: value('--board-accent', '#7fb3ee'),
 					player: value('--accent-regular', '#0057b8'),
 				};
 			}
@@ -599,6 +794,14 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 						'%s',
 						winner
 					);
+
+					// A win is worth keeping: the visitor gets a card to take
+					// away, the other way round gets the line and a restart.
+					if (to === 'player') {
+						showResult(line);
+						return;
+					}
+
 					overlay.innerHTML = `<strong>${line}</strong><span>${text.again}</span>`;
 					overlay.hidden = false;
 					return;
@@ -614,6 +817,7 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			}
 
 			function reset() {
+				hideResult();
 				points = { player: 0, cpu: 0 };
 				games = { player: 0, cpu: 0 };
 				server = 'player';
@@ -696,7 +900,10 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			function returnBall(x: number, paddleY: number, direction: 1 | -1) {
 				const offset = (ball.y - (paddleY + PADDLE_H / 2)) / (PADDLE_H / 2);
 				const speed = Math.min(Math.hypot(ball.vx, ball.vy) * 1.05, MAX_SPEED);
-				const angle = offset * 0.9;
+				// The jitter matters: a ball met dead centre would otherwise go
+				// back perfectly flat, and two players who both return down the
+				// middle would rally until the tournament ended.
+				const angle = offset * 0.9 + (Math.random() - 0.5) * 0.09;
 				ball.x = x;
 				ball.vx = Math.cos(angle) * speed * direction;
 				ball.vy = Math.sin(angle) * speed;
@@ -841,6 +1048,7 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			dialog.addEventListener('close', () => {
 				signing = false;
 				entry.hidden = true;
+				hideResult();
 				stop();
 			});
 			dialog.addEventListener('click', (event) => {
@@ -849,6 +1057,106 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 
 			/** Blocks play while the card is being filled in. */
 			let signing = false;
+			/** Blocks it while the winner's card is up. */
+			let showing = false;
+
+			function showResult(line: string) {
+				paintCard();
+				const score = scoreLine();
+				const alt = text.cardAlt
+					.replace('%p', displayName())
+					.replace('%o', opponentName)
+					.replace('%s', score);
+
+				resultImage.src = card.toDataURL('image/png');
+				resultImage.alt = alt;
+				saveLink.href = resultImage.src;
+				saveLink.download = `tennis-${displayName().toLowerCase().replace(/\s+/g, '-')}-${score.replace('–', '-')}.png`;
+				resultNote.textContent = '';
+				cardFile = null;
+				void cardBlob().then((blob) => {
+					cardFile = blob;
+				});
+
+				showing = true;
+				overlay.hidden = true;
+				result.hidden = false;
+				stop();
+				// The match is over; the keyboard belongs to the card now.
+				saveLink.focus();
+			}
+
+			function hideResult() {
+				showing = false;
+				result.hidden = true;
+			}
+
+			/**
+			 * The card as a file, for the share sheet and the clipboard. Made
+			 * as soon as the card is shown: writing to the clipboard has to
+			 * happen close to the click that asked for it, and encoding a PNG
+			 * in between is enough to lose that in some browsers.
+			 */
+			let cardFile: Blob | null = null;
+			function cardBlob(): Promise<Blob | null> {
+				return new Promise((resolve) => card.toBlob(resolve, 'image/png'));
+			}
+
+			function shareLine() {
+				return text.shareText.replace('%s', scoreLine());
+			}
+
+			// The share sheet only exists on some browsers; the button stays
+			// hidden where it does not, rather than failing when pressed.
+			if (typeof navigator.share === 'function') shareButton.hidden = false;
+
+			shareButton.addEventListener('click', async () => {
+				const blob = cardFile ?? (await cardBlob());
+				const file = blob ? new File([blob], 'tennis.png', { type: 'image/png' }) : null;
+				const payload: ShareData = { text: shareLine(), url: `https://${host}/` };
+
+				try {
+					if (file && navigator.canShare?.({ files: [file] })) {
+						await navigator.share({ ...payload, files: [file] });
+					} else {
+						await navigator.share(payload);
+					}
+				} catch {
+					// A cancelled share sheet is not a failure worth reporting.
+				}
+			});
+
+			// LinkedIn takes no attachment through a link, so the result goes to
+			// the clipboard on the way out and the note says to paste it. The
+			// link itself opens the profile either way — the copy is a bonus,
+			// and the note never claims a copy that did not happen.
+			linkedInLink.addEventListener('click', async () => {
+				const line = shareLine();
+
+				try {
+					if (cardFile && typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+						await navigator.clipboard.write([
+							new ClipboardItem({
+								'image/png': cardFile,
+								'text/plain': new Blob([line], { type: 'text/plain' }),
+							}),
+						]);
+						resultNote.textContent = text.copied;
+						return;
+					}
+					await navigator.clipboard.writeText(line);
+					resultNote.textContent = text.copiedText;
+				} catch {
+					// No clipboard: hand them the line to copy by hand.
+					resultNote.textContent = line;
+				}
+			});
+
+			this.querySelector<HTMLButtonElement>('[data-play-again]')!.addEventListener('click', () => {
+				hideResult();
+				reset();
+				start();
+			});
 
 			function askName(initial: boolean) {
 				signing = true;
@@ -887,6 +1195,11 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 
 			const serveOrRestart = () => {
 				if (signing) return;
+				if (showing) {
+					// The card has its own "play again"; a stray tap should not
+					// throw the result away.
+					return;
+				}
 				if (over) reset();
 				else if (serving) serve();
 			};
@@ -1037,6 +1350,11 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 	.venue {
 		font-size: 0.7rem;
 		color: var(--board-muted);
+		/* On a narrow board this would otherwise wrap to three lines and
+		   push the court down the screen. */
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.format {
@@ -1123,6 +1441,92 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 	.name.editable:focus-visible {
 		border-bottom-color: var(--board-accent);
 		color: var(--board-accent);
+	}
+
+	/* ── The winner's card ────────────────────────────────────────── */
+
+	.result {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.9rem;
+		padding: 1rem;
+		background-color: rgba(6, 16, 28, 0.88);
+		text-align: center;
+		overflow: auto;
+	}
+
+	.result[hidden] {
+		display: none;
+	}
+
+	.result-card {
+		width: min(30rem, 100%);
+		max-height: 58%;
+		object-fit: contain;
+		border-radius: var(--radius-md);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+	}
+
+	.result-actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.act {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.5rem 1.1rem;
+		font: inherit;
+		font-family: var(--font-brand);
+		font-size: var(--text-sm);
+		font-weight: 600;
+		color: #ffffff;
+		text-decoration: none;
+		background-color: rgba(255, 255, 255, 0.14);
+		border: 1px solid rgba(255, 255, 255, 0.28);
+		border-radius: var(--radius-full);
+		cursor: pointer;
+		transition:
+			background-color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+
+	.act:hover,
+	.act:focus-visible {
+		background-color: rgba(255, 255, 255, 0.26);
+	}
+
+	.act.primary {
+		color: var(--accent-text-over);
+		background-color: var(--accent-regular);
+		border-color: var(--accent-regular);
+	}
+
+	.act.primary:hover,
+	.act.primary:focus-visible {
+		background-color: var(--accent-hover);
+		border-color: var(--accent-hover);
+	}
+
+	.act.ghost {
+		background-color: transparent;
+	}
+
+	.act[hidden] {
+		display: none;
+	}
+
+	.result-note {
+		margin: 0;
+		max-width: 32rem;
+		font-size: var(--text-sm);
+		color: rgba(255, 255, 255, 0.82);
 	}
 
 	.entry {
@@ -1378,6 +1782,24 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 		.entry-go {
 			padding-block: 0.4rem;
 			font-size: var(--text-sm);
+		}
+
+		.result {
+			gap: 0.5rem;
+			padding: 0.6rem;
+		}
+
+		.result-card {
+			max-height: 46%;
+		}
+
+		.act {
+			padding: 0.35rem 0.8rem;
+			font-size: 0.8rem;
+		}
+
+		.result-note {
+			font-size: 0.75rem;
 		}
 	}
 
