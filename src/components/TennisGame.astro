@@ -26,15 +26,19 @@ const copy = {
 		play: 'Play a point',
 		title: 'Tennis',
 		close: 'Close',
-		opponent: 'Machine',
+		/* The visitor plays; the other end of the court is this site's owner. */
+		opponent: surname,
+		you: 'You',
+		yourName: 'Your name',
+		entry: 'Who is playing ' + surname + '?',
+		start: 'Play',
+		change: 'Change name',
 		serve: 'Space or tap to serve',
 		hint: 'Mouse, finger or ↑ ↓ to move · first to four games takes the match',
 		hintTiebreak: 'Slide to move · first to seven points, two clear',
 		tiebreak: 'Tie-break',
-		youWin: 'Game, set and match, ' + surname + '.',
-		cpuWin: 'Game, set and match, Machine.',
-		youWinTiebreak: 'Tie-break, ' + surname + '.',
-		cpuWinTiebreak: 'Tie-break, Machine.',
+		win: 'Game, set and match, %s.',
+		winTiebreak: 'Tie-break, %s.',
 		again: 'Tap or press space for a new match',
 		deuce: 'Deuce',
 	},
@@ -42,15 +46,18 @@ const copy = {
 		play: 'Einen Punkt spielen',
 		title: 'Tennis',
 		close: 'Schließen',
-		opponent: 'Maschine',
+		opponent: surname,
+		you: 'Du',
+		yourName: 'Dein Name',
+		entry: 'Wer spielt gegen ' + surname + '?',
+		start: 'Spielen',
+		change: 'Namen ändern',
 		serve: 'Leertaste oder tippen zum Aufschlag',
 		hint: 'Maus, Finger oder ↑ ↓ zum Bewegen · wer vier Spiele holt, gewinnt',
 		hintTiebreak: 'Zum Bewegen wischen · wer sieben Punkte holt, mit zwei Vorsprung',
 		tiebreak: 'Tie-Break',
-		youWin: 'Spiel, Satz und Sieg, ' + surname + '.',
-		cpuWin: 'Spiel, Satz und Sieg, Maschine.',
-		youWinTiebreak: 'Tie-Break, ' + surname + '.',
-		cpuWinTiebreak: 'Tie-Break, Maschine.',
+		win: 'Spiel, Satz und Sieg, %s.',
+		winTiebreak: 'Tie-Break, %s.',
 		again: 'Tippen oder Leertaste für ein neues Match',
 		deuce: 'Einstand',
 	},
@@ -64,15 +71,14 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 	class="tennis"
 	data-names={JSON.stringify(names)}
 	data-serve={copy.serve}
-	data-you-win={copy.youWin}
-	data-cpu-win={copy.cpuWin}
 	data-again={copy.again}
 	data-deuce={copy.deuce}
 	data-tiebreak={copy.tiebreak}
-	data-you-win-tiebreak={copy.youWinTiebreak}
-	data-cpu-win-tiebreak={copy.cpuWinTiebreak}
+	data-win={copy.win}
+	data-win-tiebreak={copy.winTiebreak}
 	data-hint={copy.hint}
 	data-hint-tiebreak={copy.hintTiebreak}
+	data-you={copy.you}
 >
 	<button type="button" class="open">
 		<svg class="ball" viewBox="0 0 24 24" aria-hidden="true">
@@ -95,7 +101,9 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				<div class="rows">
 					<div class="row">
 						<span class="serving" data-serving-player aria-hidden="true"></span>
-						<span class="name">{surname}</span>
+						<button type="button" class="name editable" data-rename title={copy.change}>
+							<span data-player-name>{copy.you}</span>
+						</button>
 						<span class="games" data-player-games>0</span>
 						<span class="points" data-player-point>0</span>
 					</div>
@@ -113,6 +121,25 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			<div class="court">
 				<canvas width="960" height="620"></canvas>
 				<p class="overlay" data-overlay>{copy.serve}</p>
+
+				<!-- The card for the match: who is on the other side of the net. -->
+				<form class="entry" data-entry hidden>
+					<label class="entry-label" for="tennis-player-name">{copy.entry}</label>
+					<div class="entry-row">
+						<input
+							id="tennis-player-name"
+							class="entry-input"
+							data-name-input
+							type="text"
+							maxlength="14"
+							autocomplete="off"
+							spellcheck="false"
+							placeholder={copy.you}
+							aria-label={copy.yourName}
+						/>
+						<button type="submit" class="entry-go">{copy.start}</button>
+					</div>
+				</form>
 			</div>
 
 			<p class="hint" data-hint-label>{copy.hint}</p>
@@ -188,6 +215,8 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			const dialog = this.querySelector<HTMLDialogElement>('dialog')!;
 			const canvas = this.querySelector<HTMLCanvasElement>('canvas')!;
 			const overlay = this.querySelector<HTMLElement>('[data-overlay]')!;
+			const entry = this.querySelector<HTMLFormElement>('[data-entry]')!;
+			const nameInput = this.querySelector<HTMLInputElement>('[data-name-input]')!;
 			const courtBox = this.querySelector<HTMLElement>('.court')!;
 			const context = canvas.getContext('2d')!;
 
@@ -202,19 +231,48 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				venue: this.querySelector<HTMLElement>('[data-venue]')!,
 				board: this.querySelector<HTMLElement>('[data-board]')!,
 				hint: this.querySelector<HTMLElement>('[data-hint-label]')!,
+				playerName: this.querySelector<HTMLElement>('[data-player-name]')!,
 			};
 
 			const text = {
 				serve: this.dataset.serve ?? '',
-				youWin: this.dataset.youWin ?? '',
-				cpuWin: this.dataset.cpuWin ?? '',
-				youWinTiebreak: this.dataset.youWinTiebreak ?? '',
-				cpuWinTiebreak: this.dataset.cpuWinTiebreak ?? '',
+				win: this.dataset.win ?? '%s',
+				winTiebreak: this.dataset.winTiebreak ?? '%s',
 				again: this.dataset.again ?? '',
 				deuce: this.dataset.deuce ?? '',
 				hint: this.dataset.hint ?? '',
 				hintTiebreak: this.dataset.hintTiebreak ?? '',
+				you: this.dataset.you ?? 'You',
 			};
+
+			/**
+			 * Who is at this end of the court. Kept in localStorage so a
+			 * returning visitor is still on the scoreboard, and editable from
+			 * the board itself.
+			 */
+			const NAME_KEY = 'tennis-player';
+			const opponentName = out.board.querySelector<HTMLElement>('.row:last-child .name')!
+				.textContent!.trim();
+
+			function readName() {
+				try {
+					return (localStorage.getItem(NAME_KEY) ?? '').trim();
+				} catch {
+					return '';
+				}
+			}
+
+			function storeName(value: string) {
+				try {
+					if (value) localStorage.setItem(NAME_KEY, value);
+					else localStorage.removeItem(NAME_KEY);
+				} catch {
+					// Private mode: the name lasts for this visit only.
+				}
+			}
+
+			let playerName = readName();
+			const displayName = () => playerName || text.you;
 			const names: Record<string, string> = JSON.parse(this.dataset.names ?? '{}');
 
 			const currentSlam = () => {
@@ -486,6 +544,7 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			}
 
 			function paintScore() {
+				out.playerName.textContent = displayName();
 				out.playerPoint.textContent = pointLabel(points.player, points.cpu);
 				out.cpuPoint.textContent = pointLabel(points.cpu, points.player);
 				out.playerGames.textContent = String(games.player);
@@ -535,14 +594,11 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				if (won) {
 					over = true;
 					serving = true;
-					const line =
-						format === 'tiebreak'
-							? to === 'player'
-								? text.youWinTiebreak
-								: text.cpuWinTiebreak
-							: to === 'player'
-								? text.youWin
-								: text.cpuWin;
+					const winner = to === 'player' ? displayName() : opponentName;
+					const line = (format === 'tiebreak' ? text.winTiebreak : text.win).replace(
+						'%s',
+						winner
+					);
 					overlay.innerHTML = `<strong>${line}</strong><span>${text.again}</span>`;
 					overlay.hidden = false;
 					return;
@@ -777,21 +833,66 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 				reset();
 				dialog.showModal();
 				fitCanvas();
-				start();
+				if (playerName) start();
+				else askName(true);
 			});
 
 			this.querySelector<HTMLButtonElement>('.close')!.addEventListener('click', () => dialog.close());
-			dialog.addEventListener('close', stop);
+			dialog.addEventListener('close', () => {
+				signing = false;
+				entry.hidden = true;
+				stop();
+			});
 			dialog.addEventListener('click', (event) => {
 				if (event.target === dialog) dialog.close();
 			});
 
+			/** Blocks play while the card is being filled in. */
+			let signing = false;
+
+			function askName(initial: boolean) {
+				signing = true;
+				entry.hidden = false;
+				overlay.hidden = true;
+				// The card sits over the stadium, so there has to be one on the
+				// canvas before the loop is stopped underneath it.
+				draw();
+				nameInput.value = playerName;
+				// A returning player is renaming, so start from a clean field
+				// only when there is nothing to rename.
+				if (initial) nameInput.value = '';
+				stop();
+				nameInput.focus();
+				nameInput.select();
+			}
+
+			function closeName() {
+				signing = false;
+				entry.hidden = true;
+				overlay.hidden = over || serving ? false : true;
+				start();
+			}
+
+			entry.addEventListener('submit', (event) => {
+				event.preventDefault();
+				playerName = nameInput.value.trim().slice(0, 14);
+				storeName(playerName);
+				paintScore();
+				closeName();
+			});
+
+			this.querySelector<HTMLButtonElement>('[data-rename]')!.addEventListener('click', () => {
+				askName(false);
+			});
+
 			const serveOrRestart = () => {
+				if (signing) return;
 				if (over) reset();
 				else if (serving) serve();
 			};
 
 			canvas.addEventListener('pointerdown', (event) => {
+				if (signing) return;
 				track(event);
 				serveOrRestart();
 			});
@@ -810,6 +911,16 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			}
 
 			dialog.addEventListener('keydown', (event: KeyboardEvent) => {
+				if (signing) {
+					// The field owns the keyboard: space types a space, Escape
+					// leaves the name as it was rather than closing the match.
+					if (event.key === 'Escape') {
+						event.preventDefault();
+						event.stopPropagation();
+						closeName();
+					}
+					return;
+				}
 				if (event.key === ' ' || event.key === 'Enter') {
 					event.preventDefault();
 					serveOrRestart();
@@ -989,6 +1100,97 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 		text-overflow: ellipsis;
 	}
 
+	/* The player's own name is theirs to change, so it reads as a control:
+	   underlined on the board, like a name written onto a card. */
+	.name.editable {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0;
+		font: inherit;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: inherit;
+		text-align: start;
+		background: none;
+		border: 0;
+		border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+		cursor: text;
+	}
+
+	.name.editable:hover,
+	.name.editable:focus-visible {
+		border-bottom-color: var(--board-accent);
+		color: var(--board-accent);
+	}
+
+	.entry {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		padding: 1rem;
+		background-color: rgba(6, 16, 28, 0.82);
+		text-align: center;
+	}
+
+	.entry[hidden] {
+		display: none;
+	}
+
+	.entry-label {
+		font-family: var(--font-brand);
+		font-size: var(--text-md);
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.entry-row {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.entry-input {
+		width: min(16rem, 60vw);
+		padding: 0.55rem 0.8rem;
+		font: inherit;
+		font-size: var(--text-base);
+		color: var(--gray-0);
+		background-color: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+	}
+
+	.entry-input:focus-visible {
+		outline: 2px solid var(--focus-ring);
+		outline-offset: 2px;
+	}
+
+	.entry-go {
+		padding: 0.55rem 1.4rem;
+		font: inherit;
+		font-family: var(--font-brand);
+		font-size: var(--text-base);
+		font-weight: 600;
+		color: var(--accent-text-over);
+		background-color: var(--accent-regular);
+		border: 1px solid var(--accent-regular);
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+		transition: background-color var(--theme-transition);
+	}
+
+	.entry-go:hover,
+	.entry-go:focus-visible {
+		background-color: var(--accent-hover);
+	}
+
 	.games,
 	.points {
 		text-align: center;
@@ -1166,6 +1368,16 @@ const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 			width: 1.9rem;
 			height: 1.9rem;
 			font-size: 1.25rem;
+		}
+
+		.entry-label {
+			font-size: var(--text-sm);
+		}
+
+		.entry-input,
+		.entry-go {
+			padding-block: 0.4rem;
+			font-size: var(--text-sm);
 		}
 	}
 
