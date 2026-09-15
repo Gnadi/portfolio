@@ -1,13 +1,16 @@
 /**
- * Grand Slam colour themes.
+ * Tournament colour themes.
  *
- * The site ships four palettes — one per major — and wears the one whose
- * tournament is either being played right now or up next. Nothing to choose
- * and nothing stored: the calendar decides, and the answer is applied as
- * `data-slam` on <html>. The palettes themselves live in
- * src/styles/global.css.
+ * The site ships a palette per tournament — the four majors and the ATP
+ * Finals that closes the season — and wears the one whose tournament is
+ * either being played right now or up next. Nothing to choose and nothing
+ * stored: the calendar decides, and the answer is applied as `data-slam` on
+ * <html>. The palettes themselves live in src/styles/global.css.
+ *
+ * The `slam` naming predates the season finale and stays as it is: it is the
+ * attribute the stylesheet and the game are keyed on.
  */
-export type SlamId = 'ao' | 'rg' | 'wimbledon' | 'usopen';
+export type SlamId = 'ao' | 'rg' | 'wimbledon' | 'usopen' | 'atp';
 
 export const SLAM_ATTRIBUTE = 'data-slam';
 
@@ -62,6 +65,16 @@ export const slams: readonly Slam[] = [
 		swatch: '#0057b8',
 		from: [8, 18],
 		to: [9, 15],
+	},
+	{
+		// Not a major, but the one that ends the year — and the long stretch
+		// after the US Open has to point at something.
+		id: 'atp',
+		name: 'ATP Finals',
+		short: 'ATP',
+		swatch: '#0c6e7a',
+		from: [11, 8],
+		to: [11, 22],
 	},
 ] as const;
 

@@ -147,9 +147,9 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 						<span class="points" data-cpu-point>0</span>
 					</div>
 				</div>
-			</div>
 
-			<button type="button" class="close" aria-label={copy.close}>&times;</button>
+				<button type="button" class="close" aria-label={copy.close}>&times;</button>
+			</div>
 
 			<div class="court">
 				<canvas width="960" height="620"></canvas>
@@ -160,7 +160,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				<div class="result" data-result hidden>
 					<img class="result-card" data-result-image alt="" />
 					<div class="result-actions">
-						<a class="act primary" data-save download="tennis.png">{copy.saveImage}</a>
+						<button type="button" class="act primary" data-save>{copy.saveImage}</button>
 						<button type="button" class="act" data-share hidden>{copy.share}</button>
 						<a
 							class="act"
@@ -254,6 +254,15 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			accentBand: 'lower', // the club's purple in the seats
 			roof: true,
 		},
+		atp: {
+			// The finals have moved before — London's O2, now Turin — so this
+			// is the one venue name here with a shelf life.
+			venue: 'Inalpi Arena, Turin',
+			corner: 40, // an indoor arena bowl, not a stadium
+			tier: 0.5,
+			accentBand: 'lower',
+			roof: true,
+		},
 	} as const;
 
 	type Side = 'player' | 'cpu';
@@ -338,7 +347,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			const result = this.querySelector<HTMLElement>('[data-result]')!;
 			const resultImage = this.querySelector<HTMLImageElement>('[data-result-image]')!;
 			const resultNote = this.querySelector<HTMLElement>('[data-result-note]')!;
-			const saveLink = this.querySelector<HTMLAnchorElement>('[data-save]')!;
+			const saveButton = this.querySelector<HTMLButtonElement>('[data-save]')!;
 			const shareButton = this.querySelector<HTMLButtonElement>('[data-share]')!;
 			const linkedInLink = this.querySelector<HTMLAnchorElement>('[data-linkedin]')!;
 			const card = document.createElement('canvas');
@@ -1070,8 +1079,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 				resultImage.src = card.toDataURL('image/png');
 				resultImage.alt = alt;
-				saveLink.href = resultImage.src;
-				saveLink.download = `tennis-${displayName().toLowerCase().replace(/\s+/g, '-')}-${score.replace('–', '-')}.png`;
+				fileName = `tennis-${displayName().toLowerCase().replace(/\s+/g, '-')}-${score.replace('–', '-')}.png`;
 				resultNote.textContent = '';
 				cardFile = null;
 				void cardBlob().then((blob) => {
@@ -1083,7 +1091,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				result.hidden = false;
 				stop();
 				// The match is over; the keyboard belongs to the card now.
-				saveLink.focus();
+				saveButton.focus();
 			}
 
 			function hideResult() {
@@ -1098,9 +1106,17 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			 * in between is enough to lose that in some browsers.
 			 */
 			let cardFile: Blob | null = null;
+			let fileName = 'tennis.png';
 			function cardBlob(): Promise<Blob | null> {
 				return new Promise((resolve) => card.toBlob(resolve, 'image/png'));
 			}
+
+			saveButton.addEventListener('click', () => {
+				const link = document.createElement('a');
+				link.href = card.toDataURL('image/png');
+				link.download = fileName;
+				link.click();
+			});
 
 			function shareLine() {
 				return text.shareText.replace('%s', scoreLine());
@@ -1321,6 +1337,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 	/* ── The tournament's scoreboard ──────────────────────────────── */
 
 	.board {
+		position: relative;
 		display: flex;
 		align-items: center;
 		gap: 1.25rem;
@@ -1614,10 +1631,13 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		color: var(--board-text);
 	}
 
+	/* Sits inside the board, so the glyph always has the board's own dark
+	   panel behind it rather than half of the dialog's light surface. */
 	.close {
 		position: absolute;
-		top: 0.5rem;
-		right: 0.5rem;
+		top: 50%;
+		right: 0.6rem;
+		transform: translateY(-50%);
 		z-index: 1;
 		width: 2.25rem;
 		height: 2.25rem;
@@ -1626,15 +1646,16 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		font-size: 1.5rem;
 		line-height: 1;
 		color: var(--board-text);
-		background-color: rgba(255, 255, 255, 0.14);
-		border: 0;
+		background-color: rgba(255, 255, 255, 0.22);
+		border: 1px solid rgba(255, 255, 255, 0.45);
 		border-radius: var(--radius-full);
 		cursor: pointer;
+		transition: background-color var(--theme-transition);
 	}
 
 	.close:hover,
 	.close:focus-visible {
-		background-color: rgba(255, 255, 255, 0.26);
+		background-color: rgba(255, 255, 255, 0.38);
 	}
 
 	/* ── Court ────────────────────────────────────────────────────── */
@@ -1809,6 +1830,11 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			flex-direction: column;
 			align-items: stretch;
 			gap: 0.5rem;
+		}
+
+		.close {
+			top: 0.5rem;
+			transform: none;
 		}
 
 		.row {
