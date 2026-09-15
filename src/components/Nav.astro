@@ -159,10 +159,14 @@ const iconLinks: {
 					))
 				}
 			</div>
-			<Language />
 
-			<div class="theme-toggle">
-				<ThemeToggle />
+			{/* One group, so that on a narrow menu both controls wrap to the
+			    next line together instead of one at a time. */}
+			<div class="controls">
+				<Language />
+				<div class="theme-toggle">
+					<ThemeToggle />
+				</div>
 			</div>
 		</div>
 	</div>
@@ -201,7 +205,9 @@ const iconLinks: {
 				setExpanded(e.matches);
 				btn.hidden = e.matches;
 			};
-			const mediaQueries = window.matchMedia("(min-width: 50em)");
+			// Same breakpoint as the horizontal nav in the styles below: above
+			// it the menu is always open and the button is gone.
+			const mediaQueries = window.matchMedia("(min-width: 72em)");
 			handleViewports(mediaQueries);
 			mediaQueries.addEventListener("change", handleViewports);
 		}
@@ -301,6 +307,8 @@ const iconLinks: {
 		--icon-padding: 0.5rem;
 
 		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
 		justify-content: space-between;
 		gap: 0.75rem;
 		padding: 1.5rem 2rem 1.5rem 1.5rem;
@@ -329,18 +337,36 @@ const iconLinks: {
 		color: var(--accent-regular);
 	}
 
+	.controls {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.75rem;
+	}
+
 	.theme-toggle {
 		display: flex;
 		align-items: center;
 		height: calc(var(--icon-size) + 2 * var(--icon-padding));
 	}
 
-	@media (min-width: 50em) {
+	/* The horizontal nav needs room for the site title, a pill of six links
+	   and three controls side by side. Below this it does not get it — the
+	   theme toggle used to be pushed off the right edge and clipped by the
+	   root's `overflow-x: hidden` — so narrower viewports keep the menu
+	   button, which handles them properly. The threshold is set by German,
+	   where the same six labels run ~90px wider than in English.
+
+	   The columns are `auto 1fr auto` rather than `1fr auto 1fr`: symmetric
+	   side columns split the free space evenly, which starved the control
+	   side while the title side sat on space it did not need. */
+	@media (min-width: 72em) {
 		nav {
 			display: grid;
-			grid-template-columns: 1fr auto 1fr;
+			grid-template-columns: auto 1fr auto;
 			align-items: center;
-			padding: 2.5rem 5rem;
+			padding: 2.5rem;
 			gap: 1rem;
 		}
 
@@ -359,6 +385,7 @@ const iconLinks: {
 		/* A single flat pill: one border, one surface colour, no stroke
 		   gradient underneath it. */
 		.nav-items {
+			justify-self: center;
 			flex-direction: row;
 			font-size: var(--text-sm);
 			border: 1px solid var(--border);
@@ -368,7 +395,7 @@ const iconLinks: {
 		}
 
 		.link {
-			padding: 0.5rem 1rem;
+			padding: 0.5rem 0.75rem;
 			border-radius: var(--radius-full);
 			transition:
 				color var(--theme-transition),
@@ -395,8 +422,8 @@ const iconLinks: {
 		.menu-footer {
 			--icon-padding: 0.375rem;
 
+			flex-wrap: nowrap;
 			justify-self: flex-end;
-			align-items: center;
 			padding: 0;
 			background-color: transparent;
 			border-bottom: 0;
@@ -407,13 +434,31 @@ const iconLinks: {
 		}
 	}
 
-	@media (min-width: 60em) {
+	@media (min-width: 90em) {
+		.link {
+			padding: 0.5rem 1rem;
+		}
+	}
+
+	/* Last thing to come back, because it is the one part of the row that
+	   has somewhere else to live — the menu on small screens, and the
+	   contact section on the home page. The threshold is again set by
+	   German, which needs the most width to seat the whole row. */
+	@media (min-width: 80em) {
 		.socials {
 			display: flex;
+			flex-wrap: nowrap;
 			justify-content: flex-end;
 			gap: 0;
 		}
 	}
+
+	@media (min-width: 100em) {
+		nav {
+			padding: 2.5rem 5rem;
+		}
+	}
+
 	@media (forced-colors: active) {
 		.link.active {
 			color: SelectedItem;

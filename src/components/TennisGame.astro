@@ -1,0 +1,1861 @@
+---
+/**
+ * A match against the machine, played in whichever Grand Slam's stadium the
+ * site is currently wearing (src/lib/slam.ts). Pong rules, tennis scoring —
+ * 15, 30, 40, deuce, advantage — and the tournament's own scoreboard over
+ * the court.
+ *
+ * Each major gets its venue: the bowl's shape, the seats, the surface and the
+ * board all change with `data-slam`. Colours come from the palette tokens in
+ * src/styles/global.css; the structure comes from VENUES in the script below.
+ *
+ * The button lives in the footer; the game is a modal dialog, so the canvas
+ * and its loop exist once per page and only run while it is open.
+ */
+import { getLangFromUrl } from '../i18n/utils';
+import { FULL_NAME, SITE_ORIGIN } from '../lib/schema';
+import { slams } from '../lib/slam';
+
+const lang = getLangFromUrl(Astro.url);
+
+/** Scoreboards show surnames, so this one does too. */
+const surname = FULL_NAME.split(' ').pop() ?? 'Player';
+
+const copy = {
+	en: {
+		play: 'Play a point',
+		title: 'Tennis',
+		close: 'Close',
+		/* The visitor plays; the other end of the court is this site's owner. */
+		opponent: surname,
+		you: 'You',
+		yourName: 'Your name',
+		entry: 'Who is playing ' + surname + '?',
+		start: 'Play',
+		change: 'Change name',
+		serve: 'Space or tap to serve',
+		hint: 'Mouse, finger or ↑ ↓ to move · first to four games takes the match',
+		hintTiebreak: 'Slide to move · first to seven points, two clear',
+		tiebreak: 'Tie-break',
+		win: 'Game, set and match, %s.',
+		winTiebreak: 'Tie-break, %s.',
+		again: 'Tap or press space for a new match',
+		deuce: 'Deuce',
+		/* The winner's card, and what to do with it. */
+		champion: 'Champion',
+		beat: 'beat %o %s',
+		saveImage: 'Save image',
+		share: 'Share',
+		sendLinkedIn: 'Send it to ' + surname,
+		playAgain: 'Play again',
+		copied: 'Result copied — paste it into your message on LinkedIn.',
+		copiedText: 'Result copied to the clipboard.',
+		shareText: 'I beat ' + FULL_NAME + ' %s at tennis on ' + SITE_ORIGIN.replace('https://', ''),
+		cardAlt: '%p beat %o %s at tennis on ' + SITE_ORIGIN.replace('https://', ''),
+	},
+	de: {
+		play: 'Einen Punkt spielen',
+		title: 'Tennis',
+		close: 'Schließen',
+		opponent: surname,
+		you: 'Du',
+		yourName: 'Dein Name',
+		entry: 'Wer spielt gegen ' + surname + '?',
+		start: 'Spielen',
+		change: 'Namen ändern',
+		serve: 'Leertaste oder tippen zum Aufschlag',
+		hint: 'Maus, Finger oder ↑ ↓ zum Bewegen · wer vier Spiele holt, gewinnt',
+		hintTiebreak: 'Zum Bewegen wischen · wer sieben Punkte holt, mit zwei Vorsprung',
+		tiebreak: 'Tie-Break',
+		win: 'Spiel, Satz und Sieg, %s.',
+		winTiebreak: 'Tie-Break, %s.',
+		again: 'Tippen oder Leertaste für ein neues Match',
+		deuce: 'Einstand',
+		champion: 'Sieger',
+		beat: 'schlägt %o %s',
+		saveImage: 'Bild speichern',
+		share: 'Teilen',
+		sendLinkedIn: 'An ' + surname + ' schicken',
+		playAgain: 'Nochmal spielen',
+		copied: 'Ergebnis kopiert — füge es in deine Nachricht auf LinkedIn ein.',
+		copiedText: 'Ergebnis in die Zwischenablage kopiert.',
+		shareText: 'Ich habe ' + FULL_NAME + ' %s im Tennis geschlagen — auf ' + SITE_ORIGIN.replace('https://', ''),
+		cardAlt: '%p schlägt %o %s im Tennis auf ' + SITE_ORIGIN.replace('https://', ''),
+	},
+}[lang];
+
+/** Tournament names for the board, keyed by the `data-slam` attribute. */
+const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
+
+/** Where a winner is sent to gloat. Same profile the nav and the card link to. */
+const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
+---
+
+<tennis-game
+	class="tennis"
+	data-names={JSON.stringify(names)}
+	data-serve={copy.serve}
+	data-again={copy.again}
+	data-deuce={copy.deuce}
+	data-tiebreak={copy.tiebreak}
+	data-win={copy.win}
+	data-win-tiebreak={copy.winTiebreak}
+	data-hint={copy.hint}
+	data-hint-tiebreak={copy.hintTiebreak}
+	data-you={copy.you}
+	data-champion={copy.champion}
+	data-beat={copy.beat}
+	data-share-text={copy.shareText}
+	data-card-alt={copy.cardAlt}
+	data-copied={copy.copied}
+	data-copied-text={copy.copiedText}
+	data-opponent={copy.opponent}
+	data-lang={lang}
+	data-host={SITE_ORIGIN.replace('https://', '')}
+>
+	<button type="button" class="open">
+		<svg class="ball" viewBox="0 0 24 24" aria-hidden="true">
+			<circle cx="12" cy="12" r="9"></circle>
+			<path d="M4.2 6.2A9 9 0 0 1 9.6 20.5"></path>
+			<path d="M19.8 6.2A9 9 0 0 0 14.4 20.5"></path>
+		</svg>
+		{copy.play}
+	</button>
+
+	<dialog class="stage" aria-label={copy.title}>
+		<div class="frame">
+			<!-- The tournament's own board: name, server, games, points. -->
+			<div class="board" data-board data-format="match">
+				<div class="brand">
+					<span class="tournament" data-tournament>US Open</span>
+					<span class="venue" data-venue></span>
+					<span class="format" data-format-label>{copy.tiebreak}</span>
+				</div>
+				<div class="rows">
+					<div class="row">
+						<span class="serving" data-serving-player aria-hidden="true"></span>
+						<button type="button" class="name editable" data-rename title={copy.change}>
+							<span data-player-name>{copy.you}</span>
+						</button>
+						<span class="games" data-player-games>0</span>
+						<span class="points" data-player-point>0</span>
+					</div>
+					<div class="row">
+						<span class="serving" data-serving-cpu aria-hidden="true"></span>
+						<span class="name">{copy.opponent}</span>
+						<span class="games" data-cpu-games>0</span>
+						<span class="points" data-cpu-point>0</span>
+					</div>
+				</div>
+
+				<button type="button" class="close" aria-label={copy.close}>&times;</button>
+			</div>
+
+			<div class="court">
+				<canvas width="960" height="620"></canvas>
+				<p class="overlay" data-overlay>{copy.serve}</p>
+
+				<!-- The winner's card: a result worth keeping, and the ways out
+				     of the page it can leave by. -->
+				<div class="result" data-result hidden>
+					<img class="result-card" data-result-image alt="" />
+					<div class="result-actions">
+						<button type="button" class="act primary" data-save>{copy.saveImage}</button>
+						<button type="button" class="act" data-share hidden>{copy.share}</button>
+						<a
+							class="act"
+							data-linkedin
+							href={LINKEDIN}
+							target="_blank"
+							rel="noopener noreferrer">{copy.sendLinkedIn}</a>
+						<button type="button" class="act ghost" data-play-again>{copy.playAgain}</button>
+					</div>
+					<p class="result-note" data-result-note role="status" aria-live="polite"></p>
+				</div>
+
+				<!-- The card for the match: who is on the other side of the net. -->
+				<form class="entry" data-entry hidden>
+					<label class="entry-label" for="tennis-player-name">{copy.entry}</label>
+					<div class="entry-row">
+						<input
+							id="tennis-player-name"
+							class="entry-input"
+							data-name-input
+							type="text"
+							maxlength="14"
+							autocomplete="off"
+							spellcheck="false"
+							placeholder={copy.you}
+							aria-label={copy.yourName}
+						/>
+						<button type="submit" class="entry-go">{copy.start}</button>
+					</div>
+				</form>
+			</div>
+
+			<p class="hint" data-hint-label>{copy.hint}</p>
+		</div>
+	</dialog>
+</tennis-game>
+
+<script>
+	/** Canvas units. The stands fill the frame; the court sits inside them. */
+	const W = 960;
+	const H = 620;
+	const COURT_W = 660;
+	const COURT_H = Math.round(COURT_W / 2.1667); // 23.77m × 10.97m
+	const COURT_X = Math.round((W - COURT_W) / 2);
+	const COURT_Y = Math.round((H - COURT_H) / 2);
+	const APRON_X = 86; // run-off between the court and the front row
+	const APRON_Y = 62;
+	const ALLEY = COURT_H * 0.125;
+	const SERVICE = COURT_W * 0.269;
+
+	const PADDLE_W = 11;
+	const PADDLE_H = 84;
+	const PADDLE_INSET = 20;
+	const BALL_R = 8;
+
+	const BASE_SPEED = 430; // px per second
+	const MAX_SPEED = 1000;
+	const PLAYER_SPEED = 640;
+	const CPU_SPEED = 440;
+
+	/**
+	 * What makes each stadium itself: the bowl's corners, how the tiers are
+	 * split, where the accent seating runs, and the name on the back wall.
+	 */
+	const VENUES = {
+		usopen: {
+			venue: 'Arthur Ashe Stadium',
+			corner: 16, // a big square bowl
+			tier: 0.46,
+			accentBand: 'lower', // the blue ring under the upper tier
+			roof: true,
+		},
+		ao: {
+			venue: 'Rod Laver Arena',
+			corner: 46, // rounded, almost oval
+			tier: 0.44,
+			accentBand: 'upper',
+			roof: true,
+		},
+		rg: {
+			venue: 'Court Philippe-Chatrier',
+			corner: 8, // the rectangle in the Bois de Boulogne
+			tier: 0.4,
+			accentBand: 'none',
+			roof: true,
+		},
+		wimbledon: {
+			venue: 'Centre Court',
+			corner: 30,
+			tier: 0.42,
+			accentBand: 'lower', // the club's purple in the seats
+			roof: true,
+		},
+		atp: {
+			// The finals have moved before — London's O2, now Turin — so this
+			// is the one venue name here with a shelf life.
+			venue: 'Inalpi Arena, Turin',
+			corner: 40, // an indoor arena bowl, not a stadium
+			tier: 0.5,
+			accentBand: 'lower',
+			roof: true,
+		},
+	} as const;
+
+	type Side = 'player' | 'cpu';
+	type Scores = { player: number; cpu: number };
+
+	class TennisGame extends HTMLElement {
+		constructor() {
+			super();
+
+			const dialog = this.querySelector<HTMLDialogElement>('dialog')!;
+			const canvas = this.querySelector<HTMLCanvasElement>('canvas')!;
+			const overlay = this.querySelector<HTMLElement>('[data-overlay]')!;
+			const entry = this.querySelector<HTMLFormElement>('[data-entry]')!;
+			const nameInput = this.querySelector<HTMLInputElement>('[data-name-input]')!;
+			const courtBox = this.querySelector<HTMLElement>('.court')!;
+			const context = canvas.getContext('2d')!;
+
+			const out = {
+				playerPoint: this.querySelector<HTMLElement>('[data-player-point]')!,
+				cpuPoint: this.querySelector<HTMLElement>('[data-cpu-point]')!,
+				playerGames: this.querySelector<HTMLElement>('[data-player-games]')!,
+				cpuGames: this.querySelector<HTMLElement>('[data-cpu-games]')!,
+				servingPlayer: this.querySelector<HTMLElement>('[data-serving-player]')!,
+				servingCpu: this.querySelector<HTMLElement>('[data-serving-cpu]')!,
+				tournament: this.querySelector<HTMLElement>('[data-tournament]')!,
+				venue: this.querySelector<HTMLElement>('[data-venue]')!,
+				board: this.querySelector<HTMLElement>('[data-board]')!,
+				hint: this.querySelector<HTMLElement>('[data-hint-label]')!,
+				playerName: this.querySelector<HTMLElement>('[data-player-name]')!,
+			};
+
+			const text = {
+				serve: this.dataset.serve ?? '',
+				win: this.dataset.win ?? '%s',
+				winTiebreak: this.dataset.winTiebreak ?? '%s',
+				again: this.dataset.again ?? '',
+				deuce: this.dataset.deuce ?? '',
+				hint: this.dataset.hint ?? '',
+				hintTiebreak: this.dataset.hintTiebreak ?? '',
+				you: this.dataset.you ?? 'You',
+				tiebreak: this.dataset.tiebreak ?? 'Tie-break',
+				champion: this.dataset.champion ?? 'Champion',
+				beat: this.dataset.beat ?? 'beat %o %s',
+				shareText: this.dataset.shareText ?? '',
+				cardAlt: this.dataset.cardAlt ?? '',
+				copied: this.dataset.copied ?? '',
+				copiedText: this.dataset.copiedText ?? '',
+			};
+			const locale = this.dataset.lang === 'de' ? 'de-AT' : 'en-GB';
+			const host = this.dataset.host ?? '';
+
+			/**
+			 * Who is at this end of the court. Kept in localStorage so a
+			 * returning visitor is still on the scoreboard, and editable from
+			 * the board itself.
+			 */
+			const NAME_KEY = 'tennis-player';
+			const opponentName = out.board.querySelector<HTMLElement>('.row:last-child .name')!
+				.textContent!.trim();
+
+			function readName() {
+				try {
+					return (localStorage.getItem(NAME_KEY) ?? '').trim();
+				} catch {
+					return '';
+				}
+			}
+
+			function storeName(value: string) {
+				try {
+					if (value) localStorage.setItem(NAME_KEY, value);
+					else localStorage.removeItem(NAME_KEY);
+				} catch {
+					// Private mode: the name lasts for this visit only.
+				}
+			}
+
+			let playerName = readName();
+			const displayName = () => playerName || text.you;
+
+			// ── The winner's card ─────────────────────────────────────────
+			const result = this.querySelector<HTMLElement>('[data-result]')!;
+			const resultImage = this.querySelector<HTMLImageElement>('[data-result-image]')!;
+			const resultNote = this.querySelector<HTMLElement>('[data-result-note]')!;
+			const saveButton = this.querySelector<HTMLButtonElement>('[data-save]')!;
+			const shareButton = this.querySelector<HTMLButtonElement>('[data-share]')!;
+			const linkedInLink = this.querySelector<HTMLAnchorElement>('[data-linkedin]')!;
+			const card = document.createElement('canvas');
+			card.width = 1200;
+			card.height = 630; // the ratio every social preview crops to
+
+			/** The score as it goes on the card: games for a match, points for a tie-break. */
+			const scoreLine = () =>
+				format === 'tiebreak'
+					? `${points.player}–${points.cpu}`
+					: `${games.player}–${games.cpu}`;
+
+			/** Shrinks the font until the text fits the width it is given. */
+			function fitText(
+				paint: CanvasRenderingContext2D,
+				value: string,
+				weight: string,
+				start: number,
+				maxWidth: number
+			) {
+				let size = start;
+				do {
+					paint.font = `${weight} ${size}px Rubik, system-ui, sans-serif`;
+					size -= 2;
+				} while (paint.measureText(value).width > maxWidth && size > 20);
+			}
+
+			function paintCard() {
+				const paint = card.getContext('2d')!;
+				const venue = VENUES[currentSlam()];
+				const { width, height } = card;
+
+				paint.fillStyle = shade(colors.stand, -0.2);
+				paint.fillRect(0, 0, width, height);
+
+				// The stadium behind the result — held back on the left, where
+				// the text sits, and left to show on the right, which is what
+				// makes a clay card look like clay and a grass one like grass.
+				if (scene) {
+					paint.drawImage(scene, 0, 0, scene.width, scene.height, 60, -30, width, 700);
+					const veil = paint.createLinearGradient(0, 0, width, 0);
+					veil.addColorStop(0, 'rgba(6, 14, 24, 0.92)');
+					veil.addColorStop(0.48, 'rgba(6, 14, 24, 0.78)');
+					veil.addColorStop(1, 'rgba(6, 14, 24, 0.18)');
+					paint.fillStyle = veil;
+					paint.fillRect(0, 0, width, height);
+				}
+
+				// The tournament's stripe across the top.
+				paint.fillStyle = colors.ink;
+				paint.fillRect(0, 0, width, 10);
+
+				const left = 72;
+				paint.textAlign = 'left';
+				paint.textBaseline = 'alphabetic';
+
+				paint.fillStyle = colors.ink;
+				paint.letterSpacing = '6px';
+				paint.font = '600 26px Rubik, system-ui, sans-serif';
+				paint.fillText((names[currentSlam()] ?? '').toUpperCase(), left, 96);
+				paint.letterSpacing = '0px';
+
+				paint.fillStyle = 'rgba(255, 255, 255, 0.62)';
+				paint.font = '400 24px Rubik, system-ui, sans-serif';
+				paint.fillText(venue.venue, left, 132);
+
+				// Champion.
+				paint.fillStyle = 'rgba(255, 255, 255, 0.68)';
+				paint.letterSpacing = '10px';
+				paint.font = '600 22px Rubik, system-ui, sans-serif';
+				paint.fillText(text.champion.toUpperCase(), left, 232);
+				paint.letterSpacing = '0px';
+
+				paint.fillStyle = '#ffffff';
+				fitText(paint, displayName(), '700', 96, width - left * 2 - 120);
+				paint.fillText(displayName(), left, 330);
+
+				paint.fillStyle = colors.ink;
+				paint.fillRect(left, 348, 96, 6);
+
+				// … beat Gnadlinger 4–2.
+				const line = text.beat.replace('%o', opponentName).replace('%s', scoreLine());
+				paint.fillStyle = 'rgba(255, 255, 255, 0.92)';
+				fitText(paint, line, '400', 40, width - left * 2 - 120);
+				paint.fillText(line, left, 412);
+
+				if (format === 'tiebreak') {
+					paint.font = '600 20px Rubik, system-ui, sans-serif';
+					const label = text.tiebreak.toUpperCase();
+					const pad = 14;
+					const chipWidth = paint.measureText(label).width + pad * 2;
+					paint.fillStyle = 'rgba(255, 255, 255, 0.16)';
+					paint.beginPath();
+					paint.roundRect(left, 442, chipWidth, 36, 8);
+					paint.fill();
+					paint.fillStyle = '#ffffff';
+					paint.letterSpacing = '2px';
+					paint.fillText(label, left + pad, 467);
+					paint.letterSpacing = '0px';
+				}
+
+				// The ball, oversized, as the card's mark.
+				paint.fillStyle = '#d8f000';
+				paint.beginPath();
+				paint.arc(width - 132, 158, 46, 0, Math.PI * 2);
+				paint.fill();
+				paint.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+				paint.lineWidth = 5;
+                paint.beginPath();
+				paint.arc(width - 132, 158, 34, Math.PI * 0.72, Math.PI * 1.45);
+				paint.stroke();
+
+				// Footer: where the match was played, and when.
+				const when = new Date().toLocaleDateString(locale, {
+					day: 'numeric',
+					month: 'long',
+					year: 'numeric',
+				});
+				paint.font = '400 24px Rubik, system-ui, sans-serif';
+				paint.fillStyle = 'rgba(255, 255, 255, 0.62)';
+				paint.fillText(when, left, height - 60);
+				const dateWidth = paint.measureText(`${when}   `).width;
+				paint.font = '600 26px Rubik, system-ui, sans-serif';
+				paint.fillStyle = colors.ink;
+				paint.fillText(host, left + dateWidth, height - 60);
+			}
+			const names: Record<string, string> = JSON.parse(this.dataset.names ?? '{}');
+
+			const currentSlam = () => {
+				const id = document.documentElement.dataset.slam ?? 'usopen';
+				return (id in VENUES ? id : 'usopen') as keyof typeof VENUES;
+			};
+
+			/** Palette, read from the page so the stadium matches the theme. */
+			let colors = readColors();
+			function readColors() {
+				const style = getComputedStyle(document.documentElement);
+				const value = (name: string, fallback: string) =>
+					style.getPropertyValue(name).trim() || fallback;
+				return {
+					surface: value('--court-surface', '#2f6cb5'),
+					apron: value('--court-apron', '#1d4f8c'),
+					line: value('--court-line', '#ffffff'),
+					net: value('--court-net', 'rgba(255,255,255,0.62)'),
+					stand: value('--stand', '#0e2a4d'),
+					seat: value('--stand-seat', '#16406f'),
+					accent: value('--stand-accent', '#0057b8'),
+					// The board's accent is the one picked to read on a dark
+					// panel, which is exactly what the card is.
+					ink: value('--board-accent', '#7fb3ee'),
+					player: value('--accent-regular', '#0057b8'),
+				};
+			}
+
+			/**
+			 * Everything that never moves — bowl, crowd, court, umpire — is
+			 * painted once into this layer and blitted each frame.
+			 */
+			let scene: HTMLCanvasElement | null = null;
+
+			function paintScene() {
+				const venue = VENUES[currentSlam()];
+				const layer = document.createElement('canvas');
+				layer.width = W;
+				layer.height = H;
+				const paint = layer.getContext('2d')!;
+
+				// Deterministic crowd: the same house every time the door opens.
+				let seed = 20260913;
+				const random = () => {
+					seed = (seed * 1664525 + 1013904223) % 4294967296;
+					return seed / 4294967296;
+				};
+
+				// ── The bowl ────────────────────────────────────────────────
+				// Roof and outer structure, then two tiers of seating rings
+				// with a concourse between them, each one painted as a block
+				// and then filled with a crowd.
+				paint.fillStyle = shade(colors.stand, -0.45);
+				paint.fillRect(0, 0, W, H);
+
+				const outer = { x: 8, y: 6, w: W - 16, h: H - 12 };
+				const front = {
+					x: COURT_X - APRON_X,
+					y: COURT_Y - APRON_Y,
+					w: COURT_W + APRON_X * 2,
+					h: COURT_H + APRON_Y * 2,
+				};
+				// The upper tier reaches this far in from the outer wall.
+				const split = {
+					x: outer.x + (front.x - outer.x) * venue.tier,
+					y: outer.y + (front.y - outer.y) * venue.tier,
+					w: 0,
+					h: 0,
+				};
+				split.w = outer.w - (split.x - outer.x) * 2;
+				split.h = outer.h - (split.y - outer.y) * 2;
+				const concourse = inset(split, 14);
+
+				roundRect(paint, outer, venue.corner + 16, shade(colors.seat, -0.4));
+				seats(paint, outer, split, venue.accentBand === 'upper', random);
+
+				// Concourse: the dark gap that separates the two tiers.
+				roundRect(paint, split, venue.corner + 8, shade(colors.stand, -0.2));
+				roundRect(paint, concourse, venue.corner + 6, shade(colors.seat, -0.2));
+				seats(paint, concourse, front, venue.accentBand === 'lower', random);
+
+				// The rail along the front row.
+				paint.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+				paint.lineWidth = 2;
+				paint.beginPath();
+				paint.roundRect(front.x - 5, front.y - 5, front.w + 10, front.h + 10, 8);
+				paint.stroke();
+
+				// ── Back wall, with the venue's name on it ──────────────────
+				const wall = { x: front.x, y: front.y - 34, w: front.w, h: 30 };
+				roundRect(paint, wall, 4, shade(colors.stand, -0.4));
+				paint.fillStyle = 'rgba(255, 255, 255, 0.72)';
+				paint.font = '600 13px Rubik, system-ui, sans-serif';
+				paint.textAlign = 'center';
+				paint.textBaseline = 'middle';
+				paint.letterSpacing = '3px';
+				paint.fillText(venue.venue.toUpperCase(), W / 2, wall.y + wall.h / 2);
+				paint.letterSpacing = '0px';
+
+				// ── Run-off and court ───────────────────────────────────────
+				roundRect(paint, front, 6, colors.apron);
+				paint.fillStyle = colors.surface;
+				paint.fillRect(COURT_X, COURT_Y, COURT_W, COURT_H);
+
+				paint.strokeStyle = colors.line;
+				paint.lineWidth = 3;
+				paint.strokeRect(COURT_X, COURT_Y, COURT_W, COURT_H);
+				const net = COURT_X + COURT_W / 2;
+				const lines: [number, number, number, number][] = [
+					[COURT_X, COURT_Y + ALLEY, COURT_X + COURT_W, COURT_Y + ALLEY],
+					[COURT_X, COURT_Y + COURT_H - ALLEY, COURT_X + COURT_W, COURT_Y + COURT_H - ALLEY],
+					[net - SERVICE, COURT_Y + ALLEY, net - SERVICE, COURT_Y + COURT_H - ALLEY],
+					[net + SERVICE, COURT_Y + ALLEY, net + SERVICE, COURT_Y + COURT_H - ALLEY],
+					[net - SERVICE, COURT_Y + COURT_H / 2, net + SERVICE, COURT_Y + COURT_H / 2],
+					[COURT_X, COURT_Y + COURT_H / 2, COURT_X + 14, COURT_Y + COURT_H / 2],
+					[COURT_X + COURT_W - 14, COURT_Y + COURT_H / 2, COURT_X + COURT_W, COURT_Y + COURT_H / 2],
+				];
+				for (const [x1, y1, x2, y2] of lines) {
+					paint.beginPath();
+					paint.moveTo(x1, y1);
+					paint.lineTo(x2, y2);
+					paint.stroke();
+				}
+
+				// Net, strung between posts outside the doubles lines.
+				paint.strokeStyle = colors.net;
+				paint.lineWidth = 5;
+				paint.setLineDash([9, 7]);
+				paint.beginPath();
+				paint.moveTo(net, COURT_Y - 16);
+				paint.lineTo(net, COURT_Y + COURT_H + 16);
+				paint.stroke();
+				paint.setLineDash([]);
+				paint.fillStyle = colors.line;
+				dot(paint, net, COURT_Y - 16, 4);
+				dot(paint, net, COURT_Y + COURT_H + 16, 4);
+
+				// ── The officials ───────────────────────────────────────────
+				// Umpire's chair at the net, ball kids at the posts, line judges
+				// behind the baselines.
+				paint.fillStyle = shade(colors.stand, -0.25);
+				paint.fillRect(net - 11, COURT_Y - APRON_Y + 14, 22, 30);
+				paint.fillStyle = 'rgba(255, 255, 255, 0.8)';
+				dot(paint, net, COURT_Y - APRON_Y + 22, 5);
+
+				paint.fillStyle = 'rgba(255, 255, 255, 0.55)';
+				for (const [x, y] of [
+					[COURT_X - 34, COURT_Y - 26],
+					[COURT_X - 34, COURT_Y + COURT_H + 26],
+					[COURT_X + COURT_W + 34, COURT_Y - 26],
+					[COURT_X + COURT_W + 34, COURT_Y + COURT_H + 26],
+					[net - 26, COURT_Y + COURT_H + APRON_Y - 18],
+					[net + 26, COURT_Y + COURT_H + APRON_Y - 18],
+				] as [number, number][]) {
+					dot(paint, x, y, 4.5);
+				}
+
+				scene = layer;
+			}
+
+			/**
+			 * Fills the ring between `from` and `to` with a packed crowd: rows
+			 * of heads, gangways cut through them, and — where the venue has
+			 * one — a band of seats in the tournament's own colour.
+			 */
+			function seats(
+				paint: CanvasRenderingContext2D,
+				from: { x: number; y: number; w: number; h: number },
+				to: { x: number; y: number; w: number; h: number },
+				accented: boolean,
+				random: () => number
+			) {
+				const step = 6;
+				for (let y = from.y + 5; y < from.y + from.h - 3; y += step) {
+					for (let x = from.x + 5; x < from.x + from.w - 3; x += step) {
+						const inside =
+							x > to.x - 3 && x < to.x + to.w + 3 && y > to.y - 3 && y < to.y + to.h + 3;
+						if (inside) continue;
+
+						// Gangways up through the stand, every so many rows.
+						if ((x - from.x) % 84 < 6 || (y - from.y) % 84 < 6) continue;
+
+						const roll = random();
+						if (roll < 0.12) continue; // an empty seat
+
+						// A block of the tournament's own colour runs through the
+						// tier where the venue has one.
+						const band = accented && (y - from.y) % 66 < 12;
+						paint.fillStyle = band
+							? roll > 0.5
+								? colors.accent
+								: shade(colors.accent, 0.25)
+							: roll > 0.78
+								? shade(colors.seat, 0.55) // a shirt catching the light
+								: roll > 0.55
+									? shade(colors.seat, 0.28)
+									: roll > 0.3
+										? colors.seat
+										: shade(colors.seat, -0.25);
+						paint.beginPath();
+						paint.arc(x + random(), y + random(), 1.9, 0, Math.PI * 2);
+						paint.fill();
+					}
+				}
+			}
+
+			function roundRect(
+				paint: CanvasRenderingContext2D,
+				box: { x: number; y: number; w: number; h: number },
+				radius: number,
+				fill: string
+			) {
+				paint.fillStyle = fill;
+				paint.beginPath();
+				paint.roundRect(box.x, box.y, box.w, box.h, radius);
+				paint.fill();
+			}
+
+			function inset(box: { x: number; y: number; w: number; h: number }, by: number) {
+				return { x: box.x + by, y: box.y + by, w: box.w - by * 2, h: box.h - by * 2 };
+			}
+
+			function dot(paint: CanvasRenderingContext2D, x: number, y: number, r: number) {
+				paint.beginPath();
+				paint.arc(x, y, r, 0, Math.PI * 2);
+				paint.fill();
+			}
+
+			/** Mixes a hex colour towards white (positive) or black (negative). */
+			function shade(hex: string, amount: number) {
+				const match = /^#?([\da-f]{6})$/i.exec(hex.trim());
+				if (!match) return hex;
+				const value = parseInt(match[1]!, 16);
+				const mix = (channel: number) =>
+					Math.round(
+						amount >= 0 ? channel + (255 - channel) * amount : channel * (1 + amount)
+					);
+				return `rgb(${mix((value >> 16) & 255)}, ${mix((value >> 8) & 255)}, ${mix(value & 255)})`;
+			}
+
+			let playerY = (H - PADDLE_H) / 2;
+			let cpuY = playerY;
+			let ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
+			let points: Scores = { player: 0, cpu: 0 };
+			let games: Scores = { player: 0, cpu: 0 };
+			let serving = true;
+			let over = false;
+			let server: Side = 'player';
+			let frame = 0;
+			let last = 0;
+			let pointerY: number | null = null;
+			const keys = new Set<string>();
+
+			/**
+			 * A phone held upright has no room for a court lying on its side,
+			 * so the whole scene is turned a quarter turn and the match becomes
+			 * a tie-break — first to seven, two clear — which is the right
+			 * length for a game played standing up.
+			 */
+			const upright = matchMedia('(orientation: portrait)');
+			let portrait = upright.matches;
+			let format: 'match' | 'tiebreak' = portrait ? 'tiebreak' : 'match';
+			/** Who started the tie-break: the serve order is counted from it. */
+			let opener: Side = 'player';
+
+			const LADDER = ['0', '15', '30', '40'];
+			function pointLabel(mine: number, theirs: number) {
+				if (format === 'tiebreak') return String(mine); // a tie-break counts plainly
+				if (mine < 3 || theirs < 3) return LADDER[Math.min(mine, 3)]!;
+				if (mine === theirs) return '40';
+				return mine > theirs ? 'AD' : '40';
+			}
+
+			function paintScore() {
+				out.playerName.textContent = displayName();
+				out.playerPoint.textContent = pointLabel(points.player, points.cpu);
+				out.cpuPoint.textContent = pointLabel(points.cpu, points.player);
+				out.playerGames.textContent = String(games.player);
+				out.cpuGames.textContent = String(games.cpu);
+				out.servingPlayer.classList.toggle('on', server === 'player');
+				out.servingCpu.classList.toggle('on', server === 'cpu');
+
+				const slam = currentSlam();
+				out.tournament.textContent = names[slam] ?? '';
+				out.venue.textContent = VENUES[slam].venue;
+			}
+
+			function serve() {
+				const toward = server === 'player' ? -1 : 1;
+				ball = {
+					x: W / 2,
+					y: H / 2,
+					vx: BASE_SPEED * toward,
+					vy: BASE_SPEED * (Math.random() * 0.5 - 0.25),
+				};
+				serving = false;
+				overlay.hidden = true;
+			}
+
+			function awardPoint(to: Side) {
+				const other: Side = to === 'player' ? 'cpu' : 'player';
+				points[to] += 1;
+
+				if (format === 'tiebreak') {
+					// One point on the opening serve, two each after that.
+					const played = points.player + points.cpu;
+					const flipped = Math.floor((played + 1) / 2) % 2 === 1;
+					server = flipped ? (opener === 'player' ? 'cpu' : 'player') : opener;
+				} else if (points[to] >= 4 && points[to] - points[other] >= 2) {
+					games[to] += 1;
+					points = { player: 0, cpu: 0 };
+					server = server === 'player' ? 'cpu' : 'player';
+				}
+
+				paintScore();
+
+				const won =
+					format === 'tiebreak'
+						? points[to] >= 7 && points[to] - points[other] >= 2
+						: games[to] >= 4;
+
+				if (won) {
+					over = true;
+					serving = true;
+					const winner = to === 'player' ? displayName() : opponentName;
+					const line = (format === 'tiebreak' ? text.winTiebreak : text.win).replace(
+						'%s',
+						winner
+					);
+
+					// A win is worth keeping: the visitor gets a card to take
+					// away, the other way round gets the line and a restart.
+					if (to === 'player') {
+						showResult(line);
+						return;
+					}
+
+					overlay.innerHTML = `<strong>${line}</strong><span>${text.again}</span>`;
+					overlay.hidden = false;
+					return;
+				}
+
+				serving = true;
+				ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
+				overlay.textContent =
+					format === 'match' && points.player >= 3 && points.player === points.cpu
+						? text.deuce
+						: text.serve;
+				overlay.hidden = false;
+			}
+
+			function reset() {
+				hideResult();
+				points = { player: 0, cpu: 0 };
+				games = { player: 0, cpu: 0 };
+				server = 'player';
+				opener = 'player';
+				over = false;
+				serving = true;
+				ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
+				playerY = cpuY = (H - PADDLE_H) / 2;
+				paintScore();
+				overlay.textContent = text.serve;
+				overlay.hidden = false;
+			}
+
+			function step(seconds: number) {
+				if (pointerY !== null) {
+					playerY = pointerY - PADDLE_H / 2;
+				} else {
+					if (keys.has('ArrowUp') || keys.has('ArrowLeft') || keys.has('w') || keys.has('W')) {
+						playerY -= PLAYER_SPEED * seconds;
+					}
+					if (keys.has('ArrowDown') || keys.has('ArrowRight') || keys.has('s') || keys.has('S')) {
+						playerY += PLAYER_SPEED * seconds;
+					}
+				}
+				playerY = clamp(playerY, COURT_Y, COURT_Y + COURT_H - PADDLE_H);
+
+				// The machine chases the ball, but only so fast, and recovers to
+				// the middle while the ball is travelling away from it.
+				const chasing = ball.vx > 0;
+				const target = chasing ? ball.y - PADDLE_H / 2 : COURT_Y + (COURT_H - PADDLE_H) / 2;
+				const reach = CPU_SPEED * seconds * (chasing ? 1 : 0.55);
+				cpuY = clamp(
+					cpuY + clamp(target - cpuY, -reach, reach),
+					COURT_Y,
+					COURT_Y + COURT_H - PADDLE_H
+				);
+
+				if (serving) return;
+
+				ball.x += ball.vx * seconds;
+				ball.y += ball.vy * seconds;
+
+				if (ball.y - BALL_R <= COURT_Y && ball.vy < 0) {
+					ball.y = COURT_Y + BALL_R;
+					ball.vy *= -1;
+				}
+				if (ball.y + BALL_R >= COURT_Y + COURT_H && ball.vy > 0) {
+					ball.y = COURT_Y + COURT_H - BALL_R;
+					ball.vy *= -1;
+				}
+
+				const playerX = COURT_X + PADDLE_INSET;
+				const cpuX = COURT_X + COURT_W - PADDLE_INSET - PADDLE_W;
+
+				if (
+					ball.vx < 0 &&
+					ball.x - BALL_R <= playerX + PADDLE_W &&
+					ball.x - BALL_R >= playerX - 14 &&
+					ball.y >= playerY &&
+					ball.y <= playerY + PADDLE_H
+				) {
+					returnBall(playerX + PADDLE_W + BALL_R, playerY, 1);
+				}
+
+				if (
+					ball.vx > 0 &&
+					ball.x + BALL_R >= cpuX &&
+					ball.x + BALL_R <= cpuX + PADDLE_W + 14 &&
+					ball.y >= cpuY &&
+					ball.y <= cpuY + PADDLE_H
+				) {
+					returnBall(cpuX - BALL_R, cpuY, -1);
+				}
+
+				if (ball.x < COURT_X - 70) awardPoint('cpu');
+				else if (ball.x > COURT_X + COURT_W + 70) awardPoint('player');
+			}
+
+			/** Where the ball meets the racket decides the angle back. */
+			function returnBall(x: number, paddleY: number, direction: 1 | -1) {
+				const offset = (ball.y - (paddleY + PADDLE_H / 2)) / (PADDLE_H / 2);
+				const speed = Math.min(Math.hypot(ball.vx, ball.vy) * 1.05, MAX_SPEED);
+				// The jitter matters: a ball met dead centre would otherwise go
+				// back perfectly flat, and two players who both return down the
+				// middle would rally until the tournament ended.
+				const angle = offset * 0.9 + (Math.random() - 0.5) * 0.09;
+				ball.x = x;
+				ball.vx = Math.cos(angle) * speed * direction;
+				ball.vy = Math.sin(angle) * speed;
+			}
+
+			function draw() {
+				// Everything below is drawn in the court's own landscape
+				// coordinates; upright, the whole scene is turned a quarter
+				// turn so the player's end is at the bottom of the screen.
+				context.setTransform(1, 0, 0, 1, 0, 0);
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				if (portrait) {
+					context.translate(0, canvas.height);
+					context.rotate(-Math.PI / 2);
+				}
+
+				if (scene) context.drawImage(scene, 0, 0);
+
+				// Deliberately not the theme colours: these two have to stay
+				// apart from each other on clay, grass and blue alike.
+				paddle(COURT_X + PADDLE_INSET, playerY, '#11202b');
+				paddle(COURT_X + COURT_W - PADDLE_INSET - PADDLE_W, cpuY, '#f2f5f8');
+
+				// The ball is yellow on every court there is.
+				context.fillStyle = '#d8f000';
+				dot(context, ball.x, ball.y, BALL_R);
+				context.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+				context.lineWidth = 1.5;
+				context.beginPath();
+				context.arc(ball.x, ball.y, BALL_R - 2.5, Math.PI * 0.75, Math.PI * 1.45);
+				context.stroke();
+			}
+
+			function paddle(x: number, y: number, color: string) {
+				context.fillStyle = color;
+				context.beginPath();
+				context.roundRect(x, y, PADDLE_W, PADDLE_H, 5);
+				context.fill();
+			}
+
+			function loop(now: number) {
+				const seconds = Math.min((now - last) / 1000, 1 / 30);
+				last = now;
+				step(seconds);
+				draw();
+				frame = requestAnimationFrame(loop);
+			}
+
+			function start() {
+				last = performance.now();
+				frame = requestAnimationFrame(loop);
+			}
+
+			function stop() {
+				cancelAnimationFrame(frame);
+			}
+
+			function clamp(value: number, min: number, max: number) {
+				return Math.max(min, Math.min(max, value));
+			}
+
+			/**
+			 * Fits the canvas to the orientation and picks the format that
+			 * goes with it. Returns true when the format changed, because a
+			 * match and a tie-break cannot be continued into one another.
+			 */
+			function applyLayout() {
+				portrait = upright.matches;
+				canvas.width = portrait ? H : W;
+				canvas.height = portrait ? W : H;
+
+				const next = portrait ? 'tiebreak' : 'match';
+				const changed = next !== format;
+				format = next;
+				out.board.dataset.format = format;
+				out.hint.textContent = format === 'tiebreak' ? text.hintTiebreak : text.hint;
+				return changed;
+			}
+
+			/**
+			 * Sizes the canvas to the largest box the court area can hold
+			 * without distorting the drawing. Done here rather than in CSS
+			 * because the element's box has to match what is painted exactly:
+			 * a letterboxed canvas would put every tap out by the margin.
+			 */
+			function fitCanvas() {
+				const box = courtBox.getBoundingClientRect();
+				if (!box.width || !box.height) return;
+
+				const ratio = canvas.width / canvas.height;
+				let width = box.width;
+				let height = width / ratio;
+				if (height > box.height) {
+					height = box.height;
+					width = height * ratio;
+				}
+
+				const next = `${Math.round(width)}px`;
+				if (canvas.style.width === next) return; // already settled
+				canvas.style.width = next;
+				canvas.style.height = `${Math.round(height)}px`;
+			}
+
+			new ResizeObserver(fitCanvas).observe(courtBox);
+
+			function refresh() {
+				colors = readColors();
+				paintScene();
+				paintScore();
+			}
+
+			// Turning the phone changes the match being played, so it starts
+			// the new one rather than carrying a half-finished score across.
+			upright.addEventListener('change', () => {
+				const changed = applyLayout();
+				if (!dialog.open) return;
+				fitCanvas();
+				if (changed) reset();
+				else draw();
+			});
+
+			// The stadium follows the theme and the tournament, even mid-match.
+			new MutationObserver(() => {
+				if (dialog.open) refresh();
+			}).observe(document.documentElement, {
+				attributes: true,
+				attributeFilter: ['class', 'data-slam'],
+			});
+
+			// ── Wiring ────────────────────────────────────────────────────
+			this.querySelector<HTMLButtonElement>('.open')!.addEventListener('click', () => {
+				applyLayout();
+				refresh();
+				reset();
+				dialog.showModal();
+				fitCanvas();
+				if (playerName) start();
+				else askName(true);
+			});
+
+			this.querySelector<HTMLButtonElement>('.close')!.addEventListener('click', () => dialog.close());
+			dialog.addEventListener('close', () => {
+				signing = false;
+				entry.hidden = true;
+				hideResult();
+				stop();
+			});
+			dialog.addEventListener('click', (event) => {
+				if (event.target === dialog) dialog.close();
+			});
+
+			/** Blocks play while the card is being filled in. */
+			let signing = false;
+			/** Blocks it while the winner's card is up. */
+			let showing = false;
+
+			function showResult(line: string) {
+				paintCard();
+				const score = scoreLine();
+				const alt = text.cardAlt
+					.replace('%p', displayName())
+					.replace('%o', opponentName)
+					.replace('%s', score);
+
+				resultImage.src = card.toDataURL('image/png');
+				resultImage.alt = alt;
+				fileName = `tennis-${displayName().toLowerCase().replace(/\s+/g, '-')}-${score.replace('–', '-')}.png`;
+				resultNote.textContent = '';
+				cardFile = null;
+				void cardBlob().then((blob) => {
+					cardFile = blob;
+				});
+
+				showing = true;
+				overlay.hidden = true;
+				result.hidden = false;
+				stop();
+				// The match is over; the keyboard belongs to the card now.
+				saveButton.focus();
+			}
+
+			function hideResult() {
+				showing = false;
+				result.hidden = true;
+			}
+
+			/**
+			 * The card as a file, for the share sheet and the clipboard. Made
+			 * as soon as the card is shown: writing to the clipboard has to
+			 * happen close to the click that asked for it, and encoding a PNG
+			 * in between is enough to lose that in some browsers.
+			 */
+			let cardFile: Blob | null = null;
+			let fileName = 'tennis.png';
+			function cardBlob(): Promise<Blob | null> {
+				return new Promise((resolve) => card.toBlob(resolve, 'image/png'));
+			}
+
+			saveButton.addEventListener('click', () => {
+				const link = document.createElement('a');
+				link.href = card.toDataURL('image/png');
+				link.download = fileName;
+				link.click();
+			});
+
+			function shareLine() {
+				return text.shareText.replace('%s', scoreLine());
+			}
+
+			// The share sheet only exists on some browsers; the button stays
+			// hidden where it does not, rather than failing when pressed.
+			if (typeof navigator.share === 'function') shareButton.hidden = false;
+
+			shareButton.addEventListener('click', async () => {
+				const blob = cardFile ?? (await cardBlob());
+				const file = blob ? new File([blob], 'tennis.png', { type: 'image/png' }) : null;
+				const payload: ShareData = { text: shareLine(), url: `https://${host}/` };
+
+				try {
+					if (file && navigator.canShare?.({ files: [file] })) {
+						await navigator.share({ ...payload, files: [file] });
+					} else {
+						await navigator.share(payload);
+					}
+				} catch {
+					// A cancelled share sheet is not a failure worth reporting.
+				}
+			});
+
+			// LinkedIn takes no attachment through a link, so the result goes to
+			// the clipboard on the way out and the note says to paste it. The
+			// link itself opens the profile either way — the copy is a bonus,
+			// and the note never claims a copy that did not happen.
+			linkedInLink.addEventListener('click', async () => {
+				const line = shareLine();
+
+				try {
+					if (cardFile && typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+						await navigator.clipboard.write([
+							new ClipboardItem({
+								'image/png': cardFile,
+								'text/plain': new Blob([line], { type: 'text/plain' }),
+							}),
+						]);
+						resultNote.textContent = text.copied;
+						return;
+					}
+					await navigator.clipboard.writeText(line);
+					resultNote.textContent = text.copiedText;
+				} catch {
+					// No clipboard: hand them the line to copy by hand.
+					resultNote.textContent = line;
+				}
+			});
+
+			this.querySelector<HTMLButtonElement>('[data-play-again]')!.addEventListener('click', () => {
+				hideResult();
+				reset();
+				start();
+			});
+
+			function askName(initial: boolean) {
+				signing = true;
+				entry.hidden = false;
+				overlay.hidden = true;
+				// The card sits over the stadium, so there has to be one on the
+				// canvas before the loop is stopped underneath it.
+				draw();
+				nameInput.value = playerName;
+				// A returning player is renaming, so start from a clean field
+				// only when there is nothing to rename.
+				if (initial) nameInput.value = '';
+				stop();
+				nameInput.focus();
+				nameInput.select();
+			}
+
+			function closeName() {
+				signing = false;
+				entry.hidden = true;
+				overlay.hidden = over || serving ? false : true;
+				start();
+			}
+
+			entry.addEventListener('submit', (event) => {
+				event.preventDefault();
+				playerName = nameInput.value.trim().slice(0, 14);
+				storeName(playerName);
+				paintScore();
+				closeName();
+			});
+
+			this.querySelector<HTMLButtonElement>('[data-rename]')!.addEventListener('click', () => {
+				askName(false);
+			});
+
+			const serveOrRestart = () => {
+				if (signing) return;
+				if (showing) {
+					// The card has its own "play again"; a stray tap should not
+					// throw the result away.
+					return;
+				}
+				if (over) reset();
+				else if (serving) serve();
+			};
+
+			canvas.addEventListener('pointerdown', (event) => {
+				if (signing) return;
+				track(event);
+				serveOrRestart();
+			});
+			canvas.addEventListener('pointermove', track);
+			canvas.addEventListener('pointerleave', () => {
+				pointerY = null;
+			});
+
+			function track(event: PointerEvent) {
+				const box = canvas.getBoundingClientRect();
+				// Upright, the court's length runs down the screen, so the
+				// racket is moved across it — the finger's x, not its y.
+				pointerY = portrait
+					? ((event.clientX - box.left) / box.width) * H
+					: ((event.clientY - box.top) / box.height) * H;
+			}
+
+			dialog.addEventListener('keydown', (event: KeyboardEvent) => {
+				if (signing) {
+					// The field owns the keyboard: space types a space, Escape
+					// leaves the name as it was rather than closing the match.
+					if (event.key === 'Escape') {
+						event.preventDefault();
+						event.stopPropagation();
+						closeName();
+					}
+					return;
+				}
+				if (event.key === ' ' || event.key === 'Enter') {
+					event.preventDefault();
+					serveOrRestart();
+					return;
+				}
+				if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 's', 'S'].includes(event.key)) {
+					event.preventDefault();
+					pointerY = null; // hand control back to the keyboard
+					keys.add(event.key);
+				}
+			});
+			dialog.addEventListener('keyup', (event: KeyboardEvent) => keys.delete(event.key));
+
+			// A tab sent to the background should not bank a walkover.
+			document.addEventListener('visibilitychange', () => {
+				if (!dialog.open) return;
+				if (document.hidden) stop();
+				else start();
+			});
+
+			applyLayout();
+			paintScore();
+		}
+	}
+
+	customElements.define('tennis-game', TennisGame);
+</script>
+
+<style>
+	.open {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.4rem 0.9rem;
+		font: inherit;
+		font-size: var(--text-sm);
+		font-family: var(--font-brand);
+		color: var(--gray-400);
+		background-color: transparent;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+		cursor: pointer;
+		transition:
+			color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+
+	.open:hover,
+	.open:focus-visible {
+		color: var(--accent-regular);
+		border-color: var(--accent-regular);
+	}
+
+	.ball {
+		width: 1.1em;
+		height: 1.1em;
+		fill: none;
+		stroke: currentcolor;
+		stroke-width: 1.6;
+	}
+
+	.stage {
+		width: min(58rem, 94vw);
+		max-width: 94vw;
+		padding: 0;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
+		background-color: var(--surface);
+		color: var(--gray-200);
+		overflow: hidden;
+	}
+
+	.stage::backdrop {
+		background: hsla(212, 65%, 8%, 0.86);
+	}
+
+	.frame {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1rem;
+	}
+
+	/* ── The tournament's scoreboard ──────────────────────────────── */
+
+	.board {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		padding: 0.6rem 3.25rem 0.6rem 0.9rem;
+		border-radius: var(--board-radius);
+		background-color: var(--board-bg);
+		color: var(--board-text);
+		font-family: var(--font-brand);
+	}
+
+	.brand {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		min-width: 0;
+		flex: 1;
+	}
+
+	.tournament {
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--board-accent);
+	}
+
+	.venue {
+		font-size: 0.7rem;
+		color: var(--board-muted);
+		/* On a narrow board this would otherwise wrap to three lines and
+		   push the court down the screen. */
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.format {
+		display: none;
+		align-self: flex-start;
+		margin-top: 0.2rem;
+		padding: 0.05rem 0.4rem;
+		border-radius: calc(var(--board-radius) / 2);
+		background-color: rgba(255, 255, 255, 0.16);
+		font-size: 0.65rem;
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	/* A tie-break has no games to show, and says so instead. */
+	.board[data-format='tiebreak'] .format {
+		display: inline-block;
+	}
+
+	.board[data-format='tiebreak'] .games {
+		display: none;
+	}
+
+	.board[data-format='tiebreak'] .row {
+		grid-template-columns: 0.6rem 8.5rem 2.75rem;
+	}
+
+	.rows {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
+
+	.row {
+		display: grid;
+		grid-template-columns: 0.6rem 8.5rem 1.75rem 2.75rem;
+		align-items: center;
+		gap: 0.6rem;
+		font-size: var(--text-sm);
+	}
+
+	/* The ball marks who is serving, the way a broadcast graphic does. */
+	.serving {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: var(--radius-full);
+		background-color: transparent;
+	}
+
+	.serving.on {
+		background-color: #d8f000;
+	}
+
+	.name {
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	/* The player's own name is theirs to change, so it reads as a control:
+	   underlined on the board, like a name written onto a card. */
+	.name.editable {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0;
+		font: inherit;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: inherit;
+		text-align: start;
+		background: none;
+		border: 0;
+		border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+		cursor: text;
+	}
+
+	.name.editable:hover,
+	.name.editable:focus-visible {
+		border-bottom-color: var(--board-accent);
+		color: var(--board-accent);
+	}
+
+	/* ── The winner's card ────────────────────────────────────────── */
+
+	.result {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.9rem;
+		padding: 1rem;
+		background-color: rgba(6, 16, 28, 0.88);
+		text-align: center;
+		overflow: auto;
+	}
+
+	.result[hidden] {
+		display: none;
+	}
+
+	.result-card {
+		width: min(30rem, 100%);
+		max-height: 58%;
+		object-fit: contain;
+		border-radius: var(--radius-md);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+	}
+
+	.result-actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.act {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.5rem 1.1rem;
+		font: inherit;
+		font-family: var(--font-brand);
+		font-size: var(--text-sm);
+		font-weight: 600;
+		color: #ffffff;
+		text-decoration: none;
+		background-color: rgba(255, 255, 255, 0.14);
+		border: 1px solid rgba(255, 255, 255, 0.28);
+		border-radius: var(--radius-full);
+		cursor: pointer;
+		transition:
+			background-color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+
+	.act:hover,
+	.act:focus-visible {
+		background-color: rgba(255, 255, 255, 0.26);
+	}
+
+	.act.primary {
+		color: var(--accent-text-over);
+		background-color: var(--accent-regular);
+		border-color: var(--accent-regular);
+	}
+
+	.act.primary:hover,
+	.act.primary:focus-visible {
+		background-color: var(--accent-hover);
+		border-color: var(--accent-hover);
+	}
+
+	.act.ghost {
+		background-color: transparent;
+	}
+
+	.act[hidden] {
+		display: none;
+	}
+
+	.result-note {
+		margin: 0;
+		max-width: 32rem;
+		font-size: var(--text-sm);
+		color: rgba(255, 255, 255, 0.82);
+	}
+
+	.entry {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		padding: 1rem;
+		background-color: rgba(6, 16, 28, 0.82);
+		text-align: center;
+	}
+
+	.entry[hidden] {
+		display: none;
+	}
+
+	.entry-label {
+		font-family: var(--font-brand);
+		font-size: var(--text-md);
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.entry-row {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.entry-input {
+		width: min(16rem, 60vw);
+		padding: 0.55rem 0.8rem;
+		font: inherit;
+		font-size: var(--text-base);
+		color: var(--gray-0);
+		background-color: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+	}
+
+	.entry-input:focus-visible {
+		outline: 2px solid var(--focus-ring);
+		outline-offset: 2px;
+	}
+
+	.entry-go {
+		padding: 0.55rem 1.4rem;
+		font: inherit;
+		font-family: var(--font-brand);
+		font-size: var(--text-base);
+		font-weight: 600;
+		color: var(--accent-text-over);
+		background-color: var(--accent-regular);
+		border: 1px solid var(--accent-regular);
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+		transition: background-color var(--theme-transition);
+	}
+
+	.entry-go:hover,
+	.entry-go:focus-visible {
+		background-color: var(--accent-hover);
+	}
+
+	.games,
+	.points {
+		text-align: center;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.games {
+		color: var(--board-muted);
+	}
+
+	.points {
+		padding: 0.05rem 0;
+		border-radius: calc(var(--board-radius) / 2);
+		background-color: rgba(255, 255, 255, 0.12);
+		font-size: var(--text-base);
+		font-weight: 600;
+		color: var(--board-text);
+	}
+
+	/* Sits inside the board, so the glyph always has the board's own dark
+	   panel behind it rather than half of the dialog's light surface. */
+	.close {
+		position: absolute;
+		top: 50%;
+		right: 0.6rem;
+		transform: translateY(-50%);
+		z-index: 1;
+		width: 2.25rem;
+		height: 2.25rem;
+		display: grid;
+		place-items: center;
+		font-size: 1.5rem;
+		line-height: 1;
+		color: var(--board-text);
+		background-color: rgba(255, 255, 255, 0.22);
+		border: 1px solid rgba(255, 255, 255, 0.45);
+		border-radius: var(--radius-full);
+		cursor: pointer;
+		transition: background-color var(--theme-transition);
+	}
+
+	.close:hover,
+	.close:focus-visible {
+		background-color: rgba(255, 255, 255, 0.38);
+	}
+
+	/* ── Court ────────────────────────────────────────────────────── */
+
+	.court {
+		position: relative;
+		border-radius: var(--radius-md);
+		overflow: hidden;
+	}
+
+	canvas {
+		display: block;
+		width: 100%;
+		height: auto;
+		touch-action: none;
+		cursor: none;
+	}
+
+	.overlay {
+		position: absolute;
+		inset: auto 0 7%;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		margin: 0;
+		padding: 0 1rem;
+		text-align: center;
+		font-family: var(--font-brand);
+		font-size: var(--text-md);
+		color: #ffffff;
+		text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+	}
+
+	.overlay :global(strong) {
+		font-size: var(--text-lg);
+	}
+
+	.overlay :global(span) {
+		font-size: var(--text-sm);
+		opacity: 0.85;
+	}
+
+	.overlay[hidden] {
+		display: none;
+	}
+
+	.hint {
+		margin: 0;
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+		text-align: center;
+	}
+
+	/* On a phone the match takes the whole screen: a dialog floating in the
+	   middle of a small viewport wastes the only space the court has. */
+	@media (max-width: 48em), (max-height: 32em), (orientation: portrait) and (max-width: 64em) {
+		.stage {
+			width: 100%;
+			max-width: 100%;
+			height: 100%;
+			max-height: 100%;
+			margin: 0;
+			border: 0;
+			border-radius: 0;
+		}
+
+		.frame {
+			height: 100%;
+			padding: 0.75rem;
+			gap: 0.6rem;
+		}
+
+		/* The court takes whatever the board and the hint leave; the canvas
+		   itself is sized in script, to the largest box that fits without
+		   distorting the drawing. */
+		.court {
+			flex: 1;
+			display: grid;
+			place-items: center;
+			min-height: 0;
+		}
+
+		canvas {
+			width: auto;
+			height: auto;
+			max-width: 100%;
+			max-height: 100%;
+		}
+
+		.hint {
+			font-size: 0.75rem;
+			flex-shrink: 0;
+		}
+	}
+
+	/* A phone on its side has ~390px of height for everything: the board
+	   gives up what it can so the court keeps the rest. */
+	@media (max-height: 32em) {
+		.frame {
+			padding: 0.5rem;
+			gap: 0.4rem;
+		}
+
+		.board {
+			padding: 0.35rem 3rem 0.35rem 0.7rem;
+		}
+
+		.venue {
+			display: none;
+		}
+
+		.row {
+			font-size: 0.8rem;
+		}
+
+		.points {
+			font-size: var(--text-sm);
+		}
+
+		.overlay {
+			font-size: var(--text-sm);
+		}
+
+		.overlay :global(strong) {
+			font-size: var(--text-md);
+		}
+
+		.hint {
+			font-size: 0.7rem;
+		}
+
+		.close {
+			top: 0.35rem;
+			right: 0.35rem;
+			width: 1.9rem;
+			height: 1.9rem;
+			font-size: 1.25rem;
+		}
+
+		.entry-label {
+			font-size: var(--text-sm);
+		}
+
+		.entry-input,
+		.entry-go {
+			padding-block: 0.4rem;
+			font-size: var(--text-sm);
+		}
+
+		.result {
+			gap: 0.5rem;
+			padding: 0.6rem;
+		}
+
+		.result-card {
+			max-height: 46%;
+		}
+
+		.act {
+			padding: 0.35rem 0.8rem;
+			font-size: 0.8rem;
+		}
+
+		.result-note {
+			font-size: 0.75rem;
+		}
+	}
+
+	/* Upright, the board has no room to run along one line. */
+	@media (orientation: portrait) and (max-width: 64em) {
+		.board {
+			flex-direction: column;
+			align-items: stretch;
+			gap: 0.5rem;
+		}
+
+		.close {
+			top: 0.5rem;
+			transform: none;
+		}
+
+		.row {
+			grid-template-columns: 0.6rem 1fr 1.75rem 2.75rem;
+		}
+
+		.board[data-format='tiebreak'] .row {
+			grid-template-columns: 0.6rem 1fr 2.75rem;
+		}
+	}
+
+	@media (max-width: 30em) {
+		.brand {
+			flex-direction: row;
+			align-items: baseline;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+		}
+
+		.venue {
+			flex: 1;
+		}
+	}
+</style>

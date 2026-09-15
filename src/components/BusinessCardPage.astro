@@ -33,7 +33,7 @@ const copy = {
 }[lang];
 ---
 
-<div class="card-page wrapper">
+<main class="card-page wrapper">
 	<div class="page-header">
 		<h1 class="page-title">{copy.title}</h1>
 		<p class="page-sub">{copy.sub}</p>
@@ -48,7 +48,7 @@ const copy = {
 		<a href={copy.aboutHref} class="back-link">{copy.back}</a>
 		<button class="print-btn" id="print-btn">{copy.print}</button>
 	</div>
-</div>
+</main>
 
 <script>
 	document.getElementById('print-btn')?.addEventListener('click', () => window.print());
@@ -91,7 +91,7 @@ const copy = {
 
 	.hint {
 		font-size: var(--text-sm);
-		color: var(--gray-500);
+		color: var(--gray-400);
 		font-style: italic;
 	}
 

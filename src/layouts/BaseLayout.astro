@@ -75,14 +75,14 @@ const lang = pathname === '/de' || pathname.startsWith('/de/') ? 'de' : 'en';
 				margin-top: auto;
 			}
 
-			/* The page is a flat surface: one background colour, a thin rule of
-			   US Open blue across the top, and nothing else. The old stack of
-			   photographic gradients, curve SVGs and a noise overlay is gone —
-			   it was what made every page read as murky. */
+			/* The page is a flat surface: one background colour, a thin rule in
+			   the current tournament's colour across the top, and nothing else.
+			   The old stack of photographic gradients, curve SVGs and a noise
+			   overlay is gone — it was what made every page read as murky. */
 			.backgrounds {
 				min-height: 100%;
 				background-color: var(--gray-999);
-				border-top: 3px solid var(--accent-regular);
+				border-top: 3px solid var(--rule-color);
 			}
 		</style>
 	</body>

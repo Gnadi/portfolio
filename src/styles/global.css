@@ -1,12 +1,20 @@
 /* Global variables */
 :root {
-	/* ── Brand: US Open blue on white ──────────────────────────────
-	   One blue ramp, used for every accent on the site. `--blue-600` is
-	   the workhorse: it is what a link, a button and a badge are painted
-	   in, and white text clears AA on top of it. */
-	/* The anchor the rest is derived from. Nothing in this stylesheet paints
-	   with it directly — it shows up as the veil on the business card and as
-	   the social-card ground in scripts/generate-og-assets.mjs. */
+	/* ── Grand Slam palettes ───────────────────────────────────────
+	   The site wears one of four tournament palettes, chosen by the
+	   calendar or pinned by the visitor (src/lib/slam.ts sets
+	   `data-slam` on <html> before first paint). This block is the
+	   US Open — the site's home major and the default when no
+	   attribute is set; the other three follow further down and
+	   override only what actually differs.
+
+	   Two knobs retint every neutral at once: `--neutral-h` is the hue
+	   the greys carry, `--neutral-k` scales how much of it shows. The
+	   lightness of each step is fixed here, so contrast holds whatever
+	   hue is in play. */
+	--neutral-h: 212;
+	--neutral-k: 1;
+
 	--blue-800: #002d72; /* US Open navy */
 	--blue-700: #003c8f;
 	--blue-600: #0057b8; /* primary */
@@ -14,23 +22,24 @@
 	--blue-300: #7fb3ee; /* court blue, for text on navy */
 	--blue-100: #dceafa;
 
-	/* Neutrals. Cool, very slightly blue so they sit next to the ramp
-	   above without reading as a second hue. */
-	--gray-0: #08182b;
-	--gray-50: #0f2540;
-	--gray-100: #17324f;
-	--gray-200: #24425f;
-	--gray-300: #3d5a78;
-	--gray-400: #556f8c;
-	--gray-500: #7e96af;
-	--gray-600: #a3b6c9;
-	--gray-700: #c5d3e0;
-	--gray-800: #dbe5f0;
-	--gray-900: #eef3f9;
-	--gray-999: #f7fafd;
+	/* Neutrals. Cool and very slightly tinted towards the tournament
+	   colour, so they sit next to the accent without reading as a
+	   second hue. */
+	--gray-0: hsl(var(--neutral-h) calc(69% * var(--neutral-k)) 10%);
+	--gray-50: hsl(var(--neutral-h) calc(62% * var(--neutral-k)) 15.5%);
+	--gray-100: hsl(var(--neutral-h) calc(55% * var(--neutral-k)) 20%);
+	--gray-200: hsl(var(--neutral-h) calc(45% * var(--neutral-k)) 26%);
+	--gray-300: hsl(var(--neutral-h) calc(33% * var(--neutral-k)) 35.5%);
+	--gray-400: hsl(var(--neutral-h) calc(24% * var(--neutral-k)) 41%);
+	--gray-500: hsl(var(--neutral-h) calc(23% * var(--neutral-k)) 59%);
+	--gray-600: hsl(var(--neutral-h) calc(26% * var(--neutral-k)) 71.5%);
+	--gray-700: hsl(var(--neutral-h) calc(30% * var(--neutral-k)) 82.5%);
+	--gray-800: hsl(var(--neutral-h) calc(41% * var(--neutral-k)) 90%);
+	--gray-900: hsl(var(--neutral-h) calc(48% * var(--neutral-k)) 95.5%);
+	--gray-999: hsl(var(--neutral-h) calc(60% * var(--neutral-k)) 98%);
 
-	/* Surfaces. The page is a near-white blue tint, cards are plain
-	   white with a hairline border — no shadow stack doing the work. */
+	/* Surfaces. The page is a near-white tint, cards are plain white
+	   with a hairline border — no shadow stack doing the work. */
 	--surface: #ffffff;
 	--border: var(--gray-800);
 	--border-strong: var(--gray-700);
@@ -44,11 +53,37 @@
 	--link-color: var(--accent-regular);
 	--focus-ring: var(--blue-500);
 
+	/* The rule across the top of every page, and the veil over the photo
+	   on the business card. Both carry the tournament's second colour
+	   where it has one. */
+	--rule-color: var(--accent-regular);
+	--card-veil: rgba(0, 45, 114, 0.86);
+
+	/* The stadium the mini game is played in (src/components/TennisGame.astro):
+	   the surface, the run-off around it, the painted lines and the stands.
+	   Only the game draws with these — the page itself stays flat. */
+	--court-surface: #2f6cb5;
+	--court-apron: #1d4f8c;
+	--court-line: #ffffff;
+	--court-net: rgba(255, 255, 255, 0.62);
+	--stand: #0e2a4d;
+	--stand-seat: #16406f;
+	--stand-accent: #0057b8;
+
+	/* The match scoreboard in the game. A dark panel in the tournament's own
+	   colours, the way each of them puts one over the court — so it keeps
+	   these values in the dark theme too. */
+	--board-bg: #002d72;
+	--board-text: #ffffff;
+	--board-muted: rgba(255, 255, 255, 0.74);
+	--board-accent: #7fb3ee;
+	--board-radius: 0.5rem;
+
 	/* Shadows — present, but only enough to lift a card off the page by a
 	   hair. Depth is carried by borders and surface colour instead. */
-	--shadow-sm: 0 1px 2px rgba(0, 45, 114, 0.06);
-	--shadow-md: 0 2px 8px rgba(0, 45, 114, 0.08);
-	--shadow-lg: 0 8px 24px rgba(0, 45, 114, 0.1);
+	--shadow-sm: 0 1px 2px hsl(var(--neutral-h) 60% 22% / 0.07);
+	--shadow-md: 0 2px 8px hsl(var(--neutral-h) 60% 22% / 0.09);
+	--shadow-lg: 0 8px 24px hsl(var(--neutral-h) 60% 22% / 0.11);
 
 	/* Radii */
 	--radius-sm: 0.375rem;
@@ -78,25 +113,27 @@
 }
 
 :root.theme-dark {
-	/* The night session: the same blue, on navy instead of white. */
+	/* The night session: the same colours, on a dark ground instead of
+	   white. Only the ramp's lightness flips — the hue knobs above carry
+	   straight over. */
 	--gray-0: #ffffff;
-	--gray-50: #f3f7fb;
-	--gray-100: #e4edf7;
-	--gray-200: #c8d8ea;
-	--gray-300: #a2b8d1;
-	--gray-400: #8ba1ba;
-	--gray-500: #5f748d;
-	--gray-600: #45596f;
-	--gray-700: #33475f;
-	--gray-800: #23374f;
-	--gray-900: #12253c;
-	--gray-999: #0a1a2f;
+	--gray-50: hsl(var(--neutral-h) calc(50% * var(--neutral-k)) 97%);
+	--gray-100: hsl(var(--neutral-h) calc(54% * var(--neutral-k)) 93%);
+	--gray-200: hsl(var(--neutral-h) calc(45% * var(--neutral-k)) 85%);
+	--gray-300: hsl(var(--neutral-h) calc(34% * var(--neutral-k)) 72.7%);
+	--gray-400: hsl(var(--neutral-h) calc(25% * var(--neutral-k)) 63.7%);
+	--gray-500: hsl(var(--neutral-h) calc(20% * var(--neutral-k)) 46%);
+	--gray-600: hsl(var(--neutral-h) calc(23% * var(--neutral-k)) 35.3%);
+	--gray-700: hsl(var(--neutral-h) calc(30% * var(--neutral-k)) 28.6%);
+	--gray-800: hsl(var(--neutral-h) calc(39% * var(--neutral-k)) 22.4%);
+	--gray-900: hsl(var(--neutral-h) calc(54% * var(--neutral-k)) 15.3%);
+	--gray-999: hsl(var(--neutral-h) calc(65% * var(--neutral-k)) 11.2%);
 
-	--surface: #0f2237;
+	--surface: hsl(var(--neutral-h) calc(57% * var(--neutral-k)) 13.7%);
 	--border: var(--gray-800);
 	--border-strong: var(--gray-700);
 
-	/* Lifted a step so the fill clears 3:1 against the navy page, and so
+	/* Lifted a step so the fill clears 3:1 against the dark page, and so
 	   link text clears AA without turning pale. */
 	--accent-regular: var(--blue-500);
 	--accent-hover: var(--blue-600);
@@ -106,11 +143,198 @@
 	--link-color: var(--blue-300);
 	--focus-ring: var(--blue-300);
 
+	/* Night session. */
+	--court-surface: #1d4a80;
+	--court-apron: #12355c;
+	--stand: #061424;
+	--stand-seat: #0f2c4d;
+	--stand-accent: #1d6fd0;
+
 	/* Dark surfaces get their separation from borders; the shadows stay
 	   faint so nothing glows. */
 	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
 	--shadow-md: 0 2px 8px rgba(0, 0, 0, 0.34);
 	--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.42);
+}
+
+/* ── Australian Open ─────────────────────────────────────────────
+   The hard courts in Melbourne, and the tournament's cyan-leaning
+   blue over them. Kept a step towards cyan from the US Open's indigo
+   so the two blues do not read as the same theme. */
+:root[data-slam='ao'] {
+	--neutral-h: 197;
+	--neutral-k: 1.05;
+
+	--accent-regular: #00719f;
+	--accent-hover: #00546f;
+	--accent-subtle-overlay: #d7eefa;
+
+	--link-color: var(--accent-regular);
+	--focus-ring: #0091d2;
+
+	--rule-color: #0091d2; /* AO blue */
+	--card-veil: rgba(0, 48, 135, 0.86); /* AO navy */
+
+	--court-surface: #3f96d2;
+	--court-apron: #1f6ea8;
+	--stand: #0c3050;
+	--stand-seat: #14507c;
+	--stand-accent: #0091d2;
+
+	--board-bg: #00529b;
+	--board-accent: #8ed6f7;
+	--board-radius: 0.85rem;
+}
+
+:root[data-slam='ao'].theme-dark {
+	--accent-regular: #007ab0;
+	--accent-hover: #00719f;
+	--accent-subtle-overlay: #123a4f;
+
+	--link-color: #6ec6f2;
+	--focus-ring: #6ec6f2;
+
+	--court-surface: #17608f;
+	--court-apron: #0f4569;
+	--stand: #07202f;
+	--stand-seat: #0d3a55;
+}
+
+/* ── Roland-Garros ───────────────────────────────────────────────
+   Terracotta clay, with the tournament's dark green on the rule and
+   the card. Night session is the same clay over a warm dark ground. */
+:root[data-slam='rg'] {
+	--neutral-h: 22;
+	--neutral-k: 0.55;
+
+	--accent-regular: #b34a24;
+	--accent-hover: #8c3a1c;
+	--accent-subtle-overlay: #f7e2d9;
+
+	--link-color: var(--accent-regular);
+	--focus-ring: #c85a2e;
+
+	--rule-color: #17603f; /* Roland-Garros green */
+	--card-veil: rgba(0, 75, 45, 0.86);
+
+	--court-surface: #bf6038; /* crushed brick */
+	--court-apron: #17603f; /* the green it is laid in */
+	--stand: #0f3b28;
+	--stand-seat: #1c5b3d;
+	--stand-accent: #c85a2e;
+
+	--board-bg: #0e3a26;
+	--board-accent: #e59470;
+	--board-radius: 0.2rem;
+}
+
+:root[data-slam='rg'].theme-dark {
+	--neutral-k: 0.5;
+
+	--accent-regular: #bb5227;
+	--accent-hover: #9c421d;
+	--accent-subtle-overlay: #402318;
+
+	--link-color: #f0a87e;
+	--focus-ring: #f0a87e;
+
+	--rule-color: #3e9a6d;
+
+	--court-surface: #8f4526;
+	--court-apron: #124a31;
+	--stand: #0b2a1d;
+	--stand-seat: #15422e;
+}
+
+/* ── ATP Finals ──────────────────────────────────────────────────
+   The season's last week, played indoors under the lights: a teal that
+   belongs to no major, over the ATP's navy. */
+:root[data-slam='atp'] {
+	--neutral-h: 190;
+	--neutral-k: 0.9;
+
+	--accent-regular: #0c6e7a;
+	--accent-hover: #08525c;
+	--accent-subtle-overlay: #d8eff2;
+
+	--link-color: var(--accent-regular);
+	--focus-ring: #0f9aab;
+
+	--rule-color: #0b2265; /* ATP navy */
+	--card-veil: rgba(11, 34, 101, 0.86);
+
+	--court-surface: #2f6fb0; /* the indoor hard court in Turin */
+	--court-apron: #12335c;
+	--stand: #0a1730;
+	--stand-seat: #16294a;
+	--stand-accent: #12b3c4;
+
+	--board-bg: #0b2265;
+	--board-accent: #4fd8e6;
+	--board-radius: 0.5rem;
+}
+
+:root[data-slam='atp'].theme-dark {
+	--accent-regular: #0d7d8c;
+	--accent-hover: #0c6e7a;
+	--accent-subtle-overlay: #10333a;
+
+	--link-color: #6fd7e3;
+	--focus-ring: #6fd7e3;
+
+	--rule-color: #4fc3d4;
+
+	--court-surface: #1c4a7a;
+	--court-apron: #0c2340;
+	--stand: #050d1c;
+	--stand-seat: #0e1e38;
+}
+
+/* ── Wimbledon ───────────────────────────────────────────────────
+   Grass green and the club's purple, on white. The purple takes the
+   rule and the card veil; the green does the work everywhere else. */
+:root[data-slam='wimbledon'] {
+	--neutral-h: 145;
+	--neutral-k: 0.5;
+
+	--accent-regular: #006633;
+	--accent-hover: #004f27;
+	--accent-subtle-overlay: #dff0e5;
+
+	--link-color: var(--accent-regular);
+	--focus-ring: #2b804b;
+
+	--rule-color: #4c2c69; /* Wimbledon purple */
+	--card-veil: rgba(76, 44, 105, 0.86);
+
+	--court-surface: #5a9e5f; /* lawn */
+	--court-apron: #2f6b3b;
+	--stand: #123d22;
+	--stand-seat: #1d5730;
+	--stand-accent: #4c2c69; /* the club's purple, in the seats */
+
+	--board-bg: #00502a;
+	--board-accent: #c9b273;
+	--board-radius: 0.2rem;
+}
+
+:root[data-slam='wimbledon'].theme-dark {
+	--neutral-k: 0.55;
+
+	--accent-regular: #2b804b;
+	--accent-hover: #20693c;
+	--accent-subtle-overlay: #1c3b28;
+
+	--link-color: #8fd6a5;
+	--focus-ring: #8fd6a5;
+
+	--rule-color: #9a72c9;
+
+	--court-surface: #2f6b3b;
+	--court-apron: #1d4a29;
+	--stand: #0b2814;
+	--stand-seat: #143a20;
+	--stand-accent: #6f4a97;
 }
 
 html,
