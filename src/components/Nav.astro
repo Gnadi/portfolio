@@ -3,7 +3,6 @@ import Icon from "./Icon.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 import type { iconPaths } from "./IconPaths";
 import Language from "./Language.astro";
-import SlamPicker from "./SlamPicker.astro";
 import { getLangFromUrl } from "../i18n/utils";
 import { FULL_NAME } from "../lib/schema";
 
@@ -161,11 +160,10 @@ const iconLinks: {
 				}
 			</div>
 
-			{/* One group, so that on a narrow menu the three controls wrap to
-			    the next line together instead of one at a time. */}
+			{/* One group, so that on a narrow menu both controls wrap to the
+			    next line together instead of one at a time. */}
 			<div class="controls">
 				<Language />
-				<SlamPicker />
 				<div class="theme-toggle">
 					<ThemeToggle />
 				</div>
@@ -209,7 +207,7 @@ const iconLinks: {
 			};
 			// Same breakpoint as the horizontal nav in the styles below: above
 			// it the menu is always open and the button is gone.
-			const mediaQueries = window.matchMedia("(min-width: 80em)");
+			const mediaQueries = window.matchMedia("(min-width: 72em)");
 			handleViewports(mediaQueries);
 			mediaQueries.addEventListener("change", handleViewports);
 		}
@@ -363,7 +361,7 @@ const iconLinks: {
 	   The columns are `auto 1fr auto` rather than `1fr auto 1fr`: symmetric
 	   side columns split the free space evenly, which starved the control
 	   side while the title side sat on space it did not need. */
-	@media (min-width: 80em) {
+	@media (min-width: 72em) {
 		nav {
 			display: grid;
 			grid-template-columns: auto 1fr auto;
@@ -445,8 +443,8 @@ const iconLinks: {
 	/* Last thing to come back, because it is the one part of the row that
 	   has somewhere else to live — the menu on small screens, and the
 	   contact section on the home page. The threshold is again set by
-	   German, which needs ~1430px of content width to seat the whole row. */
-	@media (min-width: 94em) {
+	   German, which needs the most width to seat the whole row. */
+	@media (min-width: 80em) {
 		.socials {
 			display: flex;
 			flex-wrap: nowrap;

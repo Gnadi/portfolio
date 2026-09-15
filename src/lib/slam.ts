@@ -1,32 +1,23 @@
 /**
  * Grand Slam colour themes.
  *
- * The site ships four palettes — one per major — and by default wears the one
- * whose tournament is either on right now or up next. The choice is stored
- * per visitor and applied as `data-slam` on <html>; the palettes themselves
- * live in src/styles/global.css.
- *
- * Unlike the light/dark theme this is *not* mirrored into the shared
- * gnadlinger.me cookie: the CV and the blog do not have these palettes, so
- * there is nothing on the other side to keep in step.
+ * The site ships four palettes — one per major — and wears the one whose
+ * tournament is either being played right now or up next. Nothing to choose
+ * and nothing stored: the calendar decides, and the answer is applied as
+ * `data-slam` on <html>. The palettes themselves live in
+ * src/styles/global.css.
  */
 export type SlamId = 'ao' | 'rg' | 'wimbledon' | 'usopen';
 
-/** `auto` follows the calendar; anything else pins one tournament. */
-export type SlamPreference = 'auto' | SlamId;
-
-export const SLAM_STORAGE_KEY = 'slam';
 export const SLAM_ATTRIBUTE = 'data-slam';
-
-export const DEFAULT_SLAM: SlamId = 'usopen';
 
 interface Slam {
 	id: SlamId;
 	/** Tournament name. A proper noun, so it is not translated. */
 	name: string;
-	/** Shown on the picker button, where a full name does not fit. */
+	/** Short form, for anywhere a full name does not fit. */
 	short: string;
-	/** Dot in the picker, and the `theme-color` the browser paints chrome with. */
+	/** The `theme-color` the browser paints its chrome with. */
 	swatch: string;
 	/**
 	 * The window the palette is worn in, as `[month, day]`. The real dates move
@@ -74,19 +65,6 @@ export const slams: readonly Slam[] = [
 	},
 ] as const;
 
-export const slamUi = {
-	en: {
-		label: 'Grand Slam theme',
-		auto: 'Auto',
-		autoHint: 'Current or next tournament',
-	},
-	de: {
-		label: 'Grand-Slam-Design',
-		auto: 'Automatisch',
-		autoHint: 'Aktuelles oder nächstes Turnier',
-	},
-} as const;
-
 /** `[month, day]` as a comparable number, e.g. June 9th → 609. */
 const asMonthDay = ([month, day]: [number, number]) => month * 100 + day;
 
@@ -107,36 +85,6 @@ export function slamFor(date: Date): SlamId {
 	return slams[0]!.id;
 }
 
-export function resolveSlam(preference: SlamPreference, date = new Date()): SlamId {
-	return preference === 'auto' ? slamFor(date) : preference;
-}
-
-export function applySlam(slam: SlamId) {
-	document.documentElement.setAttribute(SLAM_ATTRIBUTE, slam);
-	const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-	const swatch = slams.find((entry) => entry.id === slam)?.swatch;
-	if (meta && swatch) meta.content = swatch;
-}
-
-export function readStoredSlam(): SlamPreference {
-	try {
-		const stored = localStorage.getItem(SLAM_STORAGE_KEY);
-		if (stored === 'auto') return 'auto';
-		return slams.some((slam) => slam.id === stored) ? (stored as SlamId) : 'auto';
-	} catch {
-		return 'auto';
-	}
-}
-
-export function storeSlam(preference: SlamPreference) {
-	try {
-		localStorage.setItem(SLAM_STORAGE_KEY, preference);
-	} catch {
-		// Private mode and friends. The palette still applies for this page
-		// view; it just will not be remembered.
-	}
-}
-
 /** The data the inline script below needs, without the presentation copy. */
 const season = slams.map(({ id, swatch, from, to }) => ({
 	id,
@@ -152,20 +100,8 @@ const season = slams.map(({ id, swatch, from, to }) => ({
  * for them.
  */
 export const slamInitScript = `(function () {
-  var STORAGE = ${JSON.stringify(SLAM_STORAGE_KEY)};
   var ATTRIBUTE = ${JSON.stringify(SLAM_ATTRIBUTE)};
   var SEASON = ${JSON.stringify(season)};
-
-  function stored() {
-    try {
-      var value = localStorage.getItem(STORAGE);
-      if (value === "auto") return "auto";
-      for (var i = 0; i < SEASON.length; i++) if (SEASON[i].id === value) return value;
-      return "auto";
-    } catch (error) {
-      return "auto";
-    }
-  }
 
   function scheduled() {
     var now = new Date();
@@ -180,8 +116,7 @@ export const slamInitScript = `(function () {
   }
 
   function apply() {
-    var preference = stored();
-    var slam = preference === "auto" ? scheduled() : preference;
+    var slam = scheduled();
     document.documentElement.setAttribute(ATTRIBUTE, slam);
 
     var meta = document.querySelector('meta[name="theme-color"]');
@@ -199,5 +134,6 @@ export const slamInitScript = `(function () {
   addEventListener("pageshow", function (event) {
     if (event.persisted) apply();
   });
+  addEventListener("focus", apply);
   document.addEventListener("astro:after-swap", apply);
 })();`;
