@@ -192,6 +192,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		SERVE_MIN,
 		SERVE_MAX,
 		SERVE_KMH,
+		SERVE_BOUNCE_MAX,
 		CHARGE_SECONDS,
 		SECOND_SERVE_CHARGE,
 		clamp,
@@ -776,8 +777,6 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			/** How far the ball passed the racket by, which is what tells a winner from a miss. */
 			let missGap: number | null = null;
 			let pointBreak = false;
-			/** Set when a shot was missed outright: into the net, or long. */
-			let spoiled: 'net' | 'long' | null = null;
 			let waiting = 0;
 			let cpuServeDelay = 0;
 			let clock = 0;
@@ -963,7 +962,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 				ball.x = target.x;
 				ball.y = target.y;
-				ball.speed = Math.min(ball.speed * (0.58 + 0.07 * here.category), MAX_SPEED * 1.25);
+				ball.speed = Math.min(ball.speed * (0.58 + 0.07 * here.category), SERVE_BOUNCE_MAX);
 				ball.angle = clamp(
 					Math.atan2(aimY - target.y, Math.abs(paddleX(receiver) - target.x)),
 					-1.05,
@@ -997,7 +996,6 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				serveKick = 0;
 				touched = false;
 				missGap = null;
-				spoiled = null;
 				lastShot = null;
 				ball.speed = 0;
 				ball.spin = 0;
@@ -1228,24 +1226,6 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					ball.angle = -ball.angle;
 				}
 
-				if (spoiled) {
-					// Whoever put it into the tape or over the baseline has lost
-					// the point, and the ball is travelling away from them.
-					const against: Side = ball.dir > 0 ? 'cpu' : 'player';
-					if (spoiled === 'net') {
-						const reached = ball.dir > 0 ? ball.x >= NET_X : ball.x <= NET_X;
-						if (reached) {
-							mark = { x: NET_X, y: ball.y, in: false, life: 1.1 };
-							ball.speed = 0;
-							awardPoint(against, 'rally');
-						}
-						return;
-					}
-					const past = ball.x < COURT_X - 70 || ball.x > COURT_X + COURT_W + 70;
-					if (past) awardPoint(against, 'rally');
-					return;
-				}
-
 				const px = paddleX('player');
 				const cx = paddleX('cpu');
 				const pr = racketOf('player');
@@ -1340,48 +1320,6 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 							? 0.72 + 0.22 * here.pace.skid
 							: 1;
 
-				// ── The unforced error ────────────────────────────────────
-				// Seven points in ten are over inside four shots, and the ones
-				// that are not are decided as often by a miss as by a winner.
-				// So: the faster the ball, the further out on the frame it was
-				// met, the longer the point has gone and the emptier the legs,
-				// the likelier this one finds the net or sails long. It is the
-				// only thing that ends a rally two good retrievers could
-				// otherwise keep going until the tournament did.
-				const strain = clamp((ball.speed / MAX_SPEED - 0.6) / 0.4, 0, 1);
-				const stretched = Math.min(Math.abs(raw), 1);
-				const spent = player ? 1 - clamp(stamina / ratings.stamina, 0, 1) : 0;
-				const grind = clamp((shots - 4) / 10, 0, 1);
-				let loose = strain * 0.5 + stretched * 0.22 + spent * 0.35 + grind * 0.45;
-				loose *= player
-					? 1 / (wing === 'forehand' ? ratings.forehandPace : ratings.backhandPace)
-					: 1.15 - opponent.nerve * 0.5;
-				// A ball that was never under control in the first place is the
-				// one most likely to go.
-				loose *= 2 - quality;
-
-				if (Math.random() < loose * 0.1) {
-					stats[side].errors += 1;
-					spoiled = Math.random() < 0.55 ? 'net' : 'long';
-					ball.dir = player ? 1 : -1;
-					ball.x = x;
-					ball.curve = 0;
-					ball.spin = 0;
-					if (spoiled === 'net') {
-						// Dumped into the tape, at nothing like the pace it was
-						// struck with.
-						ball.speed = Math.max(220, ball.speed * 0.35);
-						ball.angle = clamp(raw * 0.4, -0.6, 0.6);
-					} else {
-						// Over the baseline, and past anybody's racket.
-						ball.speed = Math.min(ball.speed * 1.15, MAX_SPEED);
-						ball.angle = clamp(raw * 0.5 + (Math.random() - 0.5) * 0.3, -0.7, 0.7);
-					}
-					lastShot = { side, wing, shot, at: clock };
-					return;
-				}
-
-
 				let plus = 1;
 				if (player) {
 					if (shots === 3 && side === server) plus = ratings.servePlusOne;
@@ -1398,8 +1336,9 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					plus = opponent.pace;
 				}
 
+				const press = Math.max(here.pace.rally, 1 + Math.min(shots, 34) * 0.004);
 				const speed = clamp(
-					ball.speed * here.pace.rally * wingPace * shotPace * quality * plus,
+					ball.speed * press * wingPace * shotPace * quality * plus,
 					BASE_SPEED * 0.82,
 					MAX_SPEED
 				);
@@ -1474,7 +1413,9 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 				stats[to].points += 1;
 				if (kind === 'ace') stats[to].aces += 1;
-				if (kind === 'rally' && !spoiled) {
+				if (kind === 'rally') {
+					// A ball nowhere near the racket was a winner; one that went
+					// straight through where it was standing was a miss.
 					if ((missGap ?? 0) > 34) stats[to].winners += 1;
 					else stats[loser].errors += 1;
 				}
@@ -2120,6 +2061,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				}
 
 				resultNote.textContent = '';
+				resultNote.hidden = true;
 				showing = true;
 				overlay.hidden = true;
 				result.hidden = false;
@@ -2289,13 +2231,16 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 							}),
 						]);
 						resultNote.textContent = text.copied;
+						resultNote.hidden = false;
 						return;
 					}
 					await navigator.clipboard.writeText(line);
 					resultNote.textContent = text.copiedText;
+					resultNote.hidden = false;
 				} catch {
 					// No clipboard: hand them the line to copy by hand.
 					resultNote.textContent = line;
+					resultNote.hidden = false;
 				}
 			});
 
@@ -2778,9 +2723,12 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		justify-content: safe center;
 		gap: 0.9rem;
 		padding: 1rem;
-		background-color: rgba(6, 16, 28, 0.94);
+		/* Near enough solid: the stadium behind it is a busy thing to read a
+		   stat sheet through. */
+		background-color: rgba(4, 12, 22, 0.975);
 		text-align: center;
 		overflow: auto;
 	}
@@ -2796,7 +2744,9 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		justify-content: center;
 		gap: 1rem 1.5rem;
 		width: 100%;
-		min-height: 0;
+		/* Never shrink below the sheet: a squeezed box would put the buttons
+		   on top of the last rows rather than under them. */
+		flex: 0 0 auto;
 	}
 
 	.result-main {
@@ -2829,7 +2779,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 	.result-earned {
 		margin: 0;
 		font-size: var(--text-sm);
-		color: rgba(255, 255, 255, 0.8);
+		color: rgba(255, 255, 255, 0.88);
 		font-variant-numeric: tabular-nums;
 	}
 
@@ -2855,7 +2805,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		width: 100%;
 		border-collapse: collapse;
 		font-size: 0.76rem;
-		color: rgba(255, 255, 255, 0.78);
+		color: rgba(255, 255, 255, 0.88);
 		font-variant-numeric: tabular-nums;
 	}
 
@@ -2869,7 +2819,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		font-weight: 600;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.55);
+		color: rgba(255, 255, 255, 0.72);
 	}
 
 	.stats :global(thead th:first-child) {
@@ -2883,7 +2833,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 	.stats :global(tbody th) {
 		font-weight: 400;
 		text-align: center;
-		color: rgba(255, 255, 255, 0.55);
+		color: rgba(255, 255, 255, 0.74);
 	}
 
 	.stats :global(td) {
@@ -2921,6 +2871,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		flex-wrap: wrap;
 		justify-content: center;
 		gap: 0.5rem;
+		flex: 0 0 auto;
 	}
 
 	.act {
@@ -2971,7 +2922,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		margin: 0;
 		max-width: 32rem;
 		font-size: var(--text-sm);
-		color: rgba(255, 255, 255, 0.82);
+		color: rgba(255, 255, 255, 0.9);
 	}
 
 	/* ── The career ───────────────────────────────────────────────── */
@@ -3377,6 +3328,38 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		.hint {
 			font-size: 0.75rem;
 			flex-shrink: 0;
+		}
+	}
+
+	/* On a phone the result has a column to fit into rather than a row, so the
+	   card gives up some height and the sheet tightens up — between them they
+	   save most of the scrolling. */
+	@media (max-width: 48em) {
+		.result {
+			gap: 0.6rem;
+			padding: 0.75rem;
+		}
+
+		.result-body {
+			gap: 0.6rem;
+		}
+
+		.result-card {
+			max-height: 28vh;
+		}
+
+		.stats {
+			font-size: 0.72rem;
+		}
+
+		.stats :global(th),
+		.stats :global(td) {
+			padding: 0.14rem 0.2rem;
+		}
+
+		.act {
+			padding: 0.4rem 0.85rem;
+			font-size: 0.8rem;
 		}
 	}
 

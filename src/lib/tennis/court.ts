@@ -28,7 +28,15 @@ export const PADDLE_INSET = 20;
 export const BALL_R = 8;
 
 export const BASE_SPEED = 430; // px per second
-export const MAX_SPEED = 1080;
+/**
+ * The quickest a rally ball ever gets. It is deliberately faster than a racket
+ * can cover the court with: a long exchange escalates until somebody cannot
+ * get there, which is what ends a point between two players who are both
+ * retrieving everything.
+ */
+export const MAX_SPEED = 1400;
+/** A serve off the bounce is quick, but not rally-at-full-tilt quick. */
+export const SERVE_BOUNCE_MAX = 1350;
 export const PLAYER_SPEED = 640;
 
 /**
