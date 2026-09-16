@@ -65,6 +65,9 @@ const siteLinks: { label: string; href: string }[] = [
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+		/* On narrow screens the credits sit right at the bottom of the page,
+		   below the site links and the tennis button. */
+		order: 1;
 	}
 
 	.socials {
@@ -87,6 +90,7 @@ const siteLinks: { label: string; href: string }[] = [
 			flex-direction: row;
 			gap: 1rem;
 			flex-wrap: wrap;
+			order: 0;
 		}
 
 		.socials {
