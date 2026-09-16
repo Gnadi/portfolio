@@ -67,6 +67,7 @@ export const copy = {
 		earned: '+%p ranking points · %m',
 		nextMatch: 'Next match',
 		newDraw: 'Into a new draw',
+		playAgain: 'Play again',
 		statsTitle: 'Match statistics',
 		statsYou: 'You',
 		saveImage: 'Save image',
@@ -79,6 +80,11 @@ export const copy = {
 
 		// ── The career ────────────────────────────────────────────────
 		careerTitle: 'Career',
+		mode: 'Playing',
+		casualMode: 'Just a match',
+		careerMode: 'Career',
+		modeNote:
+			'A match on its own and nothing to keep track of — or a draw to climb, where rounds pay ranking points and prize money, and the money buys your game.',
 		ranking: 'Ranking',
 		prizeMoney: 'Prize money',
 		titles: 'Titles',
@@ -91,6 +97,7 @@ export const copy = {
 			'A left-hander’s forehand crosses to a right-hander’s backhand. It is the oldest advantage in the game, and it swaps which half of your racket is which.',
 		backhandChoice: 'Your backhand',
 		backhandNote: 'Chosen once. After that it is your backhand for good.',
+		backhandFree: 'Either one, and change it whenever you like.',
 		twoHanded: 'Two-handed',
 		twoHandedNote: 'Stability and power, and a ball at shoulder height is in the strike zone.',
 		oneHanded: 'One-handed',
@@ -151,6 +158,7 @@ export const copy = {
 		earned: '+%p Weltranglistenpunkte · %m',
 		nextMatch: 'Nächstes Match',
 		newDraw: 'In ein neues Turnier',
+		playAgain: 'Nochmal spielen',
 		statsTitle: 'Match-Statistik',
 		statsYou: 'Du',
 		saveImage: 'Bild speichern',
@@ -162,6 +170,11 @@ export const copy = {
 		cardAlt: '%p schlägt %o %s im Tennis auf ' + host,
 
 		careerTitle: 'Karriere',
+		mode: 'Du spielst',
+		casualMode: 'Nur ein Match',
+		careerMode: 'Karriere',
+		modeNote:
+			'Ein Match für sich, ohne irgendetwas zu verwalten — oder ein Turnier zum Klettern, in dem Runden Weltranglistenpunkte und Preisgeld bringen und das Preisgeld dein Spiel kauft.',
 		ranking: 'Weltrangliste',
 		prizeMoney: 'Preisgeld',
 		titles: 'Titel',
@@ -174,6 +187,7 @@ export const copy = {
 			'Die Vorhand eines Linkshänders geht auf die Rückhand eines Rechtshänders. Der älteste Vorteil im Tennis — und er vertauscht, welche Schlägerhälfte welche ist.',
 		backhandChoice: 'Deine Rückhand',
 		backhandNote: 'Einmalige Wahl. Danach bleibt es deine Rückhand.',
+		backhandFree: 'Beides möglich, und jederzeit änderbar.',
 		twoHanded: 'Beidhändig',
 		twoHandedNote: 'Stabil und kräftig, und ein Ball auf Schulterhöhe liegt im Schlagfenster.',
 		oneHanded: 'Einhändig',

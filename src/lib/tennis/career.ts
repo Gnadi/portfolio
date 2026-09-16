@@ -20,6 +20,16 @@
 import type { Hand } from './court';
 
 export type BackhandStyle = 'two' | 'one';
+
+/**
+ * Which game is being played.
+ *
+ * `casual` is a match and nothing else: no draw, no ranking, no money and no
+ * tree, which is what somebody who has come to hit a few balls in a footer
+ * actually wants. `career` is everything below. The mode is the visitor's to
+ * choose and it is the only thing standing between them and a point.
+ */
+export type Mode = 'casual' | 'career';
 export type BranchId = 'serve' | 'return' | 'forehand' | 'backhand' | 'fitness' | 'pressure';
 
 /** Copy that belongs to the data, in both languages the site speaks. */
@@ -117,6 +127,9 @@ export interface Opponent {
 	weakness: number;
 }
 
+/** The round a casual match is pitched at: a fair fight, halfway up the draw. */
+const CASUAL_ROUND = 3;
+
 export function opponentFor(round: number): Opponent {
 	const t = Math.min(round, FINAL) / FINAL;
 	return {
@@ -132,6 +145,8 @@ export function opponentFor(round: number): Opponent {
 // ── What a career is ──────────────────────────────────────────────────
 
 export interface Career {
+	/** Which of the two games is being played. */
+	mode: Mode;
 	/** Ranking points. Earned, never spent. */
 	points: number;
 	/** Prize money in hand, which is what the tree is bought with. */
@@ -151,11 +166,18 @@ export interface Career {
 	hand: Hand;
 	/** Chosen once, and then it is your backhand for good. */
 	backhand: BackhandStyle | null;
+	/**
+	 * The backhand a casual match is played with. Kept apart from the career's
+	 * because it is not a commitment: with nothing riding on it, there is no
+	 * reason not to let somebody try the other one.
+	 */
+	casualBackhand: BackhandStyle;
 	unlocked: string[];
 }
 
 export function freshCareer(): Career {
 	return {
+		mode: 'casual',
 		points: 0,
 		prize: 0,
 		earned: 0,
@@ -166,6 +188,7 @@ export function freshCareer(): Career {
 		won: 0,
 		hand: 'right',
 		backhand: null,
+		casualBackhand: 'two',
 		unlocked: [],
 	};
 }
@@ -240,6 +263,42 @@ export const BASE: Ratings = {
 	pressureBite: 0,
 	pressureScope: 0,
 };
+
+/**
+ * What a player is worth with no career behind them.
+ *
+ * A casual match has nothing to unlock, so these cannot come off a tree. They
+ * are simply the numbers of somebody who can play: a serve with some margin
+ * on it, a forehand around the tour's average spin, legs that last a match.
+ * They sit about where a career reaches halfway up the draw, so a casual
+ * match is a fair fight rather than a rehearsal for one.
+ */
+export function casualRatings(style: BackhandStyle): Ratings {
+	return {
+		...BASE,
+		serveSpeed: 1.06,
+		serveMargin: 0.14,
+		secondServe: 0.55,
+		servePlusOne: 1.06,
+		returnStep: 8,
+		returnBlock: 0.35,
+		returnPlusOne: 1.06,
+		forehandPace: 1.06,
+		forehandSpin: 2850,
+		runAround: 0.1,
+		backhandPace: 1.05,
+		backhandAngle: 1.08,
+		backhandSlice: style === 'one' ? 1.3 : 1.05,
+		backhandHigh: style === 'two' ? 0.65 : 0.2,
+		backhandReach: style === 'one' ? 9 : 0,
+		speed: 1.1,
+		stamina: 130,
+		recovery: 1.5,
+		pressureGuard: 0.08,
+		pressureBite: 0.08,
+		pressureScope: 1,
+	};
+}
 
 export interface SkillNode {
 	id: string;
@@ -650,8 +709,14 @@ export function available(node: SkillNode, career: Career) {
 	return below ? career.unlocked.includes(below.id) : false;
 }
 
+/** Who is on the other side of the net, which the mode decides as well. */
+export const opponentIn = (career: Career) =>
+	opponentFor(career.mode === 'casual' ? CASUAL_ROUND : career.round);
+
 /** Everything the match needs to know about who it is being played by. */
 export function ratingsFor(career: Career): Ratings {
+	if (career.mode === 'casual') return casualRatings(career.casualBackhand);
+
 	const ratings = { ...BASE };
 
 	// The wing you learned is worth something before a single session is
@@ -688,7 +753,13 @@ export function loadCareer(): Career {
 		const number = (value: unknown, fallback: number) =>
 			typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : fallback;
 
+		// Somebody who was playing this before it had two modes has a career
+		// going, and should not be dropped back into a casual match over it.
+		const started =
+			number(saved.points, 0) > 0 || (Array.isArray(saved.unlocked) && saved.unlocked.length > 0);
+
 		return {
+			mode: saved.mode === 'career' || (saved.mode === undefined && started) ? 'career' : 'casual',
 			points: number(saved.points, 0),
 			prize: number(saved.prize, 0),
 			earned: number(saved.earned, 0),
@@ -699,6 +770,7 @@ export function loadCareer(): Career {
 			won: Math.round(number(saved.won, 0)),
 			hand: saved.hand === 'left' ? 'left' : 'right',
 			backhand: saved.backhand === 'one' || saved.backhand === 'two' ? saved.backhand : null,
+			casualBackhand: saved.casualBackhand === 'one' ? 'one' : 'two',
 			unlocked: Array.isArray(saved.unlocked)
 				? saved.unlocked.filter((id): id is string => typeof id === 'string' && ids.has(id))
 				: [],

@@ -216,12 +216,13 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		freshCareer,
 		loadCareer,
 		nodesIn,
-		opponentFor,
+		opponentIn,
 		ratingsFor,
 		saveCareer,
 		seedFor,
 		type BackhandStyle,
 		type Career,
+		type Mode,
 		type Ratings,
 		type SkillNode,
 	} from '../lib/tennis/career';
@@ -305,7 +306,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			// ── The career ────────────────────────────────────────────────
 			let career: Career = loadCareer();
 			let ratings: Ratings = ratingsFor(career);
-			let opponent = opponentFor(career.round);
+			let opponent = opponentIn(career);
 			/** What this match has paid so far, for the panel at the end of it. */
 			let award = { points: 0, prize: 0 };
 
@@ -326,7 +327,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 			/** A draw is entered once, and the first cheque comes with the entry. */
 			function enterDraw() {
-				if (career.entered) return;
+				if (career.mode === 'casual' || career.entered) return;
 				const round = ROUNDS[Math.min(career.round, entryRound(career.points))]!;
 				bank(round.points, round.prize);
 				career.entered = true;
@@ -345,6 +346,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			 * wherever the ranking now puts you.
 			 */
 			function finishMatch(playerWon: boolean) {
+				if (career.mode === 'casual') return;
 				const at = career.round;
 				if (playerWon) {
 					const next = at + 1;
@@ -361,7 +363,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					newDraw();
 				}
 				saveCareer(career);
-				opponent = opponentFor(career.round);
+				opponent = opponentIn(career);
 			}
 
 			// ── The winner's card ─────────────────────────────────────────
@@ -440,16 +442,15 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				paint.font = '400 24px Rubik, system-ui, sans-serif';
 				paint.fillText(`${here.venue} · ${here.surface[lang]}`, left, 128);
 
-				// The round this match won, which is the thing worth boasting about.
+				// The round this match won, which is the thing worth boasting about
+				// — or, with no draw behind it, simply that it was won.
 				const round = ROUNDS[clamp(cardRound, 0, CHAMPION)]!;
+				const billing =
+					career.mode === 'career' && cardRound < CHAMPION ? round.name[lang] : text.champion;
 				paint.fillStyle = 'rgba(255, 255, 255, 0.68)';
 				paint.letterSpacing = '10px';
 				paint.font = '600 22px Rubik, system-ui, sans-serif';
-				paint.fillText(
-					(cardRound >= CHAMPION ? text.champion : round.name[lang]).toUpperCase(),
-					left,
-					220
-				);
+				paint.fillText(billing.toUpperCase(), left, 220);
 				paint.letterSpacing = '0px';
 
 				paint.fillStyle = '#ffffff';
@@ -490,7 +491,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					chipX += chipWidth + 10;
 				};
 
-				chip(formatRank(career.points, lang).toUpperCase(), 470);
+				if (career.mode === 'career') chip(formatRank(career.points, lang).toUpperCase(), 470);
 				if (format === 'tiebreak') chip(text.tiebreak.toUpperCase(), 470);
 
 				// The ball, oversized, as the card's mark.
@@ -890,14 +891,19 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				out.tournament.textContent = names[slam] ?? '';
 				out.venue.textContent = `${here.venue} · ${here.surface[lang]} · ${text.pace}: ${paceLabel[here.category][lang]}`;
 
-				const seed = seedFor(career.points);
-				const round = ROUNDS[career.round]!.name[lang];
-				const badge = seed
-					? text.seed.replace('%s', String(seed))
-					: entryRound(career.points) > 0
-						? text.unseeded
-						: text.qualifier;
-				out.standing.textContent = `${round} · ${formatRank(career.points, lang)} · ${badge}`;
+				out.board.dataset.mode = career.mode;
+				if (career.mode === 'career') {
+					const seed = seedFor(career.points);
+					const round = ROUNDS[career.round]!.name[lang];
+					const badge = seed
+						? text.seed.replace('%s', String(seed))
+						: entryRound(career.points) > 0
+							? text.unseeded
+							: text.qualifier;
+					out.standing.textContent = `${round} · ${formatRank(career.points, lang)} · ${badge}`;
+				} else {
+					out.standing.textContent = '';
+				}
 
 				const left = clamp(stamina / ratings.stamina, 0, 1);
 				out.fitness.style.width = `${Math.round(left * 100)}%`;
@@ -1532,7 +1538,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				hideResult();
 				hideCareer();
 				ratings = ratingsFor(career);
-				opponent = opponentFor(career.round);
+				opponent = opponentIn(career);
 				points = { player: 0, cpu: 0 };
 				games = { player: 0, cpu: 0 };
 				server = 'player';
@@ -1805,6 +1811,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			const careerFigures = this.querySelector<HTMLElement>('[data-career-figures]')!;
 			const careerBody = this.querySelector<HTMLElement>('[data-career-body]')!;
 			const careerDone = this.querySelector<HTMLButtonElement>('[data-career-done]')!;
+			const careerReset = this.querySelector<HTMLButtonElement>('[data-career-reset]')!;
 			/** Blocks play while the tree is open. */
 			let browsing = false;
 
@@ -1818,15 +1825,95 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 			function renderCareer() {
 				careerFigures.textContent = '';
-				figure(text.ranking, `${formatRank(career.points, lang)} · ${career.points}`);
-				figure(text.prizeMoney, formatPrize(career.prize, locale));
-				figure(text.titles, String(career.titles));
-				figure(text.matchesWon, String(career.won));
-				figure(text.best, ROUNDS[Math.min(career.best, CHAMPION)]!.name[lang]);
+				// A casual match has no standing to report, so the header carries
+				// nothing but the title until there is a career behind it.
+				if (career.mode === 'career') {
+					figure(text.ranking, `${formatRank(career.points, lang)} · ${career.points}`);
+					figure(text.prizeMoney, formatPrize(career.prize, locale));
+					figure(text.titles, String(career.titles));
+					figure(text.matchesWon, String(career.won));
+					figure(text.best, ROUNDS[Math.min(career.best, CHAMPION)]!.name[lang]);
+				}
 
 				careerBody.textContent = '';
-				careerBody.append(handRow());
+				careerBody.append(modeRow(), handRow());
+				if (career.mode === 'casual') {
+					careerBody.append(casualBackhandRow());
+					return;
+				}
 				for (const branch of BRANCHES) careerBody.append(branchColumn(branch));
+			}
+
+			/** A row of choices across the top of the panel, like the mode itself. */
+			function pickRow(title: string, note: string) {
+				const row = document.createElement('section');
+				row.className = 'branch pick';
+				const heading = document.createElement('h4');
+				heading.textContent = title;
+				const line = document.createElement('p');
+				line.className = 'branch-note';
+				line.textContent = note;
+				row.append(heading, line);
+				return row;
+			}
+
+			function choice(label: string, chosen: boolean, pick: () => void) {
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'node choice';
+				button.dataset.state = chosen ? 'owned' : 'open';
+				const name = document.createElement('span');
+				name.className = 'node-name';
+				name.textContent = label;
+				button.append(name);
+				button.addEventListener('click', pick);
+				return button;
+			}
+
+			/**
+			 * Which of the two games is being played. A visitor who has come to
+			 * hit a few balls gets a match and nothing else; the draw, the
+			 * ranking and the tree are all on the other side of this row, and
+			 * changing it starts the right kind of match straight away.
+			 */
+			function modeRow() {
+				const row = pickRow(text.mode, text.modeNote);
+				for (const mode of ['casual', 'career'] as Mode[]) {
+					row.append(
+						choice(mode === 'casual' ? text.casualMode : text.careerMode, career.mode === mode, () => {
+							if (career.mode === mode) return;
+							career.mode = mode;
+							saveCareer(career);
+							// A new match of the right kind, waiting behind the panel
+							// the choice was made in — which is now showing the other
+							// game, so the change can be seen rather than guessed at.
+							reset();
+							showCareer();
+						})
+					);
+				}
+				return row;
+			}
+
+			/** With nothing riding on it, a casual backhand is not a commitment. */
+			function casualBackhandRow() {
+				const row = pickRow(text.backhandChoice, text.backhandFree);
+				const styles: [BackhandStyle, string][] = [
+					['two', text.twoHanded],
+					['one', text.oneHanded],
+				];
+				for (const [style, label] of styles) {
+					row.append(
+						choice(label, career.casualBackhand === style, () => {
+							career.casualBackhand = style;
+							saveCareer(career);
+							ratings = ratingsFor(career);
+							renderCareer();
+							paintScore();
+						})
+					);
+				}
+				return row;
 			}
 
 			/**
@@ -1836,31 +1923,15 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			 * his.
 			 */
 			function handRow() {
-				const row = document.createElement('section');
-				row.className = 'branch hand';
-
-				const title = document.createElement('h4');
-				title.textContent = text.plays;
-				const note = document.createElement('p');
-				note.className = 'branch-note';
-				note.textContent = text.handNote;
-				row.append(title, note);
-
+				const row = pickRow(text.plays, text.handNote);
 				for (const hand of ['right', 'left'] as Hand[]) {
-					const button = document.createElement('button');
-					button.type = 'button';
-					button.className = 'node choice';
-					button.dataset.state = career.hand === hand ? 'owned' : 'open';
-					const name = document.createElement('span');
-					name.className = 'node-name';
-					name.textContent = hand === 'right' ? text.rightHanded : text.leftHanded;
-					button.append(name);
-					button.addEventListener('click', () => {
-						career.hand = hand;
-						saveCareer(career);
-						renderCareer();
-					});
-					row.append(button);
+					row.append(
+						choice(hand === 'right' ? text.rightHanded : text.leftHanded, career.hand === hand, () => {
+							career.hand = hand;
+							saveCareer(career);
+							renderCareer();
+						})
+					);
 				}
 				return row;
 			}
@@ -1967,6 +2038,10 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 			function showCareer() {
 				renderCareer();
+				// There is nothing to start again from in a casual match, and the
+				// button would be offering to throw away a career that is not on
+				// screen to be seen.
+				careerReset.hidden = career.mode !== 'career';
 				browsing = true;
 				charging = false;
 				charge = 0;
@@ -1992,22 +2067,35 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			function showResult(playerWon: boolean, line: string, played: number) {
 				renderStats();
 
-				const champion = playerWon && played + 1 >= CHAMPION;
+				const running = career.mode === 'career';
+				const champion = running && playerWon && played + 1 >= CHAMPION;
+
 				resultHead.textContent = '';
 				const headline = document.createElement('strong');
 				headline.textContent = line;
-				const progress = document.createElement('span');
-				progress.textContent = champion
-					? text.titleWon.replace('%s', String(career.titles))
-					: playerWon
-						? text.through.replace('%s', ROUNDS[career.round]!.name[lang])
-						: text.knockedOut.replace('%s', ROUNDS[played]!.name[lang]);
-				resultHead.append(headline, progress);
+				resultHead.append(headline);
 
-				resultEarned.textContent = text.earned
-					.replace('%p', String(award.points))
-					.replace('%m', formatPrize(award.prize, locale));
-				nextButton.textContent = playerWon && !champion ? text.nextMatch : text.newDraw;
+				if (running) {
+					const progress = document.createElement('span');
+					progress.textContent = champion
+						? text.titleWon.replace('%s', String(career.titles))
+						: playerWon
+							? text.through.replace('%s', ROUNDS[career.round]!.name[lang])
+							: text.knockedOut.replace('%s', ROUNDS[played]!.name[lang]);
+					resultHead.append(progress);
+				}
+
+				resultEarned.hidden = !running;
+				resultEarned.textContent = running
+					? text.earned
+							.replace('%p', String(award.points))
+							.replace('%m', formatPrize(award.prize, locale))
+					: '';
+				nextButton.textContent = !running
+					? text.playAgain
+					: playerWon && !champion
+						? text.nextMatch
+						: text.newDraw;
 
 				// A win is worth keeping; a loss is worth reading the sheet over.
 				resultImage.hidden = !playerWon;
@@ -2247,10 +2335,12 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				start();
 			});
 
-			this.querySelector<HTMLButtonElement>('[data-career-reset]')!.addEventListener('click', () => {
+			careerReset.addEventListener('click', () => {
 				if (!confirm(text.resetConfirm)) return;
 				clearCareer();
-				career = freshCareer();
+				// Starting the career again from nothing, not leaving it: whoever
+				// pressed this is standing in the career screen.
+				career = { ...freshCareer(), mode: career.mode };
 				ratings = ratingsFor(career);
 				hideCareer();
 				reset();
@@ -2536,6 +2626,12 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		font-weight: 600;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
+	}
+
+	/* A casual match has no draw behind it, so the board has nothing to say
+	   about rounds, rankings or seedings. */
+	.board[data-mode='casual'] .standing {
+		display: none;
 	}
 
 	/* A tie-break has no games to show, and says so instead. */
@@ -2946,7 +3042,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		gap: 0.3rem;
 	}
 
-	.career-body :global(.branch.hand) {
+	.career-body :global(.branch.pick) {
 		grid-column: 1 / -1;
 		flex-direction: row;
 		flex-wrap: wrap;
@@ -2956,12 +3052,12 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 	}
 
-	.career-body :global(.branch.hand .branch-note) {
+	.career-body :global(.branch.pick .branch-note) {
 		flex: 1 1 14rem;
 		margin: 0;
 	}
 
-	.career-body :global(.branch.hand .node) {
+	.career-body :global(.branch.pick .node) {
 		flex: 0 0 auto;
 	}
 
