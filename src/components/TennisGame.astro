@@ -1239,7 +1239,15 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					: ((event.clientY - box.top) / box.height) * H;
 			}
 
-			dialog.addEventListener('keydown', (event: KeyboardEvent) => {
+			/** A control that wants the key for itself: buttons and the name field. */
+			const ownsKeys = (target: EventTarget | null) =>
+				target instanceof Element && target.closest('button, input, select, textarea, a[href]') !== null;
+
+			// The match listens on the document, not on the dialog: hiding the
+			// name field or the winner's card drops focus back to the body, and
+			// a listener on the dialog would never see the keys again.
+			document.addEventListener('keydown', (event: KeyboardEvent) => {
+				if (!dialog.open) return;
 				if (signing) {
 					// The field owns the keyboard: space types a space, Escape
 					// leaves the name as it was rather than closing the match.
@@ -1251,6 +1259,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					return;
 				}
 				if (event.key === ' ' || event.key === 'Enter') {
+					// Space and Enter belong to whichever button is focused.
+					if (ownsKeys(event.target)) return;
 					event.preventDefault();
 					serveOrRestart();
 					return;
@@ -1261,7 +1271,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					keys.add(event.key);
 				}
 			});
-			dialog.addEventListener('keyup', (event: KeyboardEvent) => keys.delete(event.key));
+			document.addEventListener('keyup', (event: KeyboardEvent) => keys.delete(event.key));
 
 			// A tab sent to the background should not bank a walkover.
 			document.addEventListener('visibilitychange', () => {
@@ -1314,6 +1324,9 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 	.stage {
 		width: min(58rem, 94vw);
 		max-width: 94vw;
+		/* The global reset zeroes every margin, which also takes away the
+		   `margin: auto` a modal dialog is centred with. */
+		margin: auto;
 		padding: 0;
 		border: 1px solid var(--border);
 		border-radius: var(--radius-lg);

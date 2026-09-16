@@ -27,7 +27,9 @@ const siteLinks: { label: string; href: string }[] = [
 		{siteLinks.map(({ label, href }) => <a href={href}>{label}</a>)}
 	</nav>
 
-	<TennisGame />
+	<div class="play">
+		<TennisGame />
+	</div>
 </footer>
 <style>
 	footer {
@@ -70,6 +72,11 @@ const siteLinks: { label: string; href: string }[] = [
 		order: 1;
 	}
 
+	.play {
+		display: flex;
+		justify-content: center;
+	}
+
 	.socials {
 		display: flex;
 		justify-content: center;
@@ -91,6 +98,23 @@ const siteLinks: { label: string; href: string }[] = [
 			gap: 1rem;
 			flex-wrap: wrap;
 			order: 0;
+		}
+
+		/* The credits and the button take equal shares of what is left, so
+		   the site links land in the middle of the footer rather than
+		   wherever space-between happens to leave them. */
+		.group,
+		.play {
+			flex: 1 1 0;
+			min-width: 0;
+		}
+
+		.play {
+			justify-content: flex-end;
+		}
+
+		.site-links {
+			flex: 0 1 auto;
 		}
 
 		.socials {
