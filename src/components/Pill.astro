@@ -1,8 +1,18 @@
-<div class="pill"><slot /></div>
+---
+interface Props {
+	/** `lg` is for the hero's calls to action; the default suits a badge. */
+	size?: 'sm' | 'lg';
+}
+
+const { size = 'sm' } = Astro.props;
+---
+
+<div class:list={['pill', size]}><slot /></div>
 
 <style>
 	.pill {
 		display: flex;
+		align-items: center;
 		padding: 0.4rem 0.9rem;
 		gap: 0.5rem;
 		color: var(--accent-text-over) !important;
@@ -13,5 +23,29 @@
 		font-weight: 600;
 		line-height: 1.35;
 		white-space: nowrap;
+		transition: background-color var(--theme-transition);
+	}
+
+	.pill.lg {
+		padding: 0.6rem 1.4rem;
+		gap: 0.6rem;
+		font-size: var(--text-md);
+	}
+
+	/* A link wrapping a call to action is the thing being clicked, so the
+	   hover belongs to the link rather than the pill. Only the large ones:
+	   a status badge inside a project card is not a button, and should not
+	   light up when the card is hovered. */
+	:global(a:hover) > .pill.lg,
+	:global(a:focus-visible) > .pill.lg {
+		background-color: var(--accent-hover);
+		border-color: var(--accent-hover);
+	}
+
+	@media (min-width: 50em) {
+		.pill.lg {
+			padding: 0.7rem 1.7rem;
+			font-size: var(--text-lg);
+		}
 	}
 </style>
