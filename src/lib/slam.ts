@@ -72,7 +72,7 @@ export const slams: readonly Slam[] = [
 		id: 'atp',
 		name: 'ATP Finals',
 		short: 'ATP',
-		swatch: '#0c6e7a',
+		swatch: '#002865',
 		from: [11, 8],
 		to: [11, 22],
 	},
