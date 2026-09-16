@@ -247,47 +247,54 @@
 }
 
 /* ── ATP Finals ──────────────────────────────────────────────────
-   The season's last week, played indoors under the lights: a teal that
-   belongs to no major, over the ATP's navy. */
+   The ATP's own two colours: #002865 navy and #00aff0 cyan. The navy
+   does the work on white, the cyan takes the rule and the seats — and
+   swaps in as the fill under the lights, where navy would vanish into
+   the page. */
 :root[data-slam='atp'] {
-	--neutral-h: 190;
-	--neutral-k: 0.9;
+	--neutral-h: 214;
+	--neutral-k: 1;
 
-	--accent-regular: #0c6e7a;
-	--accent-hover: #08525c;
-	--accent-subtle-overlay: #d8eff2;
+	--accent-regular: #002865; /* ATP navy */
+	--accent-hover: #00417f;
+	--accent-subtle-overlay: #d9f2fd;
+	--accent-text-over: #ffffff;
 
 	--link-color: var(--accent-regular);
-	--focus-ring: #0f9aab;
+	--focus-ring: var(--accent-regular);
 
-	--rule-color: #0b2265; /* ATP navy */
-	--card-veil: rgba(11, 34, 101, 0.86);
+	--rule-color: #00aff0; /* ATP cyan */
+	--card-veil: rgba(0, 40, 101, 0.86);
 
-	--court-surface: #2f6fb0; /* the indoor hard court in Turin */
-	--court-apron: #12335c;
-	--stand: #0a1730;
-	--stand-seat: #16294a;
-	--stand-accent: #12b3c4;
+	--court-surface: #0f74c2; /* the indoor hard court in Turin */
+	--court-apron: #002865;
+	--stand: #001433;
+	--stand-seat: #002865;
+	--stand-accent: #00aff0;
 
-	--board-bg: #0b2265;
-	--board-accent: #4fd8e6;
+	--board-bg: #002865;
+	--board-accent: #00aff0;
 	--board-radius: 0.5rem;
 }
 
 :root[data-slam='atp'].theme-dark {
-	--accent-regular: #0d7d8c;
-	--accent-hover: #0c6e7a;
-	--accent-subtle-overlay: #10333a;
+	/* Under the lights the cyan is the fill and the navy is the type on
+	   it: navy on navy would disappear, and white on cyan is too thin to
+	   read. */
+	--accent-regular: #00aff0;
+	--accent-hover: #2ec0f5;
+	--accent-subtle-overlay: #0b2b4d;
+	--accent-text-over: #002865;
 
-	--link-color: #6fd7e3;
-	--focus-ring: #6fd7e3;
+	--link-color: #00aff0;
+	--focus-ring: #00aff0;
 
-	--rule-color: #4fc3d4;
+	--rule-color: #00aff0;
 
-	--court-surface: #1c4a7a;
-	--court-apron: #0c2340;
-	--stand: #050d1c;
-	--stand-seat: #0e1e38;
+	--court-surface: #0a4e87;
+	--court-apron: #001b45;
+	--stand: #000c1f;
+	--stand-seat: #001b45;
 }
 
 /* ── Wimbledon ───────────────────────────────────────────────────
