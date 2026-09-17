@@ -154,7 +154,7 @@ export const CASUAL_OPPONENT: Opponent = {
 	// and what makes moving him the way to win. Everything else about him is
 	// sharp enough to take the first game off somebody who has not worked out
 	// yet which half of their racket is which.
-	speed: 200,
+	speed: 300,
 	recovery: 0.44,
 	pace: 1,
 	serve: 0.9,
@@ -195,7 +195,7 @@ export interface Tempo {
 // board, and 140 km/h reads better than 60 — while the rally after it is
 // what the visitor actually has to play, and that wants to be slow enough
 // to enjoy. Career plays both at full pace.
-const CASUAL_TEMPO: Tempo = { serve: 0.72, rally: 0.45, ceiling: 0.5, press: 0.004, angle: 1.45 };
+const CASUAL_TEMPO: Tempo = { serve: 0.72, rally: 0.675, ceiling: 0.75, press: 0.004, angle: 1.45 };
 const CAREER_TEMPO: Tempo = { serve: 1, rally: 1, ceiling: 1, press: 0.004, angle: 1 };
 
 export const tempoIn = (career: Career): Tempo =>
