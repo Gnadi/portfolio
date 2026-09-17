@@ -205,6 +205,10 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 	const APRON_Y = 62;
 	const ALLEY = COURT_H * 0.125;
 	const SERVICE = COURT_W * 0.269;
+	const NET_X = COURT_X + COURT_W / 2;
+	const MID_Y = COURT_Y + COURT_H / 2;
+	/** Centre mark to singles sideline: the half a server has to stand in. */
+	const SERVE_HALF = COURT_H / 2 - ALLEY;
 
 	const PADDLE_W = 11;
 	const PADDLE_H = 84;
@@ -214,6 +218,12 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 	const BASE_SPEED = 430; // px per second
 	const MAX_SPEED = 1000;
 	const PLAYER_SPEED = 640;
+
+	/** A serve is the fastest ball in tennis, and this one is no exception. */
+	const SERVE_SPEED = BASE_SPEED * 1.2;
+	/** How far into the service box it comes down, and how clear of the lines. */
+	const SERVE_CARRY = 0.62;
+	const SERVE_INSET = 0.12;
 
 	/** One tie-break, and at 6–6 the next point is the match. */
 	const TARGET = 7;
@@ -581,7 +591,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				paint.strokeStyle = colors.line;
 				paint.lineWidth = 3;
 				paint.strokeRect(COURT_X, COURT_Y, COURT_W, COURT_H);
-				const net = COURT_X + COURT_W / 2;
+				const net = NET_X;
 				const lines: [number, number, number, number][] = [
 					[COURT_X, COURT_Y + ALLEY, COURT_X + COURT_W, COURT_Y + ALLEY],
 					[COURT_X, COURT_Y + COURT_H - ALLEY, COURT_X + COURT_W, COURT_Y + COURT_H - ALLEY],
@@ -778,6 +788,23 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			 * and a ball driven into the corner is the one it misjudges.
 			 */
 			let misread = 0;
+
+			/**
+			 * Where the machine means to stand for its own serve, or null when
+			 * it is receiving. It walks over between points rather than
+			 * appearing there, which is what makes the rotation legible: the
+			 * racket visibly changes side every point.
+			 */
+			let stance: number | null = null;
+			function takeStance() {
+				stance =
+					server === 'cpu'
+						// Between the centre mark and the sideline, the way a
+						// person stands: rarely right on either.
+						? MID_Y + serveSide() * SERVE_HALF * (0.15 + Math.random() * 0.7) - PADDLE_H / 2
+						: null;
+			}
+
 			function readBall() {
 				const awkward = Math.min(1, Math.abs(ball.vy) / 700);
 				misread = (Math.random() * 2 - 1) * FORM[level]!.miss * (0.35 + 0.65 * awkward);
@@ -818,13 +845,66 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				out.venue.textContent = VENUES[slam].venue;
 			}
 
+			/**
+			 * Which half of the baseline the serve is struck from: +1 below the
+			 * centre line, −1 above it.
+			 *
+			 * A tie-break counts as a single game, so its first point is served
+			 * from the deuce court and every point after it changes side. Deuce
+			 * court means the server's right, and the two ends of this court
+			 * face opposite ways: the player looks up it, so their right is the
+			 * bottom of the screen, while the machine looks back down it and
+			 * its right is the top. The serve therefore always crosses the
+			 * middle, which is the diagonal the rules are really asking for.
+			 */
+			function serveSide() {
+				const deuce = (points.player + points.cpu) % 2 === 0;
+				return (server === 'player') === deuce ? 1 : -1;
+			}
+
+			/** The racket face a serve leaves from. */
+			function serveX(side: Side) {
+				return side === 'player'
+					? COURT_X + PADDLE_INSET + PADDLE_W + BALL_R
+					: COURT_X + COURT_W - PADDLE_INSET - PADDLE_W - BALL_R;
+			}
+
+			/** The bounds the server's racket is held between while serving. */
+			function serveBounds() {
+				const from = MID_Y - PADDLE_H / 2;
+				const to = from + serveSide() * SERVE_HALF;
+				return { low: Math.min(from, to), high: Math.max(from, to) };
+			}
+
+			/**
+			 * Where the serve is meant to come down, from where it is struck.
+			 * Walking out towards your own sideline opens the angle and takes
+			 * the ball wide; serving from the centre mark sends it down the
+			 * middle. Both land inside the box — there are no faults yet.
+			 */
+			function serveTarget(from: number) {
+				const side = serveSide();
+				const out = clamp((from - MID_Y) / (side * SERVE_HALF), 0, 1);
+				const depth = SERVE_INSET + out * (1 - SERVE_INSET * 2);
+				return MID_Y - side * SERVE_HALF * depth;
+			}
+
 			function serve() {
-				const toward = server === 'player' ? -1 : 1;
+				// The machine walks to its mark between points, but a visitor
+				// who taps straight away does not have to wait for it.
+				if (server === 'cpu' && stance !== null) cpuY = stance;
+
+				const toward = server === 'player' ? 1 : -1;
+				const x = serveX(server);
+				const y = (server === 'player' ? playerY : cpuY) + PADDLE_H / 2;
+				const landX = NET_X + toward * SERVICE * SERVE_CARRY;
+				const angle = Math.atan2(serveTarget(y) - y, landX - x);
+
 				ball = {
-					x: W / 2,
-					y: H / 2,
-					vx: BASE_SPEED * toward,
-					vy: BASE_SPEED * (Math.random() * 0.5 - 0.25),
+					x,
+					y,
+					vx: Math.cos(angle) * SERVE_SPEED,
+					vy: Math.sin(angle) * SERVE_SPEED,
 				};
 				trail.length = 0;
 				readBall();
@@ -882,7 +962,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				}
 
 				serving = true;
-				ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
+				ball.vx = ball.vy = 0;
+				takeStance();
 				callServe();
 			}
 
@@ -895,6 +976,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				serving = true;
 				ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
 				playerY = cpuY = (H - PADDLE_H) / 2;
+				takeStance();
 				trail.length = 0;
 				readBall();
 				paintScore();
@@ -917,7 +999,15 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 						playerY += PLAYER_SPEED * seconds;
 					}
 				}
-				playerY = clamp(playerY, COURT_Y, COURT_Y + COURT_H - PADDLE_H);
+				if (serving && server === 'player') {
+					// Serving, the racket is held to the half of the baseline
+					// the rules put it on — the rule enforced by where you are
+					// allowed to stand rather than by a message.
+					const bounds = serveBounds();
+					playerY = clamp(playerY, bounds.low, bounds.high);
+				} else {
+					playerY = clamp(playerY, COURT_Y, COURT_Y + COURT_H - PADDLE_H);
+				}
 
 				// The machine chases the ball, but only so fast, off a line it
 				// read a moment ago, and never quite the line the ball is on.
@@ -926,9 +1016,12 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				// to — which is the whole easter egg.
 				const form = FORM[level]!;
 				const chasing = ball.vx > 0;
-				const target = chasing
-					? seen(form.lag) + misread - PADDLE_H / 2
-					: COURT_Y + (COURT_H - PADDLE_H) / 2;
+				const target =
+					serving && stance !== null
+						? stance // walking to its mark for the serve
+						: chasing
+							? seen(form.lag) + misread - PADDLE_H / 2
+							: COURT_Y + (COURT_H - PADDLE_H) / 2;
 				const reach = form.speed * seconds * (chasing ? 1 : 0.55);
 				cpuY = clamp(
 					cpuY + clamp(target - cpuY, -reach, reach),
@@ -936,7 +1029,13 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					COURT_Y + COURT_H - PADDLE_H
 				);
 
-				if (serving) return;
+				// Between points the ball is in the server's hand, so it moves
+				// with the racket and shows whose serve it is.
+				if (serving) {
+					ball.x = serveX(server);
+					ball.y = (server === 'player' ? playerY : cpuY) + PADDLE_H / 2;
+					return;
+				}
 
 				ball.x += ball.vx * seconds;
 				ball.y += ball.vy * seconds;
