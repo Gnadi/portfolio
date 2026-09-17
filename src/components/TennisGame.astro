@@ -295,6 +295,48 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		},
 	} as const;
 
+	/**
+	 * What the ground does to the ball, per tournament.
+	 *
+	 * The ITF rates a surface by firing a ball at it and measuring the speed it
+	 * keeps through the bounce — five categories, from 1 (slow) to 5 (fast).
+	 * Clay is a 1, Wimbledon's grass a 5, and the two hard courts here are not
+	 * the pair most people would guess: the US Open's Laykold is rated
+	 * medium-slow, while Melbourne's GreenSet is medium-fast. Turin's indoor
+	 * hard court plays around the same pace as Melbourne.
+	 *
+	 * The physics behind it is friction. Clay has a coefficient around 0.8 and
+	 * grabs the ball; grass is nearer 0.55 and lets it skid on. Clay also
+	 * throws the ball up — it comes off at a steeper angle than it went in,
+	 * which gives the returner time — while grass sends it through low and
+	 * flat. This court has no third dimension to bounce in, so both of those
+	 * end up in the same place: how quick the ball is.
+	 *
+	 * `bite` is what the serve keeps through its one bounce, and it does most
+	 * of the work here, which is as it should be: the bounce is the only
+	 * moment the ground touches the ball. `pace` scales every ball struck and
+	 * `gain` is the pace a rally builds with each shot; both are kept to a
+	 * narrow spread deliberately.
+	 *
+	 * The numbers were tuned against what a point actually lasts on tour —
+	 * 3.7 shots on grass, 5.2 on a hard court, 6.8 on clay. They land at 0.82
+	 * and 1.71 times the hard-court rally where the tour has 0.71 and 1.31, so
+	 * clay in particular is longer here than it is in life. That is deliberate
+	 * rather than lazy: rally length in this game sits on a cliff, because a
+	 * rally only continues while both rackets arrive, and a slightly slower
+	 * ball tips every marginal shot from unreachable to reachable. Matching
+	 * the tour's ratios exactly would need the surfaces to differ by so little
+	 * that nobody could feel them, which is the wrong trade for a court that
+	 * changes with the calendar.
+	 */
+	const SURFACES = {
+		rg: { pace: 0.97, bite: 0.68, gain: 1.048, clay: true }, // category 1
+		usopen: { pace: 1.0, bite: 0.8, gain: 1.051, clay: false }, // 2, Laykold
+		ao: { pace: 1.03, bite: 0.88, gain: 1.055, clay: false }, // 4, GreenSet
+		atp: { pace: 1.03, bite: 0.88, gain: 1.055, clay: false }, // 4, indoors
+		wimbledon: { pace: 1.08, bite: 0.94, gain: 1.06, clay: false }, // 5, grass
+	} as const;
+
 	type Side = 'player' | 'cpu';
 	type Scores = { player: number; cpu: number };
 
@@ -490,6 +532,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				const id = document.documentElement.dataset.slam ?? 'usopen';
 				return (id in VENUES ? id : 'usopen') as keyof typeof VENUES;
 			};
+
+			const surface = () => SURFACES[currentSlam()];
 
 			/** Palette, read from the page so the stadium matches the theme. */
 			let colors = readColors();
@@ -790,6 +834,16 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			let misread = 0;
 
 			/**
+			 * The x the serve in flight is due to come down on, or null once it
+			 * has. The only bounce this game models, and so the only place the
+			 * ground gets to touch the ball.
+			 */
+			let landing: number | null = null;
+
+			/** Where serves have landed. Clay keeps the marks; nothing else does. */
+			const marks: { x: number; y: number; at: number }[] = [];
+
+			/**
 			 * Where the machine means to stand for its own serve, or null when
 			 * it is receiving. It walks over between points rather than
 			 * appearing there, which is what makes the rotation legible: the
@@ -899,13 +953,15 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				const y = (server === 'player' ? playerY : cpuY) + PADDLE_H / 2;
 				const landX = NET_X + toward * SERVICE * SERVE_CARRY;
 				const angle = Math.atan2(serveTarget(y) - y, landX - x);
+				const speed = SERVE_SPEED * surface().pace;
 
 				ball = {
 					x,
 					y,
-					vx: Math.cos(angle) * SERVE_SPEED,
-					vy: Math.sin(angle) * SERVE_SPEED,
+					vx: Math.cos(angle) * speed,
+					vy: Math.sin(angle) * speed,
 				};
+				landing = landX;
 				trail.length = 0;
 				readBall();
 				serving = false;
@@ -963,6 +1019,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 				serving = true;
 				ball.vx = ball.vy = 0;
+				landing = null;
 				takeStance();
 				callServe();
 			}
@@ -976,6 +1033,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				serving = true;
 				ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
 				playerY = cpuY = (H - PADDLE_H) / 2;
+				landing = null;
+				marks.length = 0; // a fresh match is played on a swept court
 				takeStance();
 				trail.length = 0;
 				readBall();
@@ -1040,6 +1099,18 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				ball.x += ball.vx * seconds;
 				ball.y += ball.vy * seconds;
 
+				// The serve comes down. Clay takes the pace off it, grass lets
+				// it skid on almost untouched, and that difference is the one
+				// thing about a surface you can feel in a single shot.
+				if (landing !== null && (ball.vx > 0 ? ball.x >= landing : ball.x <= landing)) {
+					const { bite } = surface();
+					ball.vx *= bite;
+					ball.vy *= bite;
+					marks.push({ x: landing, y: ball.y, at: clock });
+					if (marks.length > 40) marks.shift();
+					landing = null;
+				}
+
 				if (ball.y - BALL_R <= COURT_Y && ball.vy < 0) {
 					ball.y = COURT_Y + BALL_R;
 					ball.vy *= -1;
@@ -1079,7 +1150,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			/** Where the ball meets the racket decides the angle back. */
 			function returnBall(x: number, paddleY: number, direction: 1 | -1) {
 				const offset = (ball.y - (paddleY + PADDLE_H / 2)) / (PADDLE_H / 2);
-				const speed = Math.min(Math.hypot(ball.vx, ball.vy) * 1.05, MAX_SPEED);
+				const speed = Math.min(Math.hypot(ball.vx, ball.vy) * surface().gain, MAX_SPEED);
 				// The jitter matters: a ball met dead centre would otherwise go
 				// back perfectly flat, and two players who both return down the
 				// middle would rally until the tournament ended.
@@ -1089,6 +1160,26 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				ball.vy = Math.sin(angle) * speed;
 				// A new shot on its way over: the machine reads it afresh.
 				if (direction === 1) readBall();
+			}
+
+			/**
+			 * Where the serves came down. Clay is the one surface that keeps the
+			 * mark — the only court in tennis you can walk over to and check —
+			 * so there they stay for the match. Everywhere else the ball leaves
+			 * nothing, and the mark fades as soon as it has been read.
+			 */
+			function bounceMarks() {
+				const { clay } = surface();
+				for (const mark of marks) {
+					const fade = clay ? 0.5 : 1 - (clock - mark.at) / 0.9;
+					if (fade <= 0) continue;
+					context.globalAlpha = fade * 0.5;
+					context.fillStyle = clay ? shade(colors.surface, -0.4) : colors.line;
+					context.beginPath();
+					context.ellipse(mark.x, mark.y, BALL_R * 1.6, BALL_R * 0.85, 0, 0, Math.PI * 2);
+					context.fill();
+				}
+				context.globalAlpha = 1;
 			}
 
 			/**
@@ -1133,6 +1224,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				paddle(COURT_X + PADDLE_INSET, playerY, '#11202b');
 				paddle(COURT_X + COURT_W - PADDLE_INSET - PADDLE_W, cpuY, '#f2f5f8');
 
+				bounceMarks();
 				tail();
 
 				// The ball is yellow on every court there is.
