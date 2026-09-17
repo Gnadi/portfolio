@@ -1,118 +1,35 @@
 ---
 /**
  * A match against the machine, played in whichever Grand Slam's stadium the
- * site is currently wearing (src/lib/slam.ts). Pong rules, tennis scoring —
- * 15, 30, 40, deuce, advantage — and the tournament's own scoreboard over
- * the court.
+ * site is currently wearing (src/lib/slam.ts) — and, since the surface and
+ * the scoring are the tournament's, played the way that tournament plays.
  *
- * Each major gets its venue: the bowl's shape, the seats, the surface and the
- * board all change with `data-slam`. Colours come from the palette tokens in
- * src/styles/global.css; the structure comes from VENUES in the script below.
+ * Pong is still underneath it, but the racket now has two halves. Meet the
+ * ball on the one nearer your hitting side and it is a forehand; on the other
+ * and it is a backhand, which is exactly the asymmetry the whole sport is
+ * organised around. Swing through the ball for topspin, pull off it for
+ * slice. Serve by winding up and letting go: too much and it is a fault,
+ * twice and it is a double fault.
+ *
+ * Around the match sits a career: you enter the draw at the round your
+ * ranking earns, rounds pay ranking points and prize money, and the money
+ * buys the six things a coach would work on. All of that lives in
+ * src/lib/tennis/, along with the surfaces, the stat sheet and the copy.
  *
  * The button lives in the footer; the game is a modal dialog, so the canvas
  * and its loop exist once per page and only run while it is open.
  */
 import { getLangFromUrl } from '../i18n/utils';
-import { FULL_NAME, SITE_ORIGIN } from '../lib/schema';
-import { slams } from '../lib/slam';
+import { copy as allCopy } from '../lib/tennis/copy';
 
 const lang = getLangFromUrl(Astro.url);
-
-/** Scoreboards show surnames, so this one does too. */
-const surname = FULL_NAME.split(' ').pop() ?? 'Player';
-
-const copy = {
-	en: {
-		play: 'Play a point',
-		title: 'Tennis',
-		close: 'Close',
-		/* The visitor plays; the other end of the court is this site's owner. */
-		opponent: surname,
-		you: 'You',
-		yourName: 'Your name',
-		entry: 'Who is playing ' + surname + '?',
-		start: 'Play',
-		change: 'Change name',
-		serve: 'Space or tap to serve',
-		hint: 'Mouse, finger or ↑ ↓ to move · first to four games takes the match',
-		hintTiebreak: 'Slide to move · first to seven points, two clear',
-		tiebreak: 'Tie-break',
-		win: 'Game, set and match, %s.',
-		winTiebreak: 'Tie-break, %s.',
-		again: 'Tap or press space for a new match',
-		deuce: 'Deuce',
-		/* The winner's card, and what to do with it. */
-		champion: 'Champion',
-		beat: 'beat %o %s',
-		saveImage: 'Save image',
-		share: 'Share',
-		sendLinkedIn: 'Send it to ' + surname,
-		playAgain: 'Play again',
-		copied: 'Result copied — paste it into your message on LinkedIn.',
-		copiedText: 'Result copied to the clipboard.',
-		shareText: 'I beat ' + FULL_NAME + ' %s at tennis on ' + SITE_ORIGIN.replace('https://', ''),
-		cardAlt: '%p beat %o %s at tennis on ' + SITE_ORIGIN.replace('https://', ''),
-	},
-	de: {
-		play: 'Einen Punkt spielen',
-		title: 'Tennis',
-		close: 'Schließen',
-		opponent: surname,
-		you: 'Du',
-		yourName: 'Dein Name',
-		entry: 'Wer spielt gegen ' + surname + '?',
-		start: 'Spielen',
-		change: 'Namen ändern',
-		serve: 'Leertaste oder tippen zum Aufschlag',
-		hint: 'Maus, Finger oder ↑ ↓ zum Bewegen · wer vier Spiele holt, gewinnt',
-		hintTiebreak: 'Zum Bewegen wischen · wer sieben Punkte holt, mit zwei Vorsprung',
-		tiebreak: 'Tie-Break',
-		win: 'Spiel, Satz und Sieg, %s.',
-		winTiebreak: 'Tie-Break, %s.',
-		again: 'Tippen oder Leertaste für ein neues Match',
-		deuce: 'Einstand',
-		champion: 'Sieger',
-		beat: 'schlägt %o %s',
-		saveImage: 'Bild speichern',
-		share: 'Teilen',
-		sendLinkedIn: 'An ' + surname + ' schicken',
-		playAgain: 'Nochmal spielen',
-		copied: 'Ergebnis kopiert — füge es in deine Nachricht auf LinkedIn ein.',
-		copiedText: 'Ergebnis in die Zwischenablage kopiert.',
-		shareText: 'Ich habe ' + FULL_NAME + ' %s im Tennis geschlagen — auf ' + SITE_ORIGIN.replace('https://', ''),
-		cardAlt: '%p schlägt %o %s im Tennis auf ' + SITE_ORIGIN.replace('https://', ''),
-	},
-}[lang];
-
-/** Tournament names for the board, keyed by the `data-slam` attribute. */
-const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
+const copy = allCopy[lang];
 
 /** Where a winner is sent to gloat. Same profile the nav and the card link to. */
 const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 ---
 
-<tennis-game
-	class="tennis"
-	data-names={JSON.stringify(names)}
-	data-serve={copy.serve}
-	data-again={copy.again}
-	data-deuce={copy.deuce}
-	data-tiebreak={copy.tiebreak}
-	data-win={copy.win}
-	data-win-tiebreak={copy.winTiebreak}
-	data-hint={copy.hint}
-	data-hint-tiebreak={copy.hintTiebreak}
-	data-you={copy.you}
-	data-champion={copy.champion}
-	data-beat={copy.beat}
-	data-share-text={copy.shareText}
-	data-card-alt={copy.cardAlt}
-	data-copied={copy.copied}
-	data-copied-text={copy.copiedText}
-	data-opponent={copy.opponent}
-	data-lang={lang}
-	data-host={SITE_ORIGIN.replace('https://', '')}
->
+<tennis-game class="tennis" data-lang={lang}>
 	<button type="button" class="open">
 		<svg class="ball" viewBox="0 0 24 24" aria-hidden="true">
 			<circle cx="12" cy="12" r="9"></circle>
@@ -124,11 +41,12 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 	<dialog class="stage" aria-label={copy.title}>
 		<div class="frame">
-			<!-- The tournament's own board: name, server, games, points. -->
+			<!-- The tournament's own board: name, round, server, games, points. -->
 			<div class="board" data-board data-format="match">
 				<div class="brand">
 					<span class="tournament" data-tournament>US Open</span>
 					<span class="venue" data-venue></span>
+					<span class="standing" data-standing></span>
 					<span class="format" data-format-label>{copy.tiebreak}</span>
 				</div>
 				<div class="rows">
@@ -148,6 +66,16 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					</div>
 				</div>
 
+				<div class="gauges">
+					<!-- How much is left in the legs, and what the last serve was
+					     clocked at: the two numbers a broadcast keeps on screen. -->
+					<div class="fitness" title={copy.fitness}>
+						<span class="fitness-bar"><span data-fitness></span></span>
+					</div>
+					<span class="speed" data-serve-speed></span>
+					<button type="button" class="chip" data-career-open>{copy.careerButton}</button>
+				</div>
+
 				<button type="button" class="close" aria-label={copy.close}>&times;</button>
 			</div>
 
@@ -155,22 +83,64 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				<canvas width="960" height="620"></canvas>
 				<p class="overlay" data-overlay>{copy.serve}</p>
 
-				<!-- The winner's card: a result worth keeping, and the ways out
-				     of the page it can leave by. -->
+				<!-- The end of a match: what it did to the career, how it was
+				     won, and — for a win — a card worth keeping. -->
 				<div class="result" data-result hidden>
-					<img class="result-card" data-result-image alt="" />
+					<div class="result-body">
+						<div class="result-main">
+							<p class="result-head" data-result-head></p>
+							<img class="result-card" data-result-image alt="" hidden />
+							<p class="result-earned" data-result-earned></p>
+						</div>
+						<div class="result-stats">
+							<h3 class="panel-title">{copy.statsTitle}</h3>
+							<table class="stats">
+								<thead>
+									<tr>
+										<th scope="col" data-stats-player>{copy.statsYou}</th>
+										<th scope="col"></th>
+										<th scope="col">{copy.opponent}</th>
+									</tr>
+								</thead>
+								<tbody data-stats-body></tbody>
+							</table>
+						</div>
+					</div>
 					<div class="result-actions">
-						<button type="button" class="act primary" data-save>{copy.saveImage}</button>
+						<button type="button" class="act primary" data-next>{copy.nextMatch}</button>
+						<button type="button" class="act" data-save hidden>{copy.saveImage}</button>
 						<button type="button" class="act" data-share hidden>{copy.share}</button>
 						<a
 							class="act"
 							data-linkedin
 							href={LINKEDIN}
 							target="_blank"
-							rel="noopener noreferrer">{copy.sendLinkedIn}</a>
-						<button type="button" class="act ghost" data-play-again>{copy.playAgain}</button>
+							rel="noopener noreferrer"
+							hidden>{copy.sendLinkedIn}</a>
+						<button type="button" class="act ghost" data-career-from-result
+							>{copy.careerButton}</button
+						>
 					</div>
 					<p class="result-note" data-result-note role="status" aria-live="polite"></p>
+				</div>
+
+				<!-- The career: the ranking, the money, and the six things the
+				     money is spent on. Built in script from src/lib/tennis. -->
+				<div class="career" data-career hidden>
+					<div class="career-head">
+						<h3 class="panel-title">{copy.careerTitle}</h3>
+						<dl class="career-figures" data-career-figures></dl>
+					</div>
+					<div class="career-body" data-career-body></div>
+					<div class="career-foot">
+						<p class="career-note">{copy.careerNote}</p>
+						<div class="career-actions">
+							<button type="button" class="act ghost" data-career-reset
+								>{copy.resetCareer}</button
+							>
+							<button type="button" class="act primary" data-career-done>{copy.done}</button>
+						</div>
+					</div>
 				</div>
 
 				<!-- The card for the match: who is on the other side of the net. -->
@@ -199,74 +169,82 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 </tennis-game>
 
 <script>
-	/** Canvas units. The stands fill the frame; the court sits inside them. */
-	const W = 960;
-	const H = 620;
-	const COURT_W = 660;
-	const COURT_H = Math.round(COURT_W / 2.1667); // 23.77m × 10.97m
-	const COURT_X = Math.round((W - COURT_W) / 2);
-	const COURT_Y = Math.round((H - COURT_H) / 2);
-	const APRON_X = 86; // run-off between the court and the front row
-	const APRON_Y = 62;
-	const ALLEY = COURT_H * 0.125;
-	const SERVICE = COURT_W * 0.269;
+	import {
+		W,
+		H,
+		COURT_W,
+		COURT_H,
+		COURT_X,
+		COURT_Y,
+		COURT_MID,
+		NET_X,
+		APRON_X,
+		APRON_Y,
+		ALLEY,
+		SERVICE,
+		PADDLE_W,
+		PADDLE_H,
+		PADDLE_INSET,
+		BALL_R,
+		BASE_SPEED,
+		MAX_SPEED,
+		PLAYER_SPEED,
+		SERVE_MIN,
+		SERVE_MAX,
+		SERVE_KMH,
+		SERVE_BOUNCE_MAX,
+		CHARGE_SECONDS,
+		SECOND_SERVE_CHARGE,
+		clamp,
+		forehandBelow,
+		other,
+		wingFor,
+		type Hand,
+		type Shot,
+		type Side,
+		type Wing,
+	} from '../lib/tennis/court';
+	import { VENUES, paceLabel, type VenueId } from '../lib/tennis/venues';
+	import {
+		BRANCHES,
+		CHAMPION,
+		ROUNDS,
+		available,
+		clearCareer,
+		entryRound,
+		formatPrize,
+		formatRank,
+		freshCareer,
+		loadCareer,
+		nodesIn,
+		opponentIn,
+		ratingsFor,
+		rulesIn,
+		saveCareer,
+		tempoIn,
+		seedFor,
+		type BackhandStyle,
+		type Career,
+		type Mode,
+		type Ratings,
+		type Rules,
+		type SkillNode,
+		type Tempo,
+	} from '../lib/tennis/career';
+	import { cardLine, freshStats, summarise, type MatchStats } from '../lib/tennis/stats';
+	import { copy as allCopy } from '../lib/tennis/copy';
+	import { SITE_ORIGIN } from '../lib/schema';
+	import { slams } from '../lib/slam';
 
-	const PADDLE_W = 11;
-	const PADDLE_H = 84;
-	const PADDLE_INSET = 20;
-	const BALL_R = 8;
+	/** The one player who is never the visitor. Right-handed, like most of them. */
+	const CPU_HAND: Hand = 'right';
 
-	const BASE_SPEED = 430; // px per second
-	const MAX_SPEED = 1000;
-	const PLAYER_SPEED = 640;
-	const CPU_SPEED = 440;
+	/** Tournament names for the board, keyed by the `data-slam` attribute. */
+	const names = Object.fromEntries(slams.map((slam) => [slam.id, slam.name]));
 
-	/**
-	 * What makes each stadium itself: the bowl's corners, how the tiers are
-	 * split, where the accent seating runs, and the name on the back wall.
-	 */
-	const VENUES = {
-		usopen: {
-			venue: 'Arthur Ashe Stadium',
-			corner: 16, // a big square bowl
-			tier: 0.46,
-			accentBand: 'lower', // the blue ring under the upper tier
-			roof: true,
-		},
-		ao: {
-			venue: 'Rod Laver Arena',
-			corner: 46, // rounded, almost oval
-			tier: 0.44,
-			accentBand: 'upper',
-			roof: true,
-		},
-		rg: {
-			venue: 'Court Philippe-Chatrier',
-			corner: 8, // the rectangle in the Bois de Boulogne
-			tier: 0.4,
-			accentBand: 'none',
-			roof: true,
-		},
-		wimbledon: {
-			venue: 'Centre Court',
-			corner: 30,
-			tier: 0.42,
-			accentBand: 'lower', // the club's purple in the seats
-			roof: true,
-		},
-		atp: {
-			// The finals have moved before — London's O2, now Turin — so this
-			// is the one venue name here with a shelf life.
-			venue: 'Inalpi Arena, Turin',
-			corner: 40, // an indoor arena bowl, not a stadium
-			tier: 0.5,
-			accentBand: 'lower',
-			roof: true,
-		},
-	} as const;
-
-	type Side = 'player' | 'cpu';
 	type Scores = { player: number; cpu: number };
+	/** Where a point is: winding up, the serve in the air, or a rally. */
+	type Phase = 'serve' | 'flight' | 'rally';
 
 	class TennisGame extends HTMLElement {
 		constructor() {
@@ -289,30 +267,19 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				servingCpu: this.querySelector<HTMLElement>('[data-serving-cpu]')!,
 				tournament: this.querySelector<HTMLElement>('[data-tournament]')!,
 				venue: this.querySelector<HTMLElement>('[data-venue]')!,
+				standing: this.querySelector<HTMLElement>('[data-standing]')!,
 				board: this.querySelector<HTMLElement>('[data-board]')!,
 				hint: this.querySelector<HTMLElement>('[data-hint-label]')!,
 				playerName: this.querySelector<HTMLElement>('[data-player-name]')!,
+				fitness: this.querySelector<HTMLElement>('[data-fitness]')!,
+				serveSpeed: this.querySelector<HTMLElement>('[data-serve-speed]')!,
 			};
 
-			const text = {
-				serve: this.dataset.serve ?? '',
-				win: this.dataset.win ?? '%s',
-				winTiebreak: this.dataset.winTiebreak ?? '%s',
-				again: this.dataset.again ?? '',
-				deuce: this.dataset.deuce ?? '',
-				hint: this.dataset.hint ?? '',
-				hintTiebreak: this.dataset.hintTiebreak ?? '',
-				you: this.dataset.you ?? 'You',
-				tiebreak: this.dataset.tiebreak ?? 'Tie-break',
-				champion: this.dataset.champion ?? 'Champion',
-				beat: this.dataset.beat ?? 'beat %o %s',
-				shareText: this.dataset.shareText ?? '',
-				cardAlt: this.dataset.cardAlt ?? '',
-				copied: this.dataset.copied ?? '',
-				copiedText: this.dataset.copiedText ?? '',
-			};
-			const locale = this.dataset.lang === 'de' ? 'de-AT' : 'en-GB';
-			const host = this.dataset.host ?? '';
+			const lang = this.dataset.lang === 'de' ? 'de' : 'en';
+			const text = allCopy[lang];
+			const locale = lang === 'de' ? 'de-AT' : 'en-GB';
+			const host = SITE_ORIGIN.replace('https://', '');
+			const opponentName = text.opponent;
 
 			/**
 			 * Who is at this end of the court. Kept in localStorage so a
@@ -320,8 +287,6 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			 * the board itself.
 			 */
 			const NAME_KEY = 'tennis-player';
-			const opponentName = out.board.querySelector<HTMLElement>('.row:last-child .name')!
-				.textContent!.trim();
 
 			function readName() {
 				try {
@@ -343,22 +308,92 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			let playerName = readName();
 			const displayName = () => playerName || text.you;
 
+			// ── The career ────────────────────────────────────────────────
+			let career: Career = loadCareer();
+			let ratings: Ratings = ratingsFor(career);
+			let opponent = opponentIn(career);
+			let tempo: Tempo = tempoIn(career);
+			let rules: Rules = rulesIn(career);
+			/** What this match has paid so far, for the panel at the end of it. */
+			let award = { points: 0, prize: 0 };
+
+			const currentSlam = (): VenueId => {
+				const id = document.documentElement.dataset.slam ?? 'usopen';
+				return (id in VENUES ? id : 'usopen') as VenueId;
+			};
+			const venue = () => VENUES[currentSlam()];
+
+			/** Money into the bank, points onto the ranking, and remember both. */
+			function bank(points: number, prize: number) {
+				career.points += points;
+				career.prize += prize;
+				career.earned += prize;
+				award.points += points;
+				award.prize += prize;
+			}
+
+			/** A draw is entered once, and the first cheque comes with the entry. */
+			function enterDraw() {
+				if (career.mode === 'casual' || career.entered) return;
+				const round = ROUNDS[Math.min(career.round, entryRound(career.points))]!;
+				bank(round.points, round.prize);
+				career.entered = true;
+				saveCareer(career);
+			}
+
+			function newDraw() {
+				career.round = entryRound(career.points);
+				career.entered = false;
+			}
+
+			/**
+			 * What a result did to the career. A win is one round further in —
+			 * and the round's own money, less what the last one already paid.
+			 * A loss is the end of the tournament, and the next one starts
+			 * wherever the ranking now puts you.
+			 */
+			function finishMatch(playerWon: boolean) {
+				if (career.mode === 'casual') return;
+				const at = career.round;
+				if (playerWon) {
+					const next = at + 1;
+					bank(ROUNDS[next]!.points - ROUNDS[at]!.points, ROUNDS[next]!.prize - ROUNDS[at]!.prize);
+					career.won += 1;
+					career.best = Math.max(career.best, next);
+					if (next >= CHAMPION) {
+						career.titles += 1;
+						newDraw();
+					} else {
+						career.round = next;
+					}
+				} else {
+					newDraw();
+				}
+				saveCareer(career);
+				opponent = opponentIn(career);
+			}
+
 			// ── The winner's card ─────────────────────────────────────────
 			const result = this.querySelector<HTMLElement>('[data-result]')!;
 			const resultImage = this.querySelector<HTMLImageElement>('[data-result-image]')!;
+			const resultHead = this.querySelector<HTMLElement>('[data-result-head]')!;
+			const resultEarned = this.querySelector<HTMLElement>('[data-result-earned]')!;
 			const resultNote = this.querySelector<HTMLElement>('[data-result-note]')!;
+			const statsBody = this.querySelector<HTMLElement>('[data-stats-body]')!;
+			const statsPlayer = this.querySelector<HTMLElement>('[data-stats-player]')!;
+			const nextButton = this.querySelector<HTMLButtonElement>('[data-next]')!;
 			const saveButton = this.querySelector<HTMLButtonElement>('[data-save]')!;
 			const shareButton = this.querySelector<HTMLButtonElement>('[data-share]')!;
 			const linkedInLink = this.querySelector<HTMLAnchorElement>('[data-linkedin]')!;
+			/** The round the card being painted is for. */
+			let cardRound = 0;
 			const card = document.createElement('canvas');
 			card.width = 1200;
 			card.height = 630; // the ratio every social preview crops to
 
 			/** The score as it goes on the card: games for a match, points for a tie-break. */
 			const scoreLine = () =>
-				format === 'tiebreak'
-					? `${points.player}–${points.cpu}`
-					: `${games.player}–${games.cpu}`;
+				format === 'tiebreak' ? `${points.player}–${points.cpu}` : `${games.player}–${games.cpu}`;
 
 			/** Shrinks the font until the text fits the width it is given. */
 			function fitText(
@@ -377,7 +412,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 			function paintCard() {
 				const paint = card.getContext('2d')!;
-				const venue = VENUES[currentSlam()];
+				const here = venue();
 				const { width, height } = card;
 
 				paint.fillStyle = shade(colors.stand, -0.2);
@@ -407,47 +442,64 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				paint.fillStyle = colors.ink;
 				paint.letterSpacing = '6px';
 				paint.font = '600 26px Rubik, system-ui, sans-serif';
-				paint.fillText((names[currentSlam()] ?? '').toUpperCase(), left, 96);
+				paint.fillText((names[currentSlam()] ?? '').toUpperCase(), left, 92);
 				paint.letterSpacing = '0px';
 
 				paint.fillStyle = 'rgba(255, 255, 255, 0.62)';
 				paint.font = '400 24px Rubik, system-ui, sans-serif';
-				paint.fillText(venue.venue, left, 132);
+				paint.fillText(`${here.venue} · ${here.surface[lang]}`, left, 128);
 
-				// Champion.
+				// The round this match won, which is the thing worth boasting about
+				// — or, with no draw behind it, simply that it was won.
+				const round = ROUNDS[clamp(cardRound, 0, CHAMPION)]!;
+				const billing =
+					career.mode === 'career' && cardRound < CHAMPION ? round.name[lang] : text.champion;
 				paint.fillStyle = 'rgba(255, 255, 255, 0.68)';
 				paint.letterSpacing = '10px';
 				paint.font = '600 22px Rubik, system-ui, sans-serif';
-				paint.fillText(text.champion.toUpperCase(), left, 232);
+				paint.fillText(billing.toUpperCase(), left, 220);
 				paint.letterSpacing = '0px';
 
 				paint.fillStyle = '#ffffff';
-				fitText(paint, displayName(), '700', 96, width - left * 2 - 120);
-				paint.fillText(displayName(), left, 330);
+				fitText(paint, displayName(), '700', 92, width - left * 2 - 120);
+				paint.fillText(displayName(), left, 314);
 
 				paint.fillStyle = colors.ink;
-				paint.fillRect(left, 348, 96, 6);
+				paint.fillRect(left, 332, 96, 6);
 
 				// … beat Gnadlinger 4–2.
 				const line = text.beat.replace('%o', opponentName).replace('%s', scoreLine());
 				paint.fillStyle = 'rgba(255, 255, 255, 0.92)';
-				fitText(paint, line, '400', 40, width - left * 2 - 120);
-				paint.fillText(line, left, 412);
+				fitText(paint, line, '400', 38, width - left * 2 - 120);
+				paint.fillText(line, left, 394);
 
-				if (format === 'tiebreak') {
+				// The stat line under it: how the match was actually won.
+				const summary = cardLine(stats, 'player', lang);
+				if (summary) {
+					paint.fillStyle = 'rgba(255, 255, 255, 0.72)';
+					fitText(paint, summary, '400', 26, width - left * 2 - 120);
+					paint.fillText(summary, left, 438);
+				}
+
+				// The ranking the win is worth, and the tie-break chip if it was one.
+				let chipX = left;
+				const chip = (label: string, y: number) => {
 					paint.font = '600 20px Rubik, system-ui, sans-serif';
-					const label = text.tiebreak.toUpperCase();
 					const pad = 14;
-					const chipWidth = paint.measureText(label).width + pad * 2;
+					const chipWidth = paint.measureText(label).width + pad * 2 + 6;
 					paint.fillStyle = 'rgba(255, 255, 255, 0.16)';
 					paint.beginPath();
-					paint.roundRect(left, 442, chipWidth, 36, 8);
+					paint.roundRect(chipX, y, chipWidth, 36, 8);
 					paint.fill();
 					paint.fillStyle = '#ffffff';
 					paint.letterSpacing = '2px';
-					paint.fillText(label, left + pad, 467);
+					paint.fillText(label, chipX + pad, y + 25);
 					paint.letterSpacing = '0px';
-				}
+					chipX += chipWidth + 10;
+				};
+
+				if (career.mode === 'career') chip(formatRank(career.points, lang).toUpperCase(), 470);
+				if (format === 'tiebreak') chip(text.tiebreak.toUpperCase(), 470);
 
 				// The ball, oversized, as the card's mark.
 				paint.fillStyle = '#d8f000';
@@ -456,7 +508,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				paint.fill();
 				paint.strokeStyle = 'rgba(255, 255, 255, 0.85)';
 				paint.lineWidth = 5;
-                paint.beginPath();
+				paint.beginPath();
 				paint.arc(width - 132, 158, 34, Math.PI * 0.72, Math.PI * 1.45);
 				paint.stroke();
 
@@ -468,18 +520,12 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				});
 				paint.font = '400 24px Rubik, system-ui, sans-serif';
 				paint.fillStyle = 'rgba(255, 255, 255, 0.62)';
-				paint.fillText(when, left, height - 60);
+				paint.fillText(when, left, height - 56);
 				const dateWidth = paint.measureText(`${when}   `).width;
 				paint.font = '600 26px Rubik, system-ui, sans-serif';
 				paint.fillStyle = colors.ink;
-				paint.fillText(host, left + dateWidth, height - 60);
+				paint.fillText(host, left + dateWidth, height - 56);
 			}
-			const names: Record<string, string> = JSON.parse(this.dataset.names ?? '{}');
-
-			const currentSlam = () => {
-				const id = document.documentElement.dataset.slam ?? 'usopen';
-				return (id in VENUES ? id : 'usopen') as keyof typeof VENUES;
-			};
 
 			/** Palette, read from the page so the stadium matches the theme. */
 			let colors = readColors();
@@ -498,7 +544,6 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					// The board's accent is the one picked to read on a dark
 					// panel, which is exactly what the card is.
 					ink: value('--board-accent', '#7fb3ee'),
-					player: value('--accent-regular', '#0057b8'),
 				};
 			}
 
@@ -509,7 +554,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			let scene: HTMLCanvasElement | null = null;
 
 			function paintScene() {
-				const venue = VENUES[currentSlam()];
+				const here = venue();
 				const layer = document.createElement('canvas');
 				layer.width = W;
 				layer.height = H;
@@ -538,8 +583,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				};
 				// The upper tier reaches this far in from the outer wall.
 				const split = {
-					x: outer.x + (front.x - outer.x) * venue.tier,
-					y: outer.y + (front.y - outer.y) * venue.tier,
+					x: outer.x + (front.x - outer.x) * here.tier,
+					y: outer.y + (front.y - outer.y) * here.tier,
 					w: 0,
 					h: 0,
 				};
@@ -547,13 +592,13 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				split.h = outer.h - (split.y - outer.y) * 2;
 				const concourse = inset(split, 14);
 
-				roundRect(paint, outer, venue.corner + 16, shade(colors.seat, -0.4));
-				seats(paint, outer, split, venue.accentBand === 'upper', random);
+				roundRect(paint, outer, here.corner + 16, shade(colors.seat, -0.4));
+				seats(paint, outer, split, here.accentBand === 'upper', random);
 
 				// Concourse: the dark gap that separates the two tiers.
-				roundRect(paint, split, venue.corner + 8, shade(colors.stand, -0.2));
-				roundRect(paint, concourse, venue.corner + 6, shade(colors.seat, -0.2));
-				seats(paint, concourse, front, venue.accentBand === 'lower', random);
+				roundRect(paint, split, here.corner + 8, shade(colors.stand, -0.2));
+				roundRect(paint, concourse, here.corner + 6, shade(colors.seat, -0.2));
+				seats(paint, concourse, front, here.accentBand === 'lower', random);
 
 				// The rail along the front row.
 				paint.strokeStyle = 'rgba(255, 255, 255, 0.18)';
@@ -570,7 +615,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				paint.textAlign = 'center';
 				paint.textBaseline = 'middle';
 				paint.letterSpacing = '3px';
-				paint.fillText(venue.venue.toUpperCase(), W / 2, wall.y + wall.h / 2);
+				paint.fillText(here.venue.toUpperCase(), W / 2, wall.y + wall.h / 2);
 				paint.letterSpacing = '0px';
 
 				// ── Run-off and court ───────────────────────────────────────
@@ -581,15 +626,14 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				paint.strokeStyle = colors.line;
 				paint.lineWidth = 3;
 				paint.strokeRect(COURT_X, COURT_Y, COURT_W, COURT_H);
-				const net = COURT_X + COURT_W / 2;
 				const lines: [number, number, number, number][] = [
 					[COURT_X, COURT_Y + ALLEY, COURT_X + COURT_W, COURT_Y + ALLEY],
 					[COURT_X, COURT_Y + COURT_H - ALLEY, COURT_X + COURT_W, COURT_Y + COURT_H - ALLEY],
-					[net - SERVICE, COURT_Y + ALLEY, net - SERVICE, COURT_Y + COURT_H - ALLEY],
-					[net + SERVICE, COURT_Y + ALLEY, net + SERVICE, COURT_Y + COURT_H - ALLEY],
-					[net - SERVICE, COURT_Y + COURT_H / 2, net + SERVICE, COURT_Y + COURT_H / 2],
-					[COURT_X, COURT_Y + COURT_H / 2, COURT_X + 14, COURT_Y + COURT_H / 2],
-					[COURT_X + COURT_W - 14, COURT_Y + COURT_H / 2, COURT_X + COURT_W, COURT_Y + COURT_H / 2],
+					[NET_X - SERVICE, COURT_Y + ALLEY, NET_X - SERVICE, COURT_Y + COURT_H - ALLEY],
+					[NET_X + SERVICE, COURT_Y + ALLEY, NET_X + SERVICE, COURT_Y + COURT_H - ALLEY],
+					[NET_X - SERVICE, COURT_MID, NET_X + SERVICE, COURT_MID],
+					[COURT_X, COURT_MID, COURT_X + 14, COURT_MID],
+					[COURT_X + COURT_W - 14, COURT_MID, COURT_X + COURT_W, COURT_MID],
 				];
 				for (const [x1, y1, x2, y2] of lines) {
 					paint.beginPath();
@@ -603,21 +647,21 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				paint.lineWidth = 5;
 				paint.setLineDash([9, 7]);
 				paint.beginPath();
-				paint.moveTo(net, COURT_Y - 16);
-				paint.lineTo(net, COURT_Y + COURT_H + 16);
+				paint.moveTo(NET_X, COURT_Y - 16);
+				paint.lineTo(NET_X, COURT_Y + COURT_H + 16);
 				paint.stroke();
 				paint.setLineDash([]);
 				paint.fillStyle = colors.line;
-				dot(paint, net, COURT_Y - 16, 4);
-				dot(paint, net, COURT_Y + COURT_H + 16, 4);
+				dot(paint, NET_X, COURT_Y - 16, 4);
+				dot(paint, NET_X, COURT_Y + COURT_H + 16, 4);
 
 				// ── The officials ───────────────────────────────────────────
 				// Umpire's chair at the net, ball kids at the posts, line judges
 				// behind the baselines.
 				paint.fillStyle = shade(colors.stand, -0.25);
-				paint.fillRect(net - 11, COURT_Y - APRON_Y + 14, 22, 30);
+				paint.fillRect(NET_X - 11, COURT_Y - APRON_Y + 14, 22, 30);
 				paint.fillStyle = 'rgba(255, 255, 255, 0.8)';
-				dot(paint, net, COURT_Y - APRON_Y + 22, 5);
+				dot(paint, NET_X, COURT_Y - APRON_Y + 22, 5);
 
 				paint.fillStyle = 'rgba(255, 255, 255, 0.55)';
 				for (const [x, y] of [
@@ -625,8 +669,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					[COURT_X - 34, COURT_Y + COURT_H + 26],
 					[COURT_X + COURT_W + 34, COURT_Y - 26],
 					[COURT_X + COURT_W + 34, COURT_Y + COURT_H + 26],
-					[net - 26, COURT_Y + COURT_H + APRON_Y - 18],
-					[net + 26, COURT_Y + COURT_H + APRON_Y - 18],
+					[NET_X - 26, COURT_Y + COURT_H + APRON_Y - 18],
+					[NET_X + 26, COURT_Y + COURT_H + APRON_Y - 18],
 				] as [number, number][]) {
 					dot(paint, x, y, 4.5);
 				}
@@ -708,22 +752,48 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				if (!match) return hex;
 				const value = parseInt(match[1]!, 16);
 				const mix = (channel: number) =>
-					Math.round(
-						amount >= 0 ? channel + (255 - channel) * amount : channel * (1 + amount)
-					);
+					Math.round(amount >= 0 ? channel + (255 - channel) * amount : channel * (1 + amount));
 				return `rgb(${mix((value >> 16) & 255)}, ${mix((value >> 8) & 255)}, ${mix(value & 255)})`;
 			}
 
+			// ── The match ─────────────────────────────────────────────────
+			// The ball is kept as a speed and an angle rather than a pair of
+			// velocities: spin bends the angle, the surface scales the speed,
+			// and both stay honest that way — a curving ball keeps its pace
+			// instead of quietly gaining some.
 			let playerY = (H - PADDLE_H) / 2;
 			let cpuY = playerY;
-			let ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
+			let playerVy = 0;
+			let cpuVy = 0;
+			let ball = { x: W / 2, y: H / 2, speed: 0, angle: 0, dir: 1, spin: 0, curve: 0 };
 			let points: Scores = { player: 0, cpu: 0 };
 			let games: Scores = { player: 0, cpu: 0 };
-			let serving = true;
 			let over = false;
 			let server: Side = 'player';
+			let serveNumber: 1 | 2 = 1;
+			let serveKick = 0;
+			let charging = false;
+			let charge = 0;
+			let serveTarget: { x: number; y: number; in: boolean } | null = null;
+			let mark: { x: number; y: number; in: boolean; life: number } | null = null;
+			let phase: Phase = 'serve';
+			/** Shots in this point, the serve counted as the first of them. */
+			let shots = 0;
+			let touched = false;
+			/** How far the ball passed the racket by, which is what tells a winner from a miss. */
+			let missGap: number | null = null;
+			let pointBreak = false;
+			let waiting = 0;
+			let cpuServeDelay = 0;
+			let clock = 0;
+			let rushUntil = 0;
+			let stamina = ratings.stamina;
+			let stats: MatchStats = freshStats();
+			let lastShot: { side: Side; wing: Wing; shot: Shot; at: number } | null = null;
 			let frame = 0;
 			let last = 0;
+			/** Whether the loop should ask for another frame after this one. */
+			let running = false;
 			let pointerY: number | null = null;
 			const keys = new Set<string>();
 
@@ -739,12 +809,77 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			/** Who started the tie-break: the serve order is counted from it. */
 			let opener: Side = 'player';
 
+			// ── Rackets, wings and where they stand ───────────────────────
+
+			/**
+			 * The racket as it is this instant: which half is the forehand, and
+			 * how far it reaches. A one-hander's extra reach really is extra
+			 * racket, and it is added on the backhand side, where it is the
+			 * hand that is off the grip.
+			 */
+			function racketOf(side: Side) {
+				const top = side === 'player' ? playerY : cpuY;
+				const hand: Hand = side === 'player' ? career.hand : CPU_HAND;
+				const reach = side === 'player' ? ratings.backhandReach : 0;
+				const below = forehandBelow(side, hand);
+				return {
+					hand,
+					below,
+					top: top - (below ? reach : 0),
+					bottom: top + PADDLE_H + (below ? 0 : reach),
+					mid: top + PADDLE_H / 2,
+				};
+			}
+
+			/** A returner who has learned to stand in stands in. */
+			function paddleX(side: Side) {
+				if (side === 'cpu') return COURT_X + COURT_W - PADDLE_INSET - PADDLE_W;
+				return COURT_X + PADDLE_INSET + (server === 'cpu' ? ratings.returnStep : 0);
+			}
+
+			/** The middle of the half of the court a given wing covers. */
+			function wingCentre(side: Side, hand: Hand, wing: Wing) {
+				const low = COURT_MID + COURT_H * 0.24;
+				const high = COURT_MID - COURT_H * 0.24;
+				const fore = forehandBelow(side, hand) ? low : high;
+				return wing === 'forehand' ? fore : forehandBelow(side, hand) ? high : low;
+			}
+
+			// ── Scoring ───────────────────────────────────────────────────
+
 			const LADDER = ['0', '15', '30', '40'];
 			function pointLabel(mine: number, theirs: number) {
 				if (format === 'tiebreak') return String(mine); // a tie-break counts plainly
 				if (mine < 3 || theirs < 3) return LADDER[Math.min(mine, 3)]!;
-				if (mine === theirs) return '40';
+				if (rules.noAd || mine === theirs) return '40';
 				return mine > theirs ? 'AD' : '40';
+			}
+
+			/** One point from taking the server's game, which is the whole sport. */
+			function isBreakPoint() {
+				if (format === 'tiebreak') return false;
+				const returner = other(server);
+				return points[returner] >= 3 && points[returner] - points[server] >= 1;
+			}
+
+			function isMatchPoint(side: Side) {
+				const them = other(side);
+				if (format === 'tiebreak') return points[side] >= 6 && points[side] - points[them] >= 1;
+				if (games[side] < rules.games - 1) return false;
+				return points[side] >= 3 && points[side] - points[them] >= 1;
+			}
+
+			/** The moments the "under pressure" branch is bought for. */
+			function attacking() {
+				if (ratings.pressureScope >= 2 && isMatchPoint('player')) return true;
+				if (ratings.pressureScope >= 1 && format === 'tiebreak') return true;
+				return server === 'cpu' && pointBreak;
+			}
+
+			function defending() {
+				if (ratings.pressureScope >= 2 && isMatchPoint('cpu')) return true;
+				if (ratings.pressureScope >= 1 && format === 'tiebreak') return true;
+				return server === 'player' && pointBreak;
 			}
 
 			function paintScore() {
@@ -757,166 +892,663 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				out.servingCpu.classList.toggle('on', server === 'cpu');
 
 				const slam = currentSlam();
+				const here = VENUES[slam];
 				out.tournament.textContent = names[slam] ?? '';
-				out.venue.textContent = VENUES[slam].venue;
-			}
+				out.venue.textContent = `${here.venue} · ${here.surface[lang]} · ${text.pace}: ${paceLabel[here.category][lang]}`;
 
-			function serve() {
-				const toward = server === 'player' ? -1 : 1;
-				ball = {
-					x: W / 2,
-					y: H / 2,
-					vx: BASE_SPEED * toward,
-					vy: BASE_SPEED * (Math.random() * 0.5 - 0.25),
-				};
-				serving = false;
-				overlay.hidden = true;
-			}
-
-			function awardPoint(to: Side) {
-				const other: Side = to === 'player' ? 'cpu' : 'player';
-				points[to] += 1;
-
-				if (format === 'tiebreak') {
-					// One point on the opening serve, two each after that.
-					const played = points.player + points.cpu;
-					const flipped = Math.floor((played + 1) / 2) % 2 === 1;
-					server = flipped ? (opener === 'player' ? 'cpu' : 'player') : opener;
-				} else if (points[to] >= 4 && points[to] - points[other] >= 2) {
-					games[to] += 1;
-					points = { player: 0, cpu: 0 };
-					server = server === 'player' ? 'cpu' : 'player';
+				out.board.dataset.mode = career.mode;
+				if (career.mode === 'career') {
+					const seed = seedFor(career.points);
+					const round = ROUNDS[career.round]!.name[lang];
+					const badge = seed
+						? text.seed.replace('%s', String(seed))
+						: entryRound(career.points) > 0
+							? text.unseeded
+							: text.qualifier;
+					out.standing.textContent = `${round} · ${formatRank(career.points, lang)} · ${badge}`;
+				} else {
+					out.standing.textContent = '';
 				}
 
-				paintScore();
+				const left = clamp(stamina / ratings.stamina, 0, 1);
+				out.fitness.style.width = `${Math.round(left * 100)}%`;
+				out.fitness.dataset.low = left < 0.4 ? 'true' : 'false';
+			}
 
-				const won =
-					format === 'tiebreak'
-						? points[to] >= 7 && points[to] - points[other] >= 2
-						: games[to] >= 4;
+			// ── The serve ─────────────────────────────────────────────────
 
-				if (won) {
-					over = true;
-					serving = true;
-					const winner = to === 'player' ? displayName() : opponentName;
-					const line = (format === 'tiebreak' ? text.winTiebreak : text.win).replace(
-						'%s',
-						winner
-					);
+			/**
+			 * The box this serve has to land in. The server's deuce court is on
+			 * their right and the ball crosses the net to the receiver's right,
+			 * which — because the two of them face opposite ways — is the other
+			 * half of the screen. The alternation from deuce to advantage court
+			 * comes straight off the point count.
+			 */
+			function serveBox(from: Side) {
+				const deuce = (points.player + points.cpu) % 2 === 0;
+				const upper = from === 'player' ? deuce : !deuce;
+				const top = upper ? COURT_Y + ALLEY : COURT_MID;
+				const bottom = upper ? COURT_MID : COURT_Y + COURT_H - ALLEY;
+				return {
+					top,
+					bottom,
+					centre: (top + bottom) / 2,
+					half: (bottom - top) / 2,
+					dir: from === 'player' ? 1 : -1,
+				};
+			}
 
-					// A win is worth keeping: the visitor gets a card to take
-					// away, the other way round gets the line and a restart.
-					if (to === 'player') {
-						showResult(line);
-						return;
-					}
+			/** What the machine goes for: the receiver's backhand, with nerve. */
+			function cpuAim(box: ReturnType<typeof serveBox>) {
+				const target = wingCentre('player', career.hand, 'backhand');
+				const toward = clamp((target - box.centre) / box.half, -1, 1);
+				return clamp(toward * opponent.nerve + (Math.random() - 0.5) * 0.35, -1, 1);
+			}
 
-					overlay.innerHTML = `<strong>${line}</strong><span>${text.again}</span>`;
-					overlay.hidden = false;
+			/**
+			 * The serve has reached the court. Off the bounce it sheds pace —
+			 * less of it the quicker the surface — and a second serve with kick
+			 * on it climbs away toward the returner's backhand, which is the
+			 * whole reason anyone hits one.
+			 */
+			function landServe() {
+				const target = serveTarget!;
+				mark = { x: target.x, y: target.y, in: target.in, life: 1.2 };
+				if (!target.in) {
+					faultServe();
 					return;
 				}
+				if (serveNumber === 1) stats[server].firstIn += 1;
 
-				serving = true;
-				ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
-				overlay.textContent =
-					format === 'match' && points.player >= 3 && points.player === points.cpu
-						? text.deuce
-						: text.serve;
-				overlay.hidden = false;
+				const here = venue();
+				const receiver = other(server);
+				const hand: Hand = receiver === 'player' ? career.hand : CPU_HAND;
+				const toward = wingCentre(receiver, hand, 'backhand');
+				const aimY = target.y + (toward - target.y) * 0.4 * serveKick;
+
+				ball.x = target.x;
+				ball.y = target.y;
+				// Off the bounce the ball drops to the pace the rally is played
+				// at, which in a casual match is well under what it arrived at.
+				ball.speed = Math.min(
+					ball.speed * (0.58 + 0.07 * here.category) * (tempo.rally / tempo.serve),
+					SERVE_BOUNCE_MAX * tempo.ceiling
+				);
+				ball.angle = clamp(
+					Math.atan2(aimY - target.y, Math.abs(paddleX(receiver) - target.x)),
+					-1.05,
+					1.05
+				);
+				ball.spin = serveKick * 0.85;
+				ball.curve = 0;
+				phase = 'rally';
 			}
 
-			function reset() {
-				hideResult();
-				points = { player: 0, cpu: 0 };
-				games = { player: 0, cpu: 0 };
-				server = 'player';
-				opener = 'player';
-				over = false;
-				serving = true;
-				ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
-				playerY = cpuY = (H - PADDLE_H) / 2;
-				paintScore();
-				overlay.textContent = text.serve;
-				overlay.hidden = false;
+			function faultServe() {
+				ball.speed = 0;
+				if (serveNumber === 1) {
+					serveNumber = 2;
+					stats[server].secondPlayed += 1;
+					announce(text.fault, text.secondServe);
+					pending = 'serve';
+					waiting = 0.9;
+					return;
+				}
+				stats[server].doubleFaults += 1;
+				awardPoint(other(server), 'double');
 			}
 
-			function step(seconds: number) {
+			/** Puts the ball back on the server's racket and waits for them. */
+			function beginServe() {
+				phase = 'serve';
+				charging = false;
+				charge = 0;
+				serveTarget = null;
+				serveKick = 0;
+				touched = false;
+				missGap = null;
+				lastShot = null;
+				ball.speed = 0;
+				ball.spin = 0;
+				ball.curve = 0;
+				const racket = racketOf(server);
+				ball.x = paddleX(server) + (server === 'player' ? PADDLE_W + BALL_R + 4 : -BALL_R - 4);
+				ball.y = racket.mid;
+				cpuServeDelay = 0.7 + Math.random() * 0.45;
+
+				if (server === 'player') {
+					const note = pointBreak
+						? isMatchPoint('cpu')
+							? text.matchPoint
+							: text.breakPoint
+						: format === 'match' && points.player >= 3 && points.player === points.cpu
+							? rules.noAd
+								? text.decidingPoint
+								: text.deuce
+							: '';
+					announce(serveNumber === 2 ? text.secondServe : portrait ? text.serveTap : text.serve, note);
+				} else {
+					announce(pointBreak ? text.breakPoint : '');
+				}
+			}
+
+			/** A fresh point: the serve count, the break-point books, the ball. */
+			function startPoint() {
+				serveNumber = 1;
+				shots = 0;
+				stats[server].serves += 1;
+				pointBreak = isBreakPoint();
+				if (pointBreak) stats[server].faced += 1;
+				beginServe();
+			}
+
+			/** What waits at the end of the pause: a whole new point, or serve two. */
+			let pending: 'point' | 'serve' = 'point';
+
+			// ── Playing the point ─────────────────────────────────────────
+
+			function playerSpeed() {
+				let mul = ratings.speed;
+				if (clock < rushUntil) mul *= 1.18;
+				if (defending()) mul *= 1 + ratings.pressureGuard;
+				const left = stamina / ratings.stamina;
+				if (left < 0.5) mul *= 0.8 + 0.2 * (left / 0.5);
+				return PLAYER_SPEED * mul;
+			}
+
+			/**
+			 * The racket follows the pointer, but only as fast as the player can
+			 * actually run — which is what makes the fitness branch worth
+			 * anything, and what lets the speed of the racket at contact mean
+			 * something. A racket that teleported would have no swing to read.
+			 */
+			function movePlayer(seconds: number) {
+				const before = playerY;
+				const speed = playerSpeed();
+
 				if (pointerY !== null) {
-					playerY = pointerY - PADDLE_H / 2;
+					const want = pointerY - PADDLE_H / 2;
+					playerY += clamp(want - playerY, -speed * seconds, speed * seconds);
 				} else {
 					if (keys.has('ArrowUp') || keys.has('ArrowLeft') || keys.has('w') || keys.has('W')) {
-						playerY -= PLAYER_SPEED * seconds;
+						playerY -= speed * seconds;
 					}
 					if (keys.has('ArrowDown') || keys.has('ArrowRight') || keys.has('s') || keys.has('S')) {
-						playerY += PLAYER_SPEED * seconds;
+						playerY += speed * seconds;
 					}
 				}
-				playerY = clamp(playerY, COURT_Y, COURT_Y + COURT_H - PADDLE_H);
 
-				// The machine chases the ball, but only so fast, and recovers to
-				// the middle while the ball is travelling away from it.
-				const chasing = ball.vx > 0;
+				playerY = clamp(playerY, COURT_Y, COURT_Y + COURT_H - PADDLE_H);
+				playerVy = seconds > 0 ? (playerY - before) / seconds : 0;
+				stamina = Math.max(0, stamina - (Math.abs(playerVy) / PLAYER_SPEED) * 2.4 * seconds);
+			}
+
+			function moveCpu(seconds: number) {
+				const before = cpuY;
+				const chasing = ball.dir > 0 && phase !== 'serve' && ball.speed > 0;
 				const target = chasing ? ball.y - PADDLE_H / 2 : COURT_Y + (COURT_H - PADDLE_H) / 2;
-				const reach = CPU_SPEED * seconds * (chasing ? 1 : 0.55);
+				const reach = opponent.speed * seconds * (chasing ? 1 : opponent.recovery);
 				cpuY = clamp(
 					cpuY + clamp(target - cpuY, -reach, reach),
 					COURT_Y,
 					COURT_Y + COURT_H - PADDLE_H
 				);
+				cpuVy = seconds > 0 ? (cpuY - before) / seconds : 0;
+			}
 
-				if (serving) return;
+			/** How far the ball passed a racket by — nothing if it was reached. */
+			function gapTo(racket: { top: number; bottom: number }) {
+				if (ball.y < racket.top) return racket.top - ball.y;
+				if (ball.y > racket.bottom) return ball.y - racket.bottom;
+				return 0;
+			}
 
-				ball.x += ball.vx * seconds;
-				ball.y += ball.vy * seconds;
+			/**
+			 * Where a serve struck now would land, and whether that is in. The
+			 * drawing wants the answer before the ball is hit — the target is
+			 * shown while the racket is still going back — so the sums live
+			 * here and `hitServe` reads them off.
+			 */
+			function projectServe(from: Side, value: number, aim: number) {
+				const box = serveBox(from);
+				const second = serveNumber === 2;
+				const margin = from === 'player' ? ratings.serveMargin : 0.06 + opponent.nerve * 0.14;
+				const spread = (0.72 + 0.95 * value) * (1 - margin) * (second ? 0.74 : 1);
+				const depth = (0.55 + 0.62 * value) * (1 - margin * 0.5) * (second ? 0.86 : 1);
+				const y = box.centre + aim * box.half * spread;
+				const x = NET_X + box.dir * SERVICE * clamp(depth, 0.1, 1.4);
+				return {
+					box,
+					x,
+					y,
+					in:
+						value > 0.08 &&
+						Math.abs(y - box.centre) <= box.half &&
+						Math.abs(x - NET_X) <= SERVICE,
+				};
+			}
 
-				if (ball.y - BALL_R <= COURT_Y && ball.vy < 0) {
+			/** The longest wind-up that still lands in front of the service line. */
+			function safeCharge() {
+				const second = serveNumber === 2;
+				const scale = (1 - ratings.serveMargin * 0.5) * (second ? 0.86 : 1);
+				return clamp((1 / scale - 0.55) / 0.62, 0, 1);
+			}
+
+			/** Where the player's racket is standing, as an aim from -1 to 1. */
+			const playerAim = () =>
+				clamp((racketOf('player').mid - COURT_MID) / (COURT_H / 2), -1, 1);
+
+			function hitServe(from: Side, value: number) {
+				const here = venue();
+				const aim = from === 'player' ? playerAim() : cpuAim(serveBox(from));
+				const shot = projectServe(from, value, aim);
+				const second = serveNumber === 2;
+
+				const power = from === 'player' ? ratings.serveSpeed : opponent.serve;
+				const speed =
+					(SERVE_MIN + (SERVE_MAX - SERVE_MIN) * value) * power * here.pace.serve * tempo.serve;
+				serveKick = second ? (from === 'player' ? ratings.secondServe : 0.55) : 0;
+
+				const startX = paddleX(from) + (from === 'player' ? PADDLE_W + BALL_R : -BALL_R);
+				ball.x = startX;
+				ball.y = racketOf(from).mid;
+				ball.speed = speed;
+				ball.dir = shot.box.dir;
+				ball.angle = clamp(
+					Math.atan2(shot.y - ball.y, Math.max(60, Math.abs(shot.x - startX))),
+					-1.2,
+					1.2
+				);
+				ball.spin = 0;
+				ball.curve = 0;
+
+				serveTarget = { x: shot.x, y: shot.y, in: shot.in };
+				phase = 'flight';
+				shots = 1;
+				lastShot = null;
+				charging = false;
+				charge = 0;
+
+				const kmh = Math.round(speed * SERVE_KMH);
+				out.serveSpeed.textContent = `${kmh} km/h`;
+				if (shot.in) stats[from].fastest = Math.max(stats[from].fastest, kmh);
+				announce('');
+			}
+
+			function serveStep(seconds: number) {
+				const racket = racketOf(server);
+				ball.x = paddleX(server) + (server === 'player' ? PADDLE_W + BALL_R + 4 : -BALL_R - 4);
+				ball.y = racket.mid;
+
+				if (server === 'cpu') {
+					cpuServeDelay -= seconds;
+					if (cpuServeDelay <= 0) {
+						const value =
+							serveNumber === 2
+								? SECOND_SERVE_CHARGE * (0.82 + Math.random() * 0.18)
+								: clamp(0.42 + opponent.nerve * 0.5 + (Math.random() - 0.5) * 0.14, 0.2, 1);
+						hitServe('cpu', value);
+					}
+					return;
+				}
+
+				if (!charging) return;
+				const cap = serveNumber === 2 ? SECOND_SERVE_CHARGE : 1;
+				charge = Math.min(charge + seconds / CHARGE_SECONDS, cap);
+				// Held all the way back, the racket goes through it anyway.
+				if (charge >= cap) hitServe('player', cap);
+			}
+
+			function advanceBall(seconds: number) {
+				const here = venue();
+
+				// A heavy ball gathers pace off the court where the surface grips
+				// it; a sliced one dies on a surface that does not.
+				if (phase === 'rally' && ball.spin !== 0) {
+					const drive =
+						ball.spin > 0
+							? 0.34 * ball.spin * here.pace.kick
+							: 0.5 * ball.spin * (1 - here.pace.skid);
+					ball.speed = clamp(
+						ball.speed * (1 + drive * seconds),
+						200 * tempo.rally,
+						MAX_SPEED * tempo.ceiling
+					);
+				}
+
+				// Spin bends the flight, and then stops bending it.
+				if (ball.curve) {
+					ball.angle = clamp(ball.angle + ball.curve * seconds, -1.05, 1.05);
+					ball.curve *= Math.pow(0.4, seconds);
+					if (Math.abs(ball.curve) < 0.02) ball.curve = 0;
+				}
+
+				ball.x += Math.cos(ball.angle) * ball.speed * ball.dir * seconds;
+				ball.y += Math.sin(ball.angle) * ball.speed * seconds;
+
+				if (phase === 'flight') {
+					const target = serveTarget!;
+					const arrived =
+						ball.dir > 0 ? ball.x >= target.x : ball.x <= target.x;
+					if (arrived) landServe();
+					return;
+				}
+
+				if (ball.y - BALL_R <= COURT_Y && ball.angle < 0) {
 					ball.y = COURT_Y + BALL_R;
-					ball.vy *= -1;
+					ball.angle = -ball.angle;
 				}
-				if (ball.y + BALL_R >= COURT_Y + COURT_H && ball.vy > 0) {
+				if (ball.y + BALL_R >= COURT_Y + COURT_H && ball.angle > 0) {
 					ball.y = COURT_Y + COURT_H - BALL_R;
-					ball.vy *= -1;
+					ball.angle = -ball.angle;
 				}
 
-				const playerX = COURT_X + PADDLE_INSET;
-				const cpuX = COURT_X + COURT_W - PADDLE_INSET - PADDLE_W;
+				const px = paddleX('player');
+				const cx = paddleX('cpu');
+				const pr = racketOf('player');
+				const cr = racketOf('cpu');
 
 				if (
-					ball.vx < 0 &&
-					ball.x - BALL_R <= playerX + PADDLE_W &&
-					ball.x - BALL_R >= playerX - 14 &&
-					ball.y >= playerY &&
-					ball.y <= playerY + PADDLE_H
+					ball.dir < 0 &&
+					ball.x - BALL_R <= px + PADDLE_W &&
+					ball.x - BALL_R >= px - 16 &&
+					ball.y >= pr.top &&
+					ball.y <= pr.bottom
 				) {
-					returnBall(playerX + PADDLE_W + BALL_R, playerY, 1);
+					hit('player', px + PADDLE_W + BALL_R);
+				} else if (
+					ball.dir > 0 &&
+					ball.x + BALL_R >= cx &&
+					ball.x + BALL_R <= cx + PADDLE_W + 16 &&
+					ball.y >= cr.top &&
+					ball.y <= cr.bottom
+				) {
+					hit('cpu', cx - BALL_R);
 				}
 
-				if (
-					ball.vx > 0 &&
-					ball.x + BALL_R >= cpuX &&
-					ball.x + BALL_R <= cpuX + PADDLE_W + 14 &&
-					ball.y >= cpuY &&
-					ball.y <= cpuY + PADDLE_H
-				) {
-					returnBall(cpuX - BALL_R, cpuY, -1);
+				// Past the racket, and by how much: a ball nowhere near it was a
+				// winner, one that went straight through it was a miss.
+				if (missGap === null) {
+					if (ball.dir < 0 && ball.x + BALL_R < px) missGap = gapTo(pr);
+					else if (ball.dir > 0 && ball.x - BALL_R > cx + PADDLE_W) missGap = gapTo(cr);
 				}
 
-				if (ball.x < COURT_X - 70) awardPoint('cpu');
-				else if (ball.x > COURT_X + COURT_W + 70) awardPoint('player');
+				if (ball.x < COURT_X - 70) awardPoint('cpu', 'rally');
+				else if (ball.x > COURT_X + COURT_W + 70) awardPoint('player', 'rally');
 			}
 
-			/** Where the ball meets the racket decides the angle back. */
-			function returnBall(x: number, paddleY: number, direction: 1 | -1) {
-				const offset = (ball.y - (paddleY + PADDLE_H / 2)) / (PADDLE_H / 2);
-				const speed = Math.min(Math.hypot(ball.vx, ball.vy) * 1.05, MAX_SPEED);
-				// The jitter matters: a ball met dead centre would otherwise go
-				// back perfectly flat, and two players who both return down the
-				// middle would rally until the tournament ended.
-				const angle = offset * 0.9 + (Math.random() - 0.5) * 0.09;
+			/** Stretched, he slices; given time, he goes after it. */
+			function cpuShot(mid: number): Shot {
+				const stretch = Math.abs(ball.y - mid) / (PADDLE_H / 2);
+				if (stretch > 0.72) return 'slice';
+				return Math.random() < 0.7 ? 'topspin' : 'flat';
+			}
+
+			/**
+			 * The shot. Which half of the racket the ball met decides the wing,
+			 * how fast the racket was travelling decides whether it was driven,
+			 * blocked or carved, and what arrived — heavy and climbing, or low
+			 * and skidding — decides how much of any of it is possible.
+			 */
+			function hit(side: Side, x: number) {
+				const here = venue();
+				const racket = racketOf(side);
+				const raw = clamp((ball.y - racket.mid) / (PADDLE_H / 2), -1.4, 1.4);
+				const runAround = side === 'player' ? ratings.runAround : 0;
+				const wing = wingFor(side, racket.hand, raw, runAround);
+				const player = side === 'player';
+
+				shots += 1;
+				if (side !== server) touched = true;
+
+				const swing = player ? playerVy : cpuVy;
+				const effort = Math.min(Math.abs(swing) / PLAYER_SPEED, 1.4);
+				const along = swing * (Math.sin(ball.angle) >= 0 ? 1 : -1);
+				const shot: Shot = !player
+					? cpuShot(racket.mid)
+					: effort < 0.18
+						? 'flat'
+						: along > 0
+							? 'topspin'
+							: 'slice';
+
+				// The wing. A backhand is never quite the forehand, trained or not.
+				const wingPace =
+					wing === 'forehand'
+						? player
+							? ratings.forehandPace
+							: 1
+						: player
+							? ratings.backhandPace * 0.94
+							: 1 - opponent.weakness * 0.6;
+
+				// What arrived: a ball kicking up at the backhand is the oldest
+				// way there is to make somebody miss.
+				const high = Math.max(0, ball.spin) * here.pace.kick;
+				const guard = player ? ratings.backhandHigh : 1 - opponent.weakness;
+				const trouble = wing === 'backhand' ? high * (1 - guard) * 0.42 : high * 0.08;
+				const low = Math.max(0, -ball.spin) * here.pace.skid;
+				const quality = clamp(1 - trouble - low * 0.2, 0.5, 1);
+
+				const shotPace =
+					shot === 'topspin'
+						? 1 + 0.16 * effort
+						: shot === 'slice'
+							? 0.72 + 0.22 * here.pace.skid
+							: 1;
+
+				let plus = 1;
+				if (player) {
+					if (shots === 3 && side === server) plus = ratings.servePlusOne;
+					if (shots === 4 && side !== server) plus = ratings.returnPlusOne;
+					if (shots === 2 && side !== server) {
+						if (shot !== 'topspin') plus = 1 + ratings.returnBlock * 0.16;
+						if (shot === 'slice' && ratings.returnRush) rushUntil = clock + ratings.returnRush;
+					}
+					if (attacking()) plus *= 1 + ratings.pressureBite;
+					const left = stamina / ratings.stamina;
+					if (left < 0.5) plus *= 0.9 + 0.2 * (left / 0.5);
+					stamina = Math.max(0, stamina - 0.9);
+				} else {
+					plus = opponent.pace;
+				}
+
+				const press = Math.max(here.pace.rally, 1 + Math.min(shots, 34) * tempo.press);
+				const speed = clamp(
+					ball.speed * press * wingPace * shotPace * quality * plus,
+					BASE_SPEED * 0.82 * tempo.rally,
+					MAX_SPEED * tempo.ceiling
+				);
+
+				// Where on the racket it was met decides the angle — and the
+				// forehand opens the court up further than the backhand will.
+				const angleMul = wing === 'forehand' ? 1 : player ? 0.84 * ratings.backhandAngle : 0.8;
+				let angle = raw * 0.9 * angleMul * tempo.angle + (Math.random() - 0.5) * 0.09;
+
+				if (!player) {
+					// He plays the backhand, and reads it better the deeper in the
+					// draw you are.
+					const target = wingCentre('player', career.hand, 'backhand');
+					const toward = Math.atan2(target - ball.y, Math.max(140, Math.abs(paddleX('player') - x)));
+					const bias = opponent.nerve * 0.5;
+					angle = angle * (1 - bias) + toward * bias;
+				}
+
+				ball.angle = clamp(angle, -1.05, 1.05);
+				ball.dir = player ? 1 : -1;
 				ball.x = x;
-				ball.vx = Math.cos(angle) * speed * direction;
-				ball.vy = Math.sin(angle) * speed;
+				ball.speed = speed;
+
+				const rpm = player
+					? wing === 'forehand'
+						? ratings.forehandSpin
+						: 2450 * ratings.backhandPace
+					: 2500 + opponent.pace * 500;
+				const heavy = clamp((rpm - 2000) / 1400, 0, 1);
+				const bite = player && wing === 'backhand' ? ratings.backhandSlice : 1;
+				ball.spin =
+					shot === 'topspin'
+						? clamp(heavy * (0.45 + 0.55 * effort), 0, 1)
+						: shot === 'slice'
+							? -clamp(0.45 * bite, 0, 1)
+							: 0;
+				ball.curve =
+					shot === 'topspin'
+						? (swing >= 0 ? 1 : -1) * heavy * 0.42
+						: shot === 'slice'
+							? (swing >= 0 ? -1 : 1) * 0.16
+							: 0;
+
+				lastShot = { side, wing, shot, at: clock };
 			}
+
+			/** The overlay, as two lines: what happened, and what it means. */
+			function announce(line: string, note = '') {
+				overlay.textContent = '';
+				if (!line && !note) {
+					overlay.hidden = true;
+					return;
+				}
+				if (line) {
+					const strong = document.createElement('strong');
+					strong.textContent = line;
+					overlay.append(strong);
+				}
+				if (note) {
+					const span = document.createElement('span');
+					span.textContent = note;
+					overlay.append(span);
+				}
+				overlay.hidden = false;
+			}
+
+			function awardPoint(to: Side, how: 'ace' | 'double' | 'rally') {
+				const loser = other(to);
+
+				// A point the returner never got a racket on is an ace.
+				const kind = how === 'rally' && to === server && !touched ? 'ace' : how;
+
+				stats[to].points += 1;
+				if (kind === 'ace') stats[to].aces += 1;
+				if (kind === 'rally') {
+					// A ball nowhere near the racket was a winner; one that went
+					// straight through where it was standing was a miss.
+					if ((missGap ?? 0) > 34) stats[to].winners += 1;
+					else stats[loser].errors += 1;
+				}
+				if (to === server && kind !== 'double') {
+					if (serveNumber === 1) stats[server].firstWon += 1;
+					else stats[server].secondWon += 1;
+					if (pointBreak) stats[server].saved += 1;
+				}
+				stats.longest = Math.max(stats.longest, shots);
+
+				points[to] += 1;
+				ball.speed = 0;
+
+				if (format === 'tiebreak') {
+					// One point on the opening serve, two each after that.
+					const played = points.player + points.cpu;
+					const flipped = Math.floor((played + 1) / 2) % 2 === 1;
+					server = flipped ? other(opener) : opener;
+				} else if (points[to] >= 4 && points[to] - points[loser] >= (rules.noAd ? 1 : 2)) {
+					games[to] += 1;
+					points = { player: 0, cpu: 0 };
+					server = other(server);
+					// Ninety seconds in the chair at every odd game.
+					if ((games.player + games.cpu) % 2 === 1) {
+						stamina = Math.min(ratings.stamina, stamina + 22 * ratings.recovery);
+					}
+				}
+
+				stamina = Math.min(ratings.stamina, stamina + 7 * ratings.recovery);
+				paintScore();
+
+				const won =
+					format === 'tiebreak'
+						? points[to] >= 7 && points[to] - points[loser] >= 2
+						: games[to] >= rules.games;
+
+				if (won) {
+					endMatch(to === 'player');
+					return;
+				}
+
+				if (kind === 'ace') announce(text.ace);
+				else if (kind === 'double') announce(text.doubleFault);
+				pending = 'point';
+				waiting = kind === 'rally' ? 0.75 : 1.1;
+			}
+
+			function endMatch(playerWon: boolean) {
+				over = true;
+				ball.speed = 0;
+				const line = (format === 'tiebreak' ? text.winTiebreak : text.win).replace(
+					'%s',
+					playerWon ? displayName() : opponentName
+				);
+				const played = career.round;
+				finishMatch(playerWon);
+				showResult(playerWon, line, played);
+			}
+
+			function reset() {
+				hideResult();
+				hideCareer();
+				ratings = ratingsFor(career);
+				opponent = opponentIn(career);
+				tempo = tempoIn(career);
+				rules = rulesIn(career);
+				points = { player: 0, cpu: 0 };
+				games = { player: 0, cpu: 0 };
+				server = 'player';
+				opener = 'player';
+				over = false;
+				stamina = ratings.stamina;
+				stats = freshStats();
+				award = { points: 0, prize: 0 };
+				clock = 0;
+				rushUntil = 0;
+				waiting = 0;
+				mark = null;
+				playerY = cpuY = (H - PADDLE_H) / 2;
+				playerVy = cpuVy = 0;
+				pointerY = null;
+				out.serveSpeed.textContent = '';
+				enterDraw();
+				paintScore();
+				startPoint();
+			}
+
+			function step(seconds: number) {
+				clock += seconds;
+				movePlayer(seconds);
+				moveCpu(seconds);
+
+				if (mark) {
+					mark.life -= seconds;
+					if (mark.life <= 0) mark = null;
+				}
+
+				if (waiting > 0) {
+					waiting -= seconds;
+					if (waiting <= 0) {
+						if (pending === 'point') startPoint();
+						else beginServe();
+					}
+					return;
+				}
+
+				if (over) return;
+				if (phase === 'serve') {
+					serveStep(seconds);
+					return;
+				}
+				advanceBall(seconds);
+			}
+
+			// ── Drawing ───────────────────────────────────────────────────
 
 			function draw() {
 				// Everything below is drawn in the court's own landscape
@@ -931,26 +1563,164 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 				if (scene) context.drawImage(scene, 0, 0);
 
-				// Deliberately not the theme colours: these two have to stay
-				// apart from each other on clay, grass and blue alike.
-				paddle(COURT_X + PADDLE_INSET, playerY, '#11202b');
-				paddle(COURT_X + COURT_W - PADDLE_INSET - PADDLE_W, cpuY, '#f2f5f8');
+				if (phase === 'serve' && server === 'player' && charging) drawTarget();
+				if (mark) drawMark();
 
-				// The ball is yellow on every court there is.
-				context.fillStyle = '#d8f000';
-				dot(context, ball.x, ball.y, BALL_R);
-				context.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-				context.lineWidth = 1.5;
+				drawRacket('player');
+				drawRacket('cpu');
+				drawBall();
+				drawCall();
+
+				if (phase === 'serve' && server === 'player') drawCharge();
+			}
+
+			/** The box the serve has to find, and where this one is heading. */
+			function drawTarget() {
+				const shot = projectServe('player', charge, playerAim());
+				const { box } = shot;
+				context.fillStyle = 'rgba(255, 255, 255, 0.1)';
+				context.fillRect(
+					Math.min(NET_X, NET_X + box.dir * SERVICE),
+					box.top,
+					SERVICE,
+					box.bottom - box.top
+				);
+
+				context.strokeStyle = shot.in ? 'rgba(216, 240, 0, 0.9)' : 'rgba(255, 93, 77, 0.9)';
+				context.lineWidth = 2;
 				context.beginPath();
-				context.arc(ball.x, ball.y, BALL_R - 2.5, Math.PI * 0.75, Math.PI * 1.45);
+				context.moveTo(shot.x - 9, shot.y);
+				context.lineTo(shot.x + 9, shot.y);
+				context.moveTo(shot.x, shot.y - 9);
+				context.lineTo(shot.x, shot.y + 9);
 				context.stroke();
 			}
 
-			function paddle(x: number, y: number, color: string) {
-				context.fillStyle = color;
+			/** Where the last serve pitched, and whether the call went with it. */
+			function drawMark() {
+				const { x, y, in: landed, life } = mark!;
+				context.globalAlpha = Math.min(1, life);
+				context.fillStyle = landed ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 93, 77, 0.95)';
 				context.beginPath();
-				context.roundRect(x, y, PADDLE_W, PADDLE_H, 5);
+				context.ellipse(x, y, 9, 5.5, 0, 0, Math.PI * 2);
 				context.fill();
+				context.globalAlpha = 1;
+			}
+
+			/**
+			 * The racket, in two tones: the forehand half in the solid colour,
+			 * the backhand half held back, and a line between them. It is the
+			 * one thing on the court the player has to be able to read at a
+			 * glance, because everything else follows from it.
+			 */
+			function drawRacket(side: Side) {
+				const racket = racketOf(side);
+				const x = paddleX(side);
+				const run = side === 'player' ? ratings.runAround : 0;
+				const boundary = racket.mid + (racket.below ? -1 : 1) * run * (PADDLE_H / 2);
+				const solid = side === 'player' ? '#11202b' : '#f2f5f8';
+				const held = side === 'player' ? shade('#11202b', 0.42) : shade('#f2f5f8', -0.34);
+
+				context.save();
+				context.beginPath();
+				context.roundRect(x, racket.top, PADDLE_W, racket.bottom - racket.top, 5);
+				context.clip();
+				context.fillStyle = held;
+				context.fillRect(x, racket.top, PADDLE_W, racket.bottom - racket.top);
+				context.fillStyle = solid;
+				if (racket.below) context.fillRect(x, boundary, PADDLE_W, racket.bottom - boundary);
+				else context.fillRect(x, racket.top, PADDLE_W, boundary - racket.top);
+				context.restore();
+
+				context.strokeStyle = 'rgba(216, 240, 0, 0.7)';
+				context.lineWidth = 1.5;
+				context.beginPath();
+				context.moveTo(x - 1.5, boundary);
+				context.lineTo(x + PADDLE_W + 1.5, boundary);
+				context.stroke();
+			}
+
+			/**
+			 * The shot the player just hit, named beside their racket for a
+			 * moment. Two wings and three swings is a lot to discover from the
+			 * way the ball comes off, so the court says it out loud instead.
+			 */
+			function drawCall() {
+				if (!lastShot || lastShot.side !== 'player') return;
+				const age = clock - lastShot.at;
+				if (age > 0.8) return;
+
+				const racket = racketOf('player');
+				context.save();
+				context.globalAlpha = Math.min(1, (0.8 - age) * 3);
+				if (portrait) {
+					// Upright the whole court is on its side; the label is not.
+					context.translate(paddleX('player') + 26, racket.mid);
+					context.rotate(Math.PI / 2);
+					context.translate(-(paddleX('player') + 26), -racket.mid);
+				}
+				context.textAlign = 'left';
+				context.textBaseline = 'middle';
+				context.font = '600 15px Rubik, system-ui, sans-serif';
+				context.fillStyle = 'rgba(255, 255, 255, 0.92)';
+				context.fillText(
+					`${text.wings[lastShot.wing]} · ${text.shots[lastShot.shot]}`,
+					paddleX('player') + 26,
+					racket.mid
+				);
+				context.restore();
+			}
+
+			function drawBall() {
+				// A trail behind it, tinted by what is on the ball: yellow and
+				// long for a heavy one, short and pale for a skidding slice.
+				if (ball.speed > 0 && phase !== 'serve') {
+					const vx = Math.cos(ball.angle) * ball.dir;
+					const vy = Math.sin(ball.angle);
+					const tint =
+						ball.spin > 0.12
+							? '216, 240, 0'
+							: ball.spin < -0.12
+								? '236, 244, 255'
+								: '216, 240, 0';
+					for (let i = 3; i >= 1; i--) {
+						context.globalAlpha = 0.09 * (4 - i);
+						context.fillStyle = `rgb(${tint})`;
+						dot(context, ball.x - vx * i * 7, ball.y - vy * i * 7, Math.max(1, BALL_R - i * 1.7));
+					}
+					context.globalAlpha = 1;
+				}
+
+				// In the air on the way to the bounce, the ball reads bigger.
+				const lift = phase === 'flight' ? 2.5 : 0;
+				context.fillStyle = '#d8f000';
+				dot(context, ball.x, ball.y, BALL_R + lift);
+				context.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+				context.lineWidth = 1.5;
+				context.beginPath();
+				context.arc(ball.x, ball.y, BALL_R + lift - 2.5, Math.PI * 0.75, Math.PI * 1.45);
+				context.stroke();
+			}
+
+			/**
+			 * The wind-up, as a bar beside the racket, with the part of it that
+			 * still lands in the court marked. Past that line it is a fault,
+			 * and the bar says so before the ball does.
+			 */
+			function drawCharge() {
+				const racket = racketOf('player');
+				const x = paddleX('player') - 18;
+				const top = racket.mid - PADDLE_H / 2;
+				const safe = safeCharge();
+
+				context.fillStyle = 'rgba(8, 16, 26, 0.45)';
+				context.fillRect(x, top, 6, PADDLE_H);
+				context.fillStyle = 'rgba(255, 255, 255, 0.26)';
+				context.fillRect(x, top + PADDLE_H * (1 - safe), 6, PADDLE_H * safe);
+				if (charge > 0) {
+					context.fillStyle = charge > safe ? '#ff5d4d' : '#d8f000';
+					context.fillRect(x, top + PADDLE_H * (1 - charge), 6, PADDLE_H * charge);
+				}
 			}
 
 			function loop(now: number) {
@@ -958,21 +1728,390 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				last = now;
 				step(seconds);
 				draw();
-				frame = requestAnimationFrame(loop);
+				if (running) frame = requestAnimationFrame(loop);
 			}
 
 			function start() {
+				if (running) return;
+				running = true;
 				last = performance.now();
 				frame = requestAnimationFrame(loop);
 			}
 
 			function stop() {
+				running = false;
 				cancelAnimationFrame(frame);
 			}
 
-			function clamp(value: number, min: number, max: number) {
-				return Math.max(min, Math.min(max, value));
+			// ── The stat sheet ────────────────────────────────────────────
+
+			function renderStats() {
+				statsPlayer.textContent = displayName();
+				statsBody.textContent = '';
+				for (const row of summarise(stats)) {
+					const line = document.createElement('tr');
+					const mine = document.createElement('td');
+					mine.textContent = row.player;
+					const label = document.createElement('th');
+					label.scope = 'row';
+					label.textContent = row.label[lang];
+					const theirs = document.createElement('td');
+					theirs.textContent = row.cpu;
+					const [a, b] = row.share;
+					const ahead = row.better === 'fewer' ? (x: number, y: number) => x < y : (x: number, y: number) => x > y;
+					if (a !== b && ahead(a, b)) mine.classList.add('lead');
+					if (a !== b && ahead(b, a)) theirs.classList.add('lead');
+					line.append(mine, label, theirs);
+					statsBody.append(line);
+				}
 			}
+
+			// ── The career panel ──────────────────────────────────────────
+
+			const careerPanel = this.querySelector<HTMLElement>('[data-career]')!;
+			const careerFigures = this.querySelector<HTMLElement>('[data-career-figures]')!;
+			const careerBody = this.querySelector<HTMLElement>('[data-career-body]')!;
+			const careerDone = this.querySelector<HTMLButtonElement>('[data-career-done]')!;
+			const careerReset = this.querySelector<HTMLButtonElement>('[data-career-reset]')!;
+			/** Blocks play while the tree is open. */
+			let browsing = false;
+
+			function figure(label: string, value: string) {
+				const term = document.createElement('dt');
+				term.textContent = label;
+				const detail = document.createElement('dd');
+				detail.textContent = value;
+				careerFigures.append(term, detail);
+			}
+
+			function renderCareer() {
+				careerFigures.textContent = '';
+				// A casual match has no standing to report, so the header carries
+				// nothing but the title until there is a career behind it.
+				if (career.mode === 'career') {
+					figure(text.ranking, `${formatRank(career.points, lang)} · ${career.points}`);
+					figure(text.prizeMoney, formatPrize(career.prize, locale));
+					figure(text.titles, String(career.titles));
+					figure(text.matchesWon, String(career.won));
+					figure(text.best, ROUNDS[Math.min(career.best, CHAMPION)]!.name[lang]);
+				}
+
+				careerBody.textContent = '';
+				careerBody.append(modeRow(), handRow());
+				if (career.mode === 'casual') {
+					careerBody.append(casualBackhandRow());
+					return;
+				}
+				for (const branch of BRANCHES) careerBody.append(branchColumn(branch));
+			}
+
+			/** A row of choices across the top of the panel, like the mode itself. */
+			function pickRow(title: string, note: string) {
+				const row = document.createElement('section');
+				row.className = 'branch pick';
+				const heading = document.createElement('h4');
+				heading.textContent = title;
+				const line = document.createElement('p');
+				line.className = 'branch-note';
+				line.textContent = note;
+				row.append(heading, line);
+				return row;
+			}
+
+			function choice(label: string, chosen: boolean, pick: () => void) {
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'node choice';
+				button.dataset.state = chosen ? 'owned' : 'open';
+				const name = document.createElement('span');
+				name.className = 'node-name';
+				name.textContent = label;
+				button.append(name);
+				button.addEventListener('click', pick);
+				return button;
+			}
+
+			/**
+			 * Which of the two games is being played. A visitor who has come to
+			 * hit a few balls gets a match and nothing else; the draw, the
+			 * ranking and the tree are all on the other side of this row, and
+			 * changing it starts the right kind of match straight away.
+			 */
+			function modeRow() {
+				const row = pickRow(text.mode, text.modeNote);
+				for (const mode of ['casual', 'career'] as Mode[]) {
+					row.append(
+						choice(mode === 'casual' ? text.casualMode : text.careerMode, career.mode === mode, () => {
+							if (career.mode === mode) return;
+							career.mode = mode;
+							saveCareer(career);
+							// A new match of the right kind, waiting behind the panel
+							// the choice was made in — which is now showing the other
+							// game, so the change can be seen rather than guessed at.
+							reset();
+							showCareer();
+						})
+					);
+				}
+				return row;
+			}
+
+			/** With nothing riding on it, a casual backhand is not a commitment. */
+			function casualBackhandRow() {
+				const row = pickRow(text.backhandChoice, text.backhandFree);
+				const styles: [BackhandStyle, string][] = [
+					['two', text.twoHanded],
+					['one', text.oneHanded],
+				];
+				for (const [style, label] of styles) {
+					row.append(
+						choice(label, career.casualBackhand === style, () => {
+							career.casualBackhand = style;
+							saveCareer(career);
+							ratings = ratingsFor(career);
+							renderCareer();
+							paintScore();
+						})
+					);
+				}
+				return row;
+			}
+
+			/**
+			 * Which way round the player's own two wings are. It costs nothing,
+			 * because it is not an upgrade — a left-hander's forehand simply
+			 * lands on the other half of the racket, and on the other half of
+			 * his.
+			 */
+			function handRow() {
+				const row = pickRow(text.plays, text.handNote);
+				for (const hand of ['right', 'left'] as Hand[]) {
+					row.append(
+						choice(hand === 'right' ? text.rightHanded : text.leftHanded, career.hand === hand, () => {
+							career.hand = hand;
+							saveCareer(career);
+							renderCareer();
+						})
+					);
+				}
+				return row;
+			}
+
+			function branchColumn(branch: (typeof BRANCHES)[number]) {
+				const section = document.createElement('section');
+				section.className = 'branch';
+
+				const title = document.createElement('h4');
+				title.textContent = branch.name[lang];
+				const note = document.createElement('p');
+				note.className = 'branch-note';
+				note.textContent = branch.note[lang];
+				section.append(title, note);
+
+				if (branch.id === 'backhand' && career.backhand === null) {
+					section.append(backhandFork());
+					return section;
+				}
+
+				for (const node of nodesIn(branch.id, career.backhand)) {
+					section.append(nodeCard(node));
+				}
+				return section;
+			}
+
+			/** The one choice in the tree that cannot be bought back. */
+			function backhandFork() {
+				const wrap = document.createDocumentFragment();
+				const styles: [BackhandStyle, string, string][] = [
+					['two', text.twoHanded, text.twoHandedNote],
+					['one', text.oneHanded, text.oneHandedNote],
+				];
+				for (const [style, name, note] of styles) {
+					const button = document.createElement('button');
+					button.type = 'button';
+					button.className = 'node choice';
+					button.dataset.state = 'open';
+					const label = document.createElement('span');
+					label.className = 'node-name';
+					label.textContent = name;
+					const detail = document.createElement('span');
+					detail.className = 'node-note';
+					detail.textContent = note;
+					button.append(label, detail);
+					button.addEventListener('click', () => {
+						career.backhand = style;
+						saveCareer(career);
+						ratings = ratingsFor(career);
+						renderCareer();
+						paintScore();
+					});
+					wrap.append(button);
+				}
+				const caution = document.createElement('p');
+				caution.className = 'branch-note quiet';
+				caution.textContent = text.backhandNote;
+				wrap.append(caution);
+				return wrap;
+			}
+
+			function nodeCard(node: SkillNode) {
+				const owned = career.unlocked.includes(node.id);
+				const open = available(node, career);
+				const afford = career.prize >= node.cost;
+
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'node';
+				button.disabled = owned || !open || !afford;
+				button.dataset.state = owned ? 'owned' : !open ? 'locked' : afford ? 'open' : 'dear';
+
+				const name = document.createElement('span');
+				name.className = 'node-name';
+				name.textContent = node.name[lang];
+
+				const note = document.createElement('span');
+				note.className = 'node-note';
+				note.textContent = node.note[lang];
+
+				const state = document.createElement('span');
+				state.className = 'node-cost';
+				state.textContent = owned
+					? text.trained
+					: !open
+						? text.locked
+						: afford
+							? `${text.train} · ${formatPrize(node.cost, locale)}`
+							: `${text.tooDear} · ${formatPrize(node.cost, locale)}`;
+
+				button.append(name, note, state);
+				button.addEventListener('click', () => {
+					if (!available(node, career) || career.prize < node.cost) return;
+					career.prize -= node.cost;
+					career.unlocked = [...career.unlocked, node.id];
+					saveCareer(career);
+					ratings = ratingsFor(career);
+					stamina = Math.min(stamina, ratings.stamina);
+					renderCareer();
+					paintScore();
+				});
+				return button;
+			}
+
+			function showCareer() {
+				renderCareer();
+				// There is nothing to start again from in a casual match, and the
+				// button would be offering to throw away a career that is not on
+				// screen to be seen.
+				careerReset.hidden = career.mode !== 'career';
+				browsing = true;
+				charging = false;
+				charge = 0;
+				overlay.hidden = true;
+				draw(); // one frame under the panel before the loop stops
+				stop();
+				careerPanel.hidden = false;
+				careerDone.focus();
+			}
+
+			function hideCareer() {
+				browsing = false;
+				careerPanel.hidden = true;
+			}
+
+			// ── The end of a match ────────────────────────────────────────
+
+			/** Blocks play while the card is being filled in. */
+			let signing = false;
+			/** Blocks it while the result is up. */
+			let showing = false;
+
+			function showResult(playerWon: boolean, line: string, played: number) {
+				renderStats();
+
+				const running = career.mode === 'career';
+				const champion = running && playerWon && played + 1 >= CHAMPION;
+
+				resultHead.textContent = '';
+				const headline = document.createElement('strong');
+				headline.textContent = line;
+				resultHead.append(headline);
+
+				if (running) {
+					const progress = document.createElement('span');
+					progress.textContent = champion
+						? text.titleWon.replace('%s', String(career.titles))
+						: playerWon
+							? text.through.replace('%s', ROUNDS[career.round]!.name[lang])
+							: text.knockedOut.replace('%s', ROUNDS[played]!.name[lang]);
+					resultHead.append(progress);
+				}
+
+				resultEarned.hidden = !running;
+				resultEarned.textContent = running
+					? text.earned
+							.replace('%p', String(award.points))
+							.replace('%m', formatPrize(award.prize, locale))
+					: '';
+				nextButton.textContent = !running
+					? text.playAgain
+					: playerWon && !champion
+						? text.nextMatch
+						: text.newDraw;
+
+				// A win is worth keeping; a loss is worth reading the sheet over.
+				resultImage.hidden = !playerWon;
+				saveButton.hidden = !playerWon;
+				linkedInLink.hidden = !playerWon;
+				shareButton.hidden = !playerWon || typeof navigator.share !== 'function';
+
+				if (playerWon) {
+					cardRound = played + 1;
+					paintCard();
+					const score = scoreLine();
+					resultImage.src = card.toDataURL('image/png');
+					resultImage.alt = text.cardAlt
+						.replace('%p', displayName())
+						.replace('%o', opponentName)
+						.replace('%s', score);
+					fileName = `tennis-${displayName().toLowerCase().replace(/\s+/g, '-')}-${score.replace('–', '-')}.png`;
+					cardFile = null;
+					void cardBlob().then((blob) => {
+						cardFile = blob;
+					});
+				}
+
+				resultNote.textContent = '';
+				resultNote.hidden = true;
+				showing = true;
+				overlay.hidden = true;
+				result.hidden = false;
+				stop();
+				// The match is over; the keyboard belongs to the panel now.
+				nextButton.focus();
+			}
+
+			function hideResult() {
+				showing = false;
+				result.hidden = true;
+			}
+
+			/**
+			 * The card as a file, for the share sheet and the clipboard. Made
+			 * as soon as the card is shown: writing to the clipboard has to
+			 * happen close to the click that asked for it, and encoding a PNG
+			 * in between is enough to lose that in some browsers.
+			 */
+			let cardFile: Blob | null = null;
+			let fileName = 'tennis.png';
+			function cardBlob(): Promise<Blob | null> {
+				return new Promise((resolve) => card.toBlob(resolve, 'image/png'));
+			}
+
+			function shareLine() {
+				return text.shareText.replace('%s', scoreLine());
+			}
+
+			// ── Fitting the court to the screen ───────────────────────────
 
 			/**
 			 * Fits the canvas to the orientation and picks the format that
@@ -1010,10 +2149,11 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					width = height * ratio;
 				}
 
-				const next = `${Math.round(width)}px`;
-				if (canvas.style.width === next) return; // already settled
-				canvas.style.width = next;
-				canvas.style.height = `${Math.round(height)}px`;
+				const across = `${Math.round(width)}px`;
+				const down = `${Math.round(height)}px`;
+				if (canvas.style.width === across && canvas.style.height === down) return; // settled
+				canvas.style.width = across;
+				canvas.style.height = down;
 			}
 
 			new ResizeObserver(fitCanvas).observe(courtBox);
@@ -1030,8 +2170,10 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				const changed = applyLayout();
 				if (!dialog.open) return;
 				fitCanvas();
-				if (changed) reset();
-				else draw();
+				if (changed) {
+					reset();
+					if (!signing && !browsing) start();
+				} else draw();
 			});
 
 			// The stadium follows the theme and the tournament, even mid-match.
@@ -1043,6 +2185,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			});
 
 			// ── Wiring ────────────────────────────────────────────────────
+
 			this.querySelector<HTMLButtonElement>('.open')!.addEventListener('click', () => {
 				applyLayout();
 				refresh();
@@ -1053,63 +2196,19 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				else askName(true);
 			});
 
-			this.querySelector<HTMLButtonElement>('.close')!.addEventListener('click', () => dialog.close());
+			this.querySelector<HTMLButtonElement>('.close')!.addEventListener('click', () =>
+				dialog.close()
+			);
 			dialog.addEventListener('close', () => {
 				signing = false;
 				entry.hidden = true;
 				hideResult();
+				hideCareer();
 				stop();
 			});
 			dialog.addEventListener('click', (event) => {
 				if (event.target === dialog) dialog.close();
 			});
-
-			/** Blocks play while the card is being filled in. */
-			let signing = false;
-			/** Blocks it while the winner's card is up. */
-			let showing = false;
-
-			function showResult(line: string) {
-				paintCard();
-				const score = scoreLine();
-				const alt = text.cardAlt
-					.replace('%p', displayName())
-					.replace('%o', opponentName)
-					.replace('%s', score);
-
-				resultImage.src = card.toDataURL('image/png');
-				resultImage.alt = alt;
-				fileName = `tennis-${displayName().toLowerCase().replace(/\s+/g, '-')}-${score.replace('–', '-')}.png`;
-				resultNote.textContent = '';
-				cardFile = null;
-				void cardBlob().then((blob) => {
-					cardFile = blob;
-				});
-
-				showing = true;
-				overlay.hidden = true;
-				result.hidden = false;
-				stop();
-				// The match is over; the keyboard belongs to the card now.
-				saveButton.focus();
-			}
-
-			function hideResult() {
-				showing = false;
-				result.hidden = true;
-			}
-
-			/**
-			 * The card as a file, for the share sheet and the clipboard. Made
-			 * as soon as the card is shown: writing to the clipboard has to
-			 * happen close to the click that asked for it, and encoding a PNG
-			 * in between is enough to lose that in some browsers.
-			 */
-			let cardFile: Blob | null = null;
-			let fileName = 'tennis.png';
-			function cardBlob(): Promise<Blob | null> {
-				return new Promise((resolve) => card.toBlob(resolve, 'image/png'));
-			}
 
 			saveButton.addEventListener('click', () => {
 				const link = document.createElement('a');
@@ -1118,14 +2217,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				link.click();
 			});
 
-			function shareLine() {
-				return text.shareText.replace('%s', scoreLine());
-			}
-
 			// The share sheet only exists on some browsers; the button stays
 			// hidden where it does not, rather than failing when pressed.
-			if (typeof navigator.share === 'function') shareButton.hidden = false;
-
 			shareButton.addEventListener('click', async () => {
 				const blob = cardFile ?? (await cardBlob());
 				const file = blob ? new File([blob], 'tennis.png', { type: 'image/png' }) : null;
@@ -1158,24 +2251,71 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 							}),
 						]);
 						resultNote.textContent = text.copied;
+						resultNote.hidden = false;
 						return;
 					}
 					await navigator.clipboard.writeText(line);
 					resultNote.textContent = text.copiedText;
+					resultNote.hidden = false;
 				} catch {
 					// No clipboard: hand them the line to copy by hand.
 					resultNote.textContent = line;
+					resultNote.hidden = false;
 				}
 			});
 
-			this.querySelector<HTMLButtonElement>('[data-play-again]')!.addEventListener('click', () => {
+			nextButton.addEventListener('click', () => {
 				hideResult();
+				reset();
+				start();
+			});
+
+			this.querySelector<HTMLButtonElement>('[data-career-open]')!.addEventListener('click', () => {
+				if (!dialog.open) return;
+				showCareer();
+			});
+			this.querySelector<HTMLButtonElement>('[data-career-from-result]')!.addEventListener(
+				'click',
+				() => {
+					hideResult();
+					showCareer();
+				}
+			);
+			careerDone.addEventListener('click', () => {
+				hideCareer();
+				if (over || showing) {
+					// The match it was opened over is already finished.
+					result.hidden = false;
+					showing = true;
+					nextButton.focus();
+					return;
+				}
+				announce(
+					phase === 'serve' && server === 'player'
+						? portrait
+							? text.serveTap
+							: text.serve
+						: ''
+				);
+				start();
+			});
+
+			careerReset.addEventListener('click', () => {
+				if (!confirm(text.resetConfirm)) return;
+				clearCareer();
+				// Starting the career again from nothing, not leaving it: whoever
+				// pressed this is standing in the career screen.
+				career = { ...freshCareer(), mode: career.mode };
+				ratings = ratingsFor(career);
+				hideCareer();
 				reset();
 				start();
 			});
 
 			function askName(initial: boolean) {
 				signing = true;
+				charging = false;
+				charge = 0;
 				entry.hidden = false;
 				overlay.hidden = true;
 				// The card sits over the stadium, so there has to be one on the
@@ -1193,8 +2333,16 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			function closeName() {
 				signing = false;
 				entry.hidden = true;
-				overlay.hidden = over || serving ? false : true;
-				start();
+				if (!showing && !browsing) {
+					announce(
+						phase === 'serve' && server === 'player'
+							? portrait
+								? text.serveTap
+								: text.serve
+							: ''
+					);
+					start();
+				}
 			}
 
 			entry.addEventListener('submit', (event) => {
@@ -1209,26 +2357,42 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				askName(false);
 			});
 
-			const serveOrRestart = () => {
-				if (signing) return;
-				if (showing) {
-					// The card has its own "play again"; a stray tap should not
-					// throw the result away.
+			// ── Serving: hold to wind up, let go to hit ───────────────────
+
+			const busy = () => signing || showing || browsing || over;
+
+			function windUp() {
+				if (busy()) return;
+				if (phase !== 'serve' || server !== 'player' || waiting > 0) return;
+				charging = true;
+			}
+
+			function letGo() {
+				if (!charging) return;
+				const value = charge;
+				charging = false;
+				if (phase !== 'serve' || server !== 'player') {
+					charge = 0;
 					return;
 				}
-				if (over) reset();
-				else if (serving) serve();
-			};
+				// A quick tap is a soft serve, not a fault: the racket still
+				// goes through the ball.
+				hitServe('player', Math.max(value, 0.2));
+			}
 
 			canvas.addEventListener('pointerdown', (event) => {
 				if (signing) return;
 				track(event);
-				serveOrRestart();
+				windUp();
 			});
 			canvas.addEventListener('pointermove', track);
+			canvas.addEventListener('pointerup', letGo);
+			canvas.addEventListener('pointercancel', letGo);
 			canvas.addEventListener('pointerleave', () => {
 				pointerY = null;
 			});
+			// A finger lifted off the canvas still finishes the serve.
+			addEventListener('pointerup', letGo);
 
 			function track(event: PointerEvent) {
 				const box = canvas.getBoundingClientRect();
@@ -1241,10 +2405,11 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 			/** A control that wants the key for itself: buttons and the name field. */
 			const ownsKeys = (target: EventTarget | null) =>
-				target instanceof Element && target.closest('button, input, select, textarea, a[href]') !== null;
+				target instanceof Element &&
+				target.closest('button, input, select, textarea, a[href]') !== null;
 
 			// The match listens on the document, not on the dialog: hiding the
-			// name field or the winner's card drops focus back to the body, and
+			// name field or the result panel drops focus back to the body, and
 			// a listener on the dialog would never see the keys again.
 			document.addEventListener('keydown', (event: KeyboardEvent) => {
 				if (!dialog.open) return;
@@ -1258,26 +2423,42 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					}
 					return;
 				}
+				if (browsing && event.key === 'Escape') {
+					event.preventDefault();
+					event.stopPropagation();
+					careerDone.click();
+					return;
+				}
 				if (event.key === ' ' || event.key === 'Enter') {
 					// Space and Enter belong to whichever button is focused.
 					if (ownsKeys(event.target)) return;
 					event.preventDefault();
-					serveOrRestart();
+					if (!event.repeat) windUp();
 					return;
 				}
-				if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 's', 'S'].includes(event.key)) {
+				if (
+					['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 's', 'S'].includes(
+						event.key
+					)
+				) {
 					event.preventDefault();
 					pointerY = null; // hand control back to the keyboard
 					keys.add(event.key);
 				}
 			});
-			document.addEventListener('keyup', (event: KeyboardEvent) => keys.delete(event.key));
+
+			document.addEventListener('keyup', (event: KeyboardEvent) => {
+				keys.delete(event.key);
+				if ((event.key === ' ' || event.key === 'Enter') && dialog.open && !ownsKeys(event.target)) {
+					letGo();
+				}
+			});
 
 			// A tab sent to the background should not bank a walkover.
 			document.addEventListener('visibilitychange', () => {
 				if (!dialog.open) return;
 				if (document.hidden) stop();
-				else start();
+				else if (!signing && !showing && !browsing) start();
 			});
 
 			applyLayout();
@@ -1387,6 +2568,18 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		text-overflow: ellipsis;
 	}
 
+	/* Where the match sits in the draw: the round, the ranking, the seeding.
+	   A broadcast puts this under the tournament's name, and so does this. */
+	.standing {
+		font-size: 0.68rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		color: var(--board-accent);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
 	.format {
 		display: none;
 		align-self: flex-start;
@@ -1398,6 +2591,12 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		font-weight: 600;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
+	}
+
+	/* A casual match has no draw behind it, so the board has nothing to say
+	   about rounds, rankings or seedings. */
+	.board[data-mode='casual'] .standing {
+		display: none;
 	}
 
 	/* A tie-break has no games to show, and says so instead. */
@@ -1473,7 +2672,69 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		color: var(--board-accent);
 	}
 
-	/* ── The winner's card ────────────────────────────────────────── */
+	/* ── What is left in the legs, and what the serve was clocked at ── */
+
+	.gauges {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+
+	.fitness {
+		width: 3.5rem;
+		flex-shrink: 0;
+	}
+
+	.fitness-bar {
+		display: block;
+		height: 0.3rem;
+		border-radius: var(--radius-full);
+		background-color: rgba(255, 255, 255, 0.18);
+		overflow: hidden;
+	}
+
+	.fitness-bar > span {
+		display: block;
+		height: 100%;
+		width: 100%;
+		background-color: #d8f000;
+		transition: width 220ms linear;
+	}
+
+	.fitness-bar > span[data-low='true'] {
+		background-color: #ff8a5d;
+	}
+
+	.speed {
+		min-width: 4.4rem;
+		font-size: 0.68rem;
+		text-align: end;
+		color: var(--board-muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.chip {
+		padding: 0.2rem 0.65rem;
+		font: inherit;
+		font-family: var(--font-brand);
+		font-size: 0.68rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--board-text);
+		background-color: rgba(255, 255, 255, 0.14);
+		border: 1px solid rgba(255, 255, 255, 0.28);
+		border-radius: var(--radius-full);
+		cursor: pointer;
+		transition: background-color var(--theme-transition);
+	}
+
+	.chip:hover,
+	.chip:focus-visible {
+		background-color: rgba(255, 255, 255, 0.28);
+	}
+
+	/* ── The end of a match: the sheet, and the card ──────────────── */
 
 	.result {
 		position: absolute;
@@ -1482,15 +2743,139 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		justify-content: safe center;
 		gap: 0.9rem;
 		padding: 1rem;
-		background-color: rgba(6, 16, 28, 0.88);
+		/* Near enough solid: the stadium behind it is a busy thing to read a
+		   stat sheet through. */
+		background-color: rgba(4, 12, 22, 0.975);
 		text-align: center;
 		overflow: auto;
 	}
 
 	.result[hidden] {
 		display: none;
+	}
+
+	.result-body {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: center;
+		gap: 1rem 1.5rem;
+		width: 100%;
+		/* Never shrink below the sheet: a squeezed box would put the buttons
+		   on top of the last rows rather than under them. */
+		flex: 0 0 auto;
+	}
+
+	.result-main {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.6rem;
+		flex: 1 1 18rem;
+		min-width: 0;
+	}
+
+	.result-head {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+		margin: 0;
+		font-family: var(--font-brand);
+		color: #ffffff;
+	}
+
+	.result-head :global(strong) {
+		font-size: var(--text-lg);
+	}
+
+	.result-head :global(span) {
+		font-size: var(--text-sm);
+		color: var(--board-accent);
+	}
+
+	.result-earned {
+		margin: 0;
+		font-size: var(--text-sm);
+		color: rgba(255, 255, 255, 0.88);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.result-stats {
+		flex: 1 1 20rem;
+		min-width: 0;
+		text-align: start;
+	}
+
+	.panel-title {
+		margin: 0 0 0.4rem;
+		font-family: var(--font-brand);
+		font-size: var(--text-sm);
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--board-accent);
+	}
+
+	/* The sheet reads outwards from the middle, the way a broadcast puts it
+	   up: your number, what it is, then his. */
+	.stats {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.76rem;
+		color: rgba(255, 255, 255, 0.88);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.stats :global(th),
+	.stats :global(td) {
+		padding: 0.16rem 0.3rem;
+	}
+
+	.stats :global(thead th) {
+		font-size: 0.66rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.72);
+	}
+
+	.stats :global(thead th:first-child) {
+		text-align: end;
+	}
+
+	.stats :global(thead th:last-child) {
+		text-align: start;
+	}
+
+	.stats :global(tbody th) {
+		font-weight: 400;
+		text-align: center;
+		color: rgba(255, 255, 255, 0.74);
+	}
+
+	.stats :global(td) {
+		width: 30%;
+		white-space: nowrap;
+	}
+
+	.stats :global(td:first-child) {
+		text-align: end;
+	}
+
+	.stats :global(td:last-child) {
+		text-align: start;
+	}
+
+	.stats :global(td.lead) {
+		color: #ffffff;
+		font-weight: 600;
+	}
+
+	.stats :global(tbody tr + tr) {
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
 	.result-card {
@@ -1506,6 +2891,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		flex-wrap: wrap;
 		justify-content: center;
 		gap: 0.5rem;
+		flex: 0 0 auto;
 	}
 
 	.act {
@@ -1556,7 +2942,208 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		margin: 0;
 		max-width: 32rem;
 		font-size: var(--text-sm);
-		color: rgba(255, 255, 255, 0.82);
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	/* ── The career ───────────────────────────────────────────────── */
+
+	.career {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1rem;
+		background-color: rgba(6, 16, 28, 0.95);
+		text-align: start;
+		overflow: hidden;
+	}
+
+	.career[hidden] {
+		display: none;
+	}
+
+	.career-head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.4rem 1.25rem;
+	}
+
+	.career-figures {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.2rem 0.5rem;
+		margin: 0;
+		font-family: var(--font-brand);
+	}
+
+	.career-figures :global(dt) {
+		font-size: 0.66rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.career-figures :global(dd) {
+		margin: 0 0.85rem 0 0;
+		font-size: var(--text-sm);
+		font-weight: 600;
+		color: #ffffff;
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* Six branches side by side where there is room, and stacked where there
+	   is not — the tree has no shape worth preserving, only an order. */
+	.career-body {
+		flex: 1;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr));
+		align-content: start;
+		gap: 0.7rem;
+		min-height: 0;
+		overflow: auto;
+		padding-right: 0.25rem;
+	}
+
+	.career-body :global(.branch) {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	}
+
+	.career-body :global(.branch.pick) {
+		grid-column: 1 / -1;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.career-body :global(.branch.pick .branch-note) {
+		flex: 1 1 14rem;
+		margin: 0;
+	}
+
+	.career-body :global(.branch.pick .node) {
+		flex: 0 0 auto;
+	}
+
+	.career-body :global(.branch h4) {
+		margin: 0;
+		font-family: var(--font-brand);
+		font-size: var(--text-sm);
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.career-body :global(.branch-note) {
+		margin: 0 0 0.15rem;
+		font-size: 0.68rem;
+		line-height: 1.35;
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.career-body :global(.branch-note.quiet) {
+		margin-top: 0.35rem;
+		font-style: italic;
+	}
+
+	.career-body :global(.node) {
+		display: flex;
+		flex-direction: column;
+		gap: 0.14rem;
+		padding: 0.4rem 0.55rem;
+		font: inherit;
+		text-align: start;
+		color: rgba(255, 255, 255, 0.86);
+		background-color: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-left: 3px solid rgba(255, 255, 255, 0.2);
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+		transition:
+			background-color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+
+	.career-body :global(.node:hover:not(:disabled)),
+	.career-body :global(.node:focus-visible) {
+		background-color: rgba(255, 255, 255, 0.15);
+	}
+
+	.career-body :global(.node:disabled) {
+		cursor: default;
+	}
+
+	.career-body :global(.node[data-state='open']) {
+		border-left-color: var(--board-accent);
+	}
+
+	.career-body :global(.node[data-state='owned']) {
+		background-color: rgba(216, 240, 0, 0.09);
+		border-left-color: #d8f000;
+	}
+
+	.career-body :global(.node[data-state='dear']) {
+		opacity: 0.68;
+	}
+
+	.career-body :global(.node[data-state='locked']) {
+		opacity: 0.42;
+	}
+
+	.career-body :global(.node-name) {
+		font-family: var(--font-brand);
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.career-body :global(.node-note) {
+		font-size: 0.68rem;
+		line-height: 1.35;
+		color: rgba(255, 255, 255, 0.6);
+	}
+
+	.career-body :global(.node-cost) {
+		font-size: 0.68rem;
+		font-weight: 600;
+		color: var(--board-accent);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.career-body :global(.node[data-state='owned'] .node-cost) {
+		color: #d8f000;
+	}
+
+	.career-body :global(.node[data-state='dear'] .node-cost),
+	.career-body :global(.node[data-state='locked'] .node-cost) {
+		color: rgba(255, 255, 255, 0.45);
+	}
+
+	.career-foot {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+
+	.career-note {
+		margin: 0;
+		max-width: 28rem;
+		font-size: 0.68rem;
+		color: rgba(255, 255, 255, 0.45);
+	}
+
+	.career-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
 	}
 
 	.entry {
@@ -1764,6 +3351,38 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		}
 	}
 
+	/* On a phone the result has a column to fit into rather than a row, so the
+	   card gives up some height and the sheet tightens up — between them they
+	   save most of the scrolling. */
+	@media (max-width: 48em) {
+		.result {
+			gap: 0.6rem;
+			padding: 0.75rem;
+		}
+
+		.result-body {
+			gap: 0.6rem;
+		}
+
+		.result-card {
+			max-height: 28vh;
+		}
+
+		.stats {
+			font-size: 0.72rem;
+		}
+
+		.stats :global(th),
+		.stats :global(td) {
+			padding: 0.14rem 0.2rem;
+		}
+
+		.act {
+			padding: 0.4rem 0.85rem;
+			font-size: 0.8rem;
+		}
+	}
+
 	/* A phone on its side has ~390px of height for everything: the board
 	   gives up what it can so the court keeps the rest. */
 	@media (max-height: 32em) {
@@ -1827,6 +3446,32 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			max-height: 46%;
 		}
 
+		.result-body {
+			gap: 0.5rem 1rem;
+		}
+
+		.result-head strong {
+			font-size: var(--text-md);
+		}
+
+		.stats {
+			font-size: 0.68rem;
+		}
+
+		.career {
+			padding: 0.6rem;
+			gap: 0.5rem;
+		}
+
+		.career-note {
+			display: none;
+		}
+
+		.speed,
+		.standing {
+			display: none;
+		}
+
 		.act {
 			padding: 0.35rem 0.8rem;
 			font-size: 0.8rem;
@@ -1843,6 +3488,16 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			flex-direction: column;
 			align-items: stretch;
 			gap: 0.5rem;
+		}
+
+		/* Upright there is no room beside the score, so the gauges take a
+		   line of their own under it. */
+		.gauges {
+			justify-content: space-between;
+		}
+
+		.fitness {
+			flex: 1;
 		}
 
 		.close {
@@ -1867,7 +3522,13 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			flex-wrap: wrap;
 		}
 
+		/* The tournament and the round are worth the width; the stadium and
+		   the surface are not, at this size. */
 		.venue {
+			display: none;
+		}
+
+		.standing {
 			flex: 1;
 		}
 	}
