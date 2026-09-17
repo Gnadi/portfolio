@@ -42,7 +42,7 @@ const copy = {
 		decider: 'Deciding point',
 		/* The winner's card, and what to do with it. */
 		champion: 'Champion',
-		beat: 'beat %o %s',
+		versus: 'vs. %o %s',
 		saveImage: 'Save image',
 		share: 'Share',
 		sendLinkedIn: 'Send it to ' + surname,
@@ -50,7 +50,7 @@ const copy = {
 		copied: 'Result copied — paste it into your message on LinkedIn.',
 		copiedText: 'Result copied to the clipboard.',
 		shareText: 'I beat ' + FULL_NAME + ' %s at tennis on ' + SITE_ORIGIN.replace('https://', ''),
-		cardAlt: '%p beat %o %s at tennis on ' + SITE_ORIGIN.replace('https://', ''),
+		cardAlt: '%p vs. %o %s at tennis on ' + SITE_ORIGIN.replace('https://', ''),
 	},
 	de: {
 		play: 'Einen Punkt spielen',
@@ -70,7 +70,7 @@ const copy = {
 		again: 'Tippen oder Leertaste für ein neues Match',
 		decider: 'Entscheidungspunkt',
 		champion: 'Sieger',
-		beat: 'schlägt %o %s',
+		versus: 'vs. %o %s',
 		saveImage: 'Bild speichern',
 		share: 'Teilen',
 		sendLinkedIn: 'An ' + surname + ' schicken',
@@ -78,7 +78,7 @@ const copy = {
 		copied: 'Ergebnis kopiert — füge es in deine Nachricht auf LinkedIn ein.',
 		copiedText: 'Ergebnis in die Zwischenablage kopiert.',
 		shareText: 'Ich habe ' + FULL_NAME + ' %s im Tennis geschlagen — auf ' + SITE_ORIGIN.replace('https://', ''),
-		cardAlt: '%p schlägt %o %s im Tennis auf ' + SITE_ORIGIN.replace('https://', ''),
+		cardAlt: '%p vs. %o %s im Tennis auf ' + SITE_ORIGIN.replace('https://', ''),
 	},
 }[lang];
 
@@ -101,7 +101,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 	data-hint-upright={copy.hintUpright}
 	data-you={copy.you}
 	data-champion={copy.champion}
-	data-beat={copy.beat}
+	data-versus={copy.versus}
 	data-share-text={copy.shareText}
 	data-card-alt={copy.cardAlt}
 	data-copied={copy.copied}
@@ -323,7 +323,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				you: this.dataset.you ?? 'You',
 				tiebreak: this.dataset.tiebreak ?? 'Tie-break',
 				champion: this.dataset.champion ?? 'Champion',
-				beat: this.dataset.beat ?? 'beat %o %s',
+				versus: this.dataset.versus ?? 'vs. %o %s',
 				shareText: this.dataset.shareText ?? '',
 				cardAlt: this.dataset.cardAlt ?? '',
 				copied: this.dataset.copied ?? '',
@@ -443,8 +443,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				paint.fillStyle = colors.ink;
 				paint.fillRect(left, 348, 96, 6);
 
-				// … beat Gnadlinger 4–2.
-				const line = text.beat.replace('%o', opponentName).replace('%s', scoreLine());
+				// … vs. Gnadlinger 7–4.
+				const line = text.versus.replace('%o', opponentName).replace('%s', scoreLine());
 				paint.fillStyle = 'rgba(255, 255, 255, 0.92)';
 				fitText(paint, line, '400', 40, width - left * 2 - 120);
 				paint.fillText(line, left, 412);
