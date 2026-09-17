@@ -219,13 +219,17 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 		nodesIn,
 		opponentIn,
 		ratingsFor,
+		rulesIn,
 		saveCareer,
+		tempoIn,
 		seedFor,
 		type BackhandStyle,
 		type Career,
 		type Mode,
 		type Ratings,
+		type Rules,
 		type SkillNode,
+		type Tempo,
 	} from '../lib/tennis/career';
 	import { cardLine, freshStats, summarise, type MatchStats } from '../lib/tennis/stats';
 	import { copy as allCopy } from '../lib/tennis/copy';
@@ -308,6 +312,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			let career: Career = loadCareer();
 			let ratings: Ratings = ratingsFor(career);
 			let opponent = opponentIn(career);
+			let tempo: Tempo = tempoIn(career);
+			let rules: Rules = rulesIn(career);
 			/** What this match has paid so far, for the panel at the end of it. */
 			let award = { points: 0, prize: 0 };
 
@@ -845,7 +851,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			function pointLabel(mine: number, theirs: number) {
 				if (format === 'tiebreak') return String(mine); // a tie-break counts plainly
 				if (mine < 3 || theirs < 3) return LADDER[Math.min(mine, 3)]!;
-				if (mine === theirs) return '40';
+				if (rules.noAd || mine === theirs) return '40';
 				return mine > theirs ? 'AD' : '40';
 			}
 
@@ -859,7 +865,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			function isMatchPoint(side: Side) {
 				const them = other(side);
 				if (format === 'tiebreak') return points[side] >= 6 && points[side] - points[them] >= 1;
-				if (games[side] < 3) return false;
+				if (games[side] < rules.games - 1) return false;
 				return points[side] >= 3 && points[side] - points[them] >= 1;
 			}
 
@@ -962,7 +968,12 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 				ball.x = target.x;
 				ball.y = target.y;
-				ball.speed = Math.min(ball.speed * (0.58 + 0.07 * here.category), SERVE_BOUNCE_MAX);
+				// Off the bounce the ball drops to the pace the rally is played
+				// at, which in a casual match is well under what it arrived at.
+				ball.speed = Math.min(
+					ball.speed * (0.58 + 0.07 * here.category) * (tempo.rally / tempo.serve),
+					SERVE_BOUNCE_MAX * tempo.ceiling
+				);
 				ball.angle = clamp(
 					Math.atan2(aimY - target.y, Math.abs(paddleX(receiver) - target.x)),
 					-1.05,
@@ -1011,7 +1022,9 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 							? text.matchPoint
 							: text.breakPoint
 						: format === 'match' && points.player >= 3 && points.player === points.cpu
-							? text.deuce
+							? rules.noAd
+								? text.decidingPoint
+								: text.deuce
 							: '';
 					announce(serveNumber === 2 ? text.secondServe : portrait ? text.serveTap : text.serve, note);
 				} else {
@@ -1133,7 +1146,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				const second = serveNumber === 2;
 
 				const power = from === 'player' ? ratings.serveSpeed : opponent.serve;
-				const speed = (SERVE_MIN + (SERVE_MAX - SERVE_MIN) * value) * power * here.pace.serve;
+				const speed =
+					(SERVE_MIN + (SERVE_MAX - SERVE_MIN) * value) * power * here.pace.serve * tempo.serve;
 				serveKick = second ? (from === 'player' ? ratings.secondServe : 0.55) : 0;
 
 				const startX = paddleX(from) + (from === 'player' ? PADDLE_W + BALL_R : -BALL_R);
@@ -1196,7 +1210,11 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 						ball.spin > 0
 							? 0.34 * ball.spin * here.pace.kick
 							: 0.5 * ball.spin * (1 - here.pace.skid);
-					ball.speed = clamp(ball.speed * (1 + drive * seconds), 200, MAX_SPEED);
+					ball.speed = clamp(
+						ball.speed * (1 + drive * seconds),
+						200 * tempo.rally,
+						MAX_SPEED * tempo.ceiling
+					);
 				}
 
 				// Spin bends the flight, and then stops bending it.
@@ -1336,17 +1354,17 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					plus = opponent.pace;
 				}
 
-				const press = Math.max(here.pace.rally, 1 + Math.min(shots, 34) * 0.004);
+				const press = Math.max(here.pace.rally, 1 + Math.min(shots, 34) * tempo.press);
 				const speed = clamp(
 					ball.speed * press * wingPace * shotPace * quality * plus,
-					BASE_SPEED * 0.82,
-					MAX_SPEED
+					BASE_SPEED * 0.82 * tempo.rally,
+					MAX_SPEED * tempo.ceiling
 				);
 
 				// Where on the racket it was met decides the angle — and the
 				// forehand opens the court up further than the backhand will.
 				const angleMul = wing === 'forehand' ? 1 : player ? 0.84 * ratings.backhandAngle : 0.8;
-				let angle = raw * 0.9 * angleMul + (Math.random() - 0.5) * 0.09;
+				let angle = raw * 0.9 * angleMul * tempo.angle + (Math.random() - 0.5) * 0.09;
 
 				if (!player) {
 					// He plays the backhand, and reads it better the deeper in the
@@ -1434,7 +1452,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 					const played = points.player + points.cpu;
 					const flipped = Math.floor((played + 1) / 2) % 2 === 1;
 					server = flipped ? other(opener) : opener;
-				} else if (points[to] >= 4 && points[to] - points[loser] >= 2) {
+				} else if (points[to] >= 4 && points[to] - points[loser] >= (rules.noAd ? 1 : 2)) {
 					games[to] += 1;
 					points = { player: 0, cpu: 0 };
 					server = other(server);
@@ -1450,7 +1468,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				const won =
 					format === 'tiebreak'
 						? points[to] >= 7 && points[to] - points[loser] >= 2
-						: games[to] >= 4;
+						: games[to] >= rules.games;
 
 				if (won) {
 					endMatch(to === 'player');
@@ -1480,6 +1498,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				hideCareer();
 				ratings = ratingsFor(career);
 				opponent = opponentIn(career);
+				tempo = tempoIn(career);
+				rules = rulesIn(career);
 				points = { player: 0, cpu: 0 };
 				games = { player: 0, cpu: 0 };
 				server = 'player';

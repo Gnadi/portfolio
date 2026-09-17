@@ -37,6 +37,7 @@ export const copy = {
 		doubleFault: 'Double fault',
 		ace: 'Ace',
 		deuce: 'Deuce',
+		decidingPoint: 'Deciding point',
 		/* Called out beside the racket as it is hit, so the two wings and the
 		   three swings are learned by seeing them named. */
 		wings: { forehand: 'Forehand', backhand: 'Backhand' },
@@ -132,6 +133,7 @@ export const copy = {
 		doubleFault: 'Doppelfehler',
 		ace: 'Ass',
 		deuce: 'Einstand',
+		decidingPoint: 'Entscheidungspunkt',
 		wings: { forehand: 'Vorhand', backhand: 'Rückhand' },
 		shots: { topspin: 'Topspin', slice: 'Slice', flat: 'Block' },
 		breakPoint: 'Breakball',

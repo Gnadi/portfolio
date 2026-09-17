@@ -127,9 +127,6 @@ export interface Opponent {
 	weakness: number;
 }
 
-/** The round a casual match is pitched at: a fair fight, halfway up the draw. */
-const CASUAL_ROUND = 3;
-
 export function opponentFor(round: number): Opponent {
 	const t = Math.min(round, FINAL) / FINAL;
 	return {
@@ -141,6 +138,88 @@ export function opponentFor(round: number): Opponent {
 		weakness: 0.26 - t * 0.19,
 	};
 }
+
+/**
+ * The machine in a casual match.
+ *
+ * Nobody arrives at a footer easter egg wanting a fight. He covers less of
+ * the court than any round of the draw does, gets back to the middle slowly,
+ * serves softly and puts it near the middle of the box, and has a backhand
+ * worth going after — which is also how somebody finds out that going after
+ * it is the game. Losing the first one and winning the second is about
+ * right; being beaten three times is not.
+ */
+export const CASUAL_OPPONENT: Opponent = {
+	// Slow on his feet on purpose — it is what lets a rally end at this pace,
+	// and what makes moving him the way to win. Everything else about him is
+	// sharp enough to take the first game off somebody who has not worked out
+	// yet which half of their racket is which.
+	speed: 200,
+	recovery: 0.44,
+	pace: 1,
+	serve: 0.9,
+	nerve: 0.58,
+	weakness: 0.24,
+};
+
+/**
+ * How quickly the ball moves, and how hard a rally leans on it.
+ *
+ * The career is played at the pace the sport is: the ball ends up quicker
+ * than a racket can cross the court, which is what finishes a long point. A
+ * casual match is the same game at about two thirds of that, with a ceiling
+ * low enough that the visitor is never beaten by sheer speed — only by not
+ * watching the ball, which is a fair way to lose and an obvious one to fix.
+ */
+export interface Tempo {
+	/** Multiplier on the serve's flight — and so on the number on the board. */
+	serve: number;
+	/** Multiplier on the pace a rally is actually played at. */
+	rally: number;
+	/** Multiplier on the quickest a rally ever gets. */
+	ceiling: number;
+	/** How much pace a long rally adds with each shot. */
+	press: number;
+	/**
+	 * How far off the middle of the court a shot off the edge of the racket
+	 * ends up. A slow game cannot be won by hitting through anybody, so a
+	 * casual match is won by moving them instead: the angles open up, the
+	 * corners become reachable, and wrong-footing the machine is what ends
+	 * the point rather than out-hitting it.
+	 */
+	angle: number;
+}
+
+// The serve and the rally are separated because they are doing different
+// jobs. A serve wants to look like a serve — it is the one number on the
+// board, and 140 km/h reads better than 60 — while the rally after it is
+// what the visitor actually has to play, and that wants to be slow enough
+// to enjoy. Career plays both at full pace.
+const CASUAL_TEMPO: Tempo = { serve: 0.72, rally: 0.45, ceiling: 0.5, press: 0.004, angle: 1.45 };
+const CAREER_TEMPO: Tempo = { serve: 1, rally: 1, ceiling: 1, press: 0.004, angle: 1 };
+
+export const tempoIn = (career: Career): Tempo =>
+	career.mode === 'casual' ? CASUAL_TEMPO : CAREER_TEMPO;
+
+/**
+ * How long a match is, and how a game is closed out.
+ *
+ * A casual match is short on purpose: somebody who has just found this should
+ * be able to lose one, work out what the two halves of the racket are for,
+ * and win the next — all inside a few minutes. No-ad scoring is what does
+ * most of that work, and it is a real format rather than a shortcut: at
+ * forty-all the next point takes the game, the way it does in doubles and at
+ * the Next Gen finals. A career keeps the full thing.
+ */
+export interface Rules {
+	/** Games needed to win the match. */
+	games: number;
+	/** Whether forty-all is settled by the next point instead of by two clear. */
+	noAd: boolean;
+}
+
+export const rulesIn = (career: Career): Rules =>
+	career.mode === 'casual' ? { games: 3, noAd: true } : { games: 4, noAd: false };
 
 // ── What a career is ──────────────────────────────────────────────────
 
@@ -711,7 +790,7 @@ export function available(node: SkillNode, career: Career) {
 
 /** Who is on the other side of the net, which the mode decides as well. */
 export const opponentIn = (career: Career) =>
-	opponentFor(career.mode === 'casual' ? CASUAL_ROUND : career.round);
+	career.mode === 'casual' ? CASUAL_OPPONENT : opponentFor(career.round);
 
 /** Everything the match needs to know about who it is being played by. */
 export function ratingsFor(career: Career): Ratings {
