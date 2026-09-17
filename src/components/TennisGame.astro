@@ -449,19 +449,6 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				fitText(paint, line, '400', 40, width - left * 2 - 120);
 				paint.fillText(line, left, 412);
 
-				paint.font = '600 20px Rubik, system-ui, sans-serif';
-				const label = text.tiebreak.toUpperCase();
-				const pad = 14;
-				const chipWidth = paint.measureText(label).width + pad * 2;
-				paint.fillStyle = 'rgba(255, 255, 255, 0.16)';
-				paint.beginPath();
-				paint.roundRect(left, 442, chipWidth, 36, 8);
-				paint.fill();
-				paint.fillStyle = '#ffffff';
-				paint.letterSpacing = '2px';
-				paint.fillText(label, left + pad, 467);
-				paint.letterSpacing = '0px';
-
 				// The ball, oversized, as the card's mark.
 				paint.fillStyle = '#d8f000';
 				paint.beginPath();
@@ -797,12 +784,13 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 			}
 
 			/**
-			 * Where the ball has been, so the machine can be a step behind it.
+			 * Where the ball has been: what the machine reads the line off a
+			 * moment late, and what the tail behind the ball is drawn from.
 			 * Stamped with the clock rather than counted in frames, because the
 			 * loop's own step is whatever the display gives it.
 			 */
 			let clock = 0;
-			const trail: { at: number; y: number }[] = [];
+			const trail: { at: number; x: number; y: number }[] = [];
 
 			/** The ball's line as the machine has it: `lag` seconds out of date. */
 			function seen(lag: number) {
@@ -915,7 +903,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 
 			function step(seconds: number) {
 				clock += seconds;
-				trail.push({ at: clock, y: ball.y });
+				trail.push({ at: clock, x: ball.x, y: ball.y });
 				// Half a second of history, comfortably past the longest lag.
 				while (trail.length > 1 && trail[0]!.at < clock - 0.5) trail.shift();
 
@@ -1004,6 +992,30 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				if (direction === 1) readBall();
 			}
 
+			/**
+			 * A short tail behind the ball. The court is a busy thing to find
+			 * a small yellow dot on — a crowd, the lines, the net — and by the
+			 * end of a rally that dot is crossing it at a thousand pixels a
+			 * second. The tail is what the eye actually tracks; the ball on
+			 * its own reads as a flicker.
+			 */
+			const TAIL = 0.11; // seconds of it, so it stays a tail and not a streak
+
+			function tail() {
+				if (serving) return; // nothing to trail, and the trail is stale
+				context.fillStyle = '#d8f000';
+				for (const mark of trail) {
+					const age = (clock - mark.at) / TAIL;
+					if (age > 1) continue;
+					const left = 1 - age;
+					// Squared, so the tail thins out quickly behind the ball
+					// rather than dragging an even smear across the court.
+					context.globalAlpha = 0.45 * left * left;
+					dot(context, mark.x, mark.y, BALL_R * (0.3 + 0.7 * left));
+				}
+				context.globalAlpha = 1;
+			}
+
 			function draw() {
 				// Everything below is drawn in the court's own landscape
 				// coordinates; upright, the whole scene is turned a quarter
@@ -1021,6 +1033,8 @@ const LINKEDIN = 'https://www.linkedin.com/in/johannes-gnadlinger-842293271';
 				// apart from each other on clay, grass and blue alike.
 				paddle(COURT_X + PADDLE_INSET, playerY, '#11202b');
 				paddle(COURT_X + COURT_W - PADDLE_INSET - PADDLE_W, cpuY, '#f2f5f8');
+
+				tail();
 
 				// The ball is yellow on every court there is.
 				context.fillStyle = '#d8f000';
