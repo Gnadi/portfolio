@@ -6,8 +6,6 @@
 import Icon from './Icon.astro';
 import {
 	careerUi,
-	kindLabels,
-	kindOrder,
 	sortedCareer,
 	translate,
 	typeIcons,
@@ -31,10 +29,6 @@ const presentTypes = typeOrder.filter((type) =>
 	entries.some((entry) => entry.type === type)
 );
 
-const presentKinds = kindOrder.filter((kind) =>
-	entries.some((entry) => typeKinds[entry.type] === kind)
-);
-
 const year = (value: string) => yearLabel(value, lang);
 
 /* Projects and hackathons name the role held, not an organisation, so that
@@ -43,31 +37,18 @@ const organizationIsRole = (entry: CareerEntry) =>
 	typeKinds[entry.type] === 'project' || entry.type === 'hackathon';
 ---
 
-<div class="controls">
-	<div class="filters">
-		<label for="career-filter" class="filter-label">{careerUi.filterLabel[lang]}</label>
-		<div class="select-wrapper">
-			<select id="career-filter" class="filter-select">
-				<option value="all">{careerUi.filterAll[lang]}</option>
-				{
-					presentTypes.map((type: CareerType) => (
-						<option value={type}>{typeLabels[type][lang]}</option>
-					))
-				}
-			</select>
-		</div>
+<div class="filters">
+	<label for="career-filter" class="filter-label">{careerUi.filterLabel[lang]}</label>
+	<div class="select-wrapper">
+		<select id="career-filter" class="filter-select">
+			<option value="all">{careerUi.filterAll[lang]}</option>
+			{
+				presentTypes.map((type: CareerType) => (
+					<option value={type}>{typeLabels[type][lang]}</option>
+				))
+			}
+		</select>
 	</div>
-
-	<ul class="legend" aria-label={careerUi.legendLabel[lang]}>
-		{
-			presentKinds.map((kind) => (
-				<li class="legend-item" data-kind={kind}>
-					<span class="legend-swatch" aria-hidden="true" />
-					{kindLabels[kind][lang]}
-				</li>
-			))
-		}
-	</ul>
 </div>
 
 <div class="timeline">
@@ -136,12 +117,6 @@ const organizationIsRole = (entry: CareerEntry) =>
 </script>
 
 <style>
-	.controls {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
 	.filters {
 		display: flex;
 		align-items: center;
@@ -227,48 +202,6 @@ const organizationIsRole = (entry: CareerEntry) =>
 
 	:global(.theme-dark) [data-kind='leave'] {
 		--kind-color: #f472b6;
-	}
-
-	/* ── Legend ────────────────────────────────────────────────── */
-
-	.legend {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem 1.25rem;
-		font-size: var(--text-sm);
-		color: var(--gray-300);
-	}
-
-	.legend-item {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	/* A small copy of each kind's marker: the shapes match the timeline. */
-	.legend-swatch {
-		width: 0.85rem;
-		height: 0.85rem;
-		border: 2px solid var(--kind-color);
-		border-radius: 50%;
-		background-color: var(--surface);
-	}
-
-	.legend-item[data-kind='job'] .legend-swatch {
-		background-color: var(--kind-fill);
-		border-color: var(--kind-fill);
-	}
-
-	.legend-item[data-kind='event'] .legend-swatch {
-		border-radius: 0.15rem;
-		transform: rotate(45deg) scale(0.85);
-	}
-
-	.legend-item[data-kind='leave'] .legend-swatch {
-		border-style: dashed;
 	}
 
 	/* ── Timeline ──────────────────────────────────────────────── */

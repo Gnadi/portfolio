@@ -355,7 +355,6 @@ export const careerUi = {
 	breadcrumb: { en: 'Career', de: 'Werdegang' },
 	ongoing: { en: 'Present', de: 'heute' },
 	role: { en: 'Role', de: 'Rolle' },
-	legendLabel: { en: 'Legend', de: 'Legende' },
 } as const satisfies Record<string, Translated>;
 
 /** Visible label per entry type. */
@@ -393,17 +392,6 @@ export const typeKinds = {
 	certification: 'event',
 	leave: 'leave',
 } as const satisfies Record<CareerType, CareerKind>;
-
-/** Visible label per kind, for the legend. */
-export const kindLabels = {
-	job: { en: 'Employment', de: 'Anstellung' },
-	project: { en: 'Project', de: 'Projekt' },
-	event: { en: 'Event & Award', de: 'Event & Auszeichnung' },
-	leave: { en: 'Leave', de: 'Auszeit' },
-} as const satisfies Record<CareerKind, Translated>;
-
-/** The order the legend lists the kinds in. */
-export const kindOrder: CareerKind[] = ['job', 'project', 'event', 'leave'];
 
 /** The order the filter dropdown offers the types in. */
 export const typeOrder: CareerType[] = [
