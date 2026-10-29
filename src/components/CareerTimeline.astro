@@ -31,14 +31,6 @@ const presentTypes = typeOrder.filter((type) =>
 
 const year = (value: string) => yearLabel(value, lang);
 
-/* A linked title, split before its last word: that word and the link button
-   are kept on one line, so the button never wraps away on its own. */
-const splitTitle = (entry: CareerEntry) => {
-	const title = translate(entry.title, lang);
-	const cut = title.lastIndexOf(' ') + 1;
-	return { lead: title.slice(0, cut), last: title.slice(cut) };
-};
-
 /* Projects and hackathons name the role held, not an organisation, so that
    line gets a label to keep "Developer" from reading as an employer. */
 const organizationIsRole = (entry: CareerEntry) =>
@@ -75,21 +67,7 @@ const organizationIsRole = (entry: CareerEntry) =>
 							{year(entry.startDate)} - {year(entry.endDate)}
 						</span>
 					</div>
-					<h2>
-						{entry.url ? (
-							<a class="title-link" href={entry.url} target="_blank" rel="noopener noreferrer">
-								{splitTitle(entry).lead}
-								<span class="title-tail">
-									{splitTitle(entry).last}
-									<span class="link-button">
-										<Icon icon="external" size="1.1rem" />
-									</span>
-								</span>
-							</a>
-						) : (
-							translate(entry.title, lang)
-						)}
-					</h2>
+					<h2>{translate(entry.title, lang)}</h2>
 					{
 						entry.phases ? (
 							/* One employer, several roles: the phases sit inside the one
@@ -117,6 +95,14 @@ const organizationIsRole = (entry: CareerEntry) =>
 								</p>
 								{entry.description && <p>{translate(entry.description, lang)}</p>}
 							</Fragment>
+						)
+					}
+					{
+						entry.url && (
+							<a class="entry-link" href={entry.url} target="_blank" rel="noopener noreferrer">
+								{careerUi.linkLabel[lang]}
+								<Icon icon="external" size="1rem" />
+							</a>
 						)
 					}
 				</div>
@@ -348,39 +334,27 @@ const organizationIsRole = (entry: CareerEntry) =>
 		margin-bottom: 0.25rem;
 	}
 
-	.title-link {
-		color: inherit;
-		text-decoration: none;
-	}
-
-	.title-link:hover,
-	.title-link:focus-visible {
-		color: var(--kind-color);
-	}
-
-	.title-tail {
-		white-space: nowrap;
-	}
-
-	/* Sized as a button rather than a glyph, so it is easy to spot and to
-	   hit on a phone — the whole title stays the link either way. */
-	.link-button {
+	/* Sits at the foot of the card, after the text it points onwards from,
+	   and is sized as a button so it is easy to hit on a phone. */
+	.entry-link {
 		display: inline-flex;
 		align-items: center;
-		justify-content: center;
-		width: 2.25rem;
-		height: 2.25rem;
-		margin-left: 0.5rem;
-		vertical-align: middle;
+		gap: 0.5rem;
+		margin-top: 1rem;
+		min-height: 2.75rem;
+		padding: 0.5rem 1.1rem;
 		border: 1px solid var(--kind-color);
-		border-radius: 50%;
+		border-radius: var(--radius-full);
 		color: var(--kind-color);
 		background-color: color-mix(in srgb, var(--kind-color) 10%, var(--surface));
+		font-size: var(--text-sm);
+		font-weight: 600;
+		text-decoration: none;
 		transition: background-color var(--theme-transition), color var(--theme-transition);
 	}
 
-	.title-link:hover .link-button,
-	.title-link:focus-visible .link-button {
+	.entry-link:hover,
+	.entry-link:focus-visible {
 		background-color: var(--kind-fill);
 		border-color: var(--kind-fill);
 		color: #ffffff;

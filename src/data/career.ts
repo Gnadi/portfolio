@@ -370,6 +370,7 @@ export const careerUi = {
 	breadcrumb: { en: 'Career', de: 'Werdegang' },
 	ongoing: { en: 'Present', de: 'heute' },
 	role: { en: 'Role', de: 'Rolle' },
+	linkLabel: { en: 'Visit event page', de: 'Zur Event-Seite' },
 } as const satisfies Record<string, Translated>;
 
 /** Visible label per entry type. */
