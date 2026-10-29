@@ -354,6 +354,8 @@ export const careerUi = {
 	filterAll: { en: 'All', de: 'Alle' },
 	breadcrumb: { en: 'Career', de: 'Werdegang' },
 	ongoing: { en: 'Present', de: 'heute' },
+	role: { en: 'Role', de: 'Rolle' },
+	legendLabel: { en: 'Legend', de: 'Legende' },
 } as const satisfies Record<string, Translated>;
 
 /** Visible label per entry type. */
@@ -375,6 +377,33 @@ export const typeIcons = {
 	certification: 'medal',
 	leave: 'heart',
 } as const satisfies Record<CareerType, string>;
+
+/**
+ * The broader kind each type belongs to. The timeline styles by kind, so a
+ * reader can tell an employment from a project from a one-off event at a
+ * glance — the type badge then names the exact type within it.
+ */
+export type CareerKind = 'job' | 'project' | 'event' | 'leave';
+
+export const typeKinds = {
+	job: 'job',
+	project: 'project',
+	'side-project': 'project',
+	hackathon: 'event',
+	certification: 'event',
+	leave: 'leave',
+} as const satisfies Record<CareerType, CareerKind>;
+
+/** Visible label per kind, for the legend. */
+export const kindLabels = {
+	job: { en: 'Employment', de: 'Anstellung' },
+	project: { en: 'Project', de: 'Projekt' },
+	event: { en: 'Event & Award', de: 'Event & Auszeichnung' },
+	leave: { en: 'Leave', de: 'Auszeit' },
+} as const satisfies Record<CareerKind, Translated>;
+
+/** The order the legend lists the kinds in. */
+export const kindOrder: CareerKind[] = ['job', 'project', 'event', 'leave'];
 
 /** The order the filter dropdown offers the types in. */
 export const typeOrder: CareerType[] = [
