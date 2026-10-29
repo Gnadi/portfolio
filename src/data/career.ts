@@ -21,6 +21,7 @@ export type CareerType =
 	| 'project'
 	| 'side-project'
 	| 'hackathon'
+	| 'event'
 	| 'certification'
 	| 'leave';
 
@@ -52,6 +53,8 @@ export interface CareerEntry {
 	description?: Text;
 	/** Roles held within this one entry, newest first. */
 	phases?: CareerPhase[];
+	/** An external page about the entry, e.g. the event's own site. */
+	url?: string;
 }
 
 /** Entries that have not ended carry this instead of a date. */
@@ -301,6 +304,18 @@ export const CAREER: CareerEntry[] = [
 		},
 	},
 	{
+		type: 'event',
+		title: 'OpenAI DevDay Exchange Berlin',
+		organization: 'OpenAI',
+		startDate: '2026-10-26',
+		endDate: '2026-10-26',
+		description: {
+			en: 'Participation in the OpenAI DevDay Exchange in Berlin — a regional edition of DevDay on building with OpenAI models and Codex.',
+			de: 'Teilnahme am OpenAI DevDay Exchange in Berlin — einer regionalen Ausgabe des DevDay rund um die Entwicklung mit OpenAI-Modellen und Codex.',
+		},
+		url: 'https://events.openai.com/devdayexchange2026/',
+	},
+	{
 		type: 'hackathon',
 		title: 'Raiffeisen Arena Hackathon',
 		organization: 'Developer',
@@ -354,6 +369,8 @@ export const careerUi = {
 	filterAll: { en: 'All', de: 'Alle' },
 	breadcrumb: { en: 'Career', de: 'Werdegang' },
 	ongoing: { en: 'Present', de: 'heute' },
+	role: { en: 'Role', de: 'Rolle' },
+	linkLabel: { en: 'Details', de: 'Details' },
 } as const satisfies Record<string, Translated>;
 
 /** Visible label per entry type. */
@@ -362,6 +379,7 @@ export const typeLabels = {
 	project: { en: 'Project', de: 'Projekt' },
 	'side-project': { en: 'Side Project', de: 'Nebenprojekt' },
 	hackathon: { en: 'Hackathon', de: 'Hackathon' },
+	event: { en: 'Event', de: 'Event' },
 	certification: { en: 'Certification', de: 'Zertifizierung' },
 	leave: { en: 'Parental Leave', de: 'Karenz' },
 } as const satisfies Record<CareerType, Translated>;
@@ -372,9 +390,27 @@ export const typeIcons = {
 	project: 'code',
 	'side-project': 'pencil-line',
 	hackathon: 'trophy',
+	event: 'microphone-stage',
 	certification: 'medal',
 	leave: 'heart',
 } as const satisfies Record<CareerType, string>;
+
+/**
+ * The broader kind each type belongs to. The timeline styles by kind, so a
+ * reader can tell an employment from a project from a one-off event at a
+ * glance — the type badge then names the exact type within it.
+ */
+export type CareerKind = 'job' | 'project' | 'event' | 'leave';
+
+export const typeKinds = {
+	job: 'job',
+	project: 'project',
+	'side-project': 'project',
+	hackathon: 'event',
+	event: 'event',
+	certification: 'event',
+	leave: 'leave',
+} as const satisfies Record<CareerType, CareerKind>;
 
 /** The order the filter dropdown offers the types in. */
 export const typeOrder: CareerType[] = [
@@ -383,6 +419,7 @@ export const typeOrder: CareerType[] = [
 	'certification',
 	'leave',
 	'hackathon',
+	'event',
 	'side-project',
 ];
 

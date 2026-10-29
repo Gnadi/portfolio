@@ -9,9 +9,11 @@ import {
 	sortedCareer,
 	translate,
 	typeIcons,
+	typeKinds,
 	typeLabels,
 	typeOrder,
 	yearLabel,
+	type CareerEntry,
 	type CareerType,
 	type SiteLang,
 } from '../data/career';
@@ -28,6 +30,11 @@ const presentTypes = typeOrder.filter((type) =>
 );
 
 const year = (value: string) => yearLabel(value, lang);
+
+/* Projects and hackathons name the role held, not an organisation, so that
+   line gets a label to keep "Developer" from reading as an employer. */
+const organizationIsRole = (entry: CareerEntry) =>
+	typeKinds[entry.type] === 'project' || entry.type === 'hackathon';
 ---
 
 <div class="filters">
@@ -47,7 +54,7 @@ const year = (value: string) => yearLabel(value, lang);
 <div class="timeline">
 	{
 		entries.map((entry) => (
-			<div class="timeline-item" data-type={entry.type}>
+			<div class="timeline-item" data-type={entry.type} data-kind={typeKinds[entry.type]}>
 				<div class="timeline-marker">
 					<div class="icon-wrapper">
 						<Icon icon={typeIcons[entry.type] as any} size="1.2em" />
@@ -80,9 +87,22 @@ const year = (value: string) => yearLabel(value, lang);
 							</ol>
 						) : (
 							<Fragment>
-								<p class="organization">{translate(entry.organization, lang)}</p>
+								<p class="organization">
+									{organizationIsRole(entry) && (
+										<span class="organization-label">{careerUi.role[lang]}:</span>
+									)}
+									{translate(entry.organization, lang)}
+								</p>
 								{entry.description && <p>{translate(entry.description, lang)}</p>}
 							</Fragment>
+						)
+					}
+					{
+						entry.url && (
+							<a class="entry-link" href={entry.url} target="_blank" rel="noopener noreferrer">
+								{careerUi.linkLabel[lang]}
+								<Icon icon="external" size="1rem" />
+							</a>
 						)
 					}
 				</div>
@@ -154,6 +174,46 @@ const year = (value: string) => yearLabel(value, lang);
 		pointer-events: none;
 	}
 
+	/* ── Kinds ─────────────────────────────────────────────────────
+	   Each kind carries its own colour, so employment, projects and events
+	   stay apart at a glance. `--kind-color` draws lines, icons and the
+	   card stripe; `--kind-fill` sits under white text on the badge and the
+	   employment marker, so it stays dark enough in both themes. Employment
+	   follows the tournament accent; the others keep fixed hues. */
+	[data-kind='job'] {
+		--kind-color: var(--accent-regular);
+		--kind-fill: var(--accent-regular);
+	}
+
+	[data-kind='project'] {
+		--kind-color: #0f766e;
+		--kind-fill: #0f766e;
+	}
+
+	[data-kind='event'] {
+		--kind-color: #a15c07;
+		--kind-fill: #a15c07;
+	}
+
+	[data-kind='leave'] {
+		--kind-color: #be185d;
+		--kind-fill: #be185d;
+	}
+
+	:global(.theme-dark) [data-kind='project'] {
+		--kind-color: #2dd4bf;
+	}
+
+	:global(.theme-dark) [data-kind='event'] {
+		--kind-color: #fbbf24;
+	}
+
+	:global(.theme-dark) [data-kind='leave'] {
+		--kind-color: #f472b6;
+	}
+
+	/* ── Timeline ──────────────────────────────────────────────── */
+
 	.timeline {
 		position: relative;
 		display: flex;
@@ -178,13 +238,42 @@ const year = (value: string) => yearLabel(value, lang);
 		align-items: center;
 		justify-content: center;
 		background-color: var(--surface);
-		border: 2px solid var(--accent-regular);
+		border: 2px solid var(--kind-color);
 		border-radius: 50%;
 		z-index: 1;
 	}
 
 	.icon-wrapper {
-		color: var(--accent-regular);
+		display: flex;
+		color: var(--kind-color);
+	}
+
+	/* Employment is what everything else hangs off: a solid marker. */
+	[data-kind='job'] .timeline-marker {
+		background-color: var(--kind-fill);
+		border-color: var(--kind-fill);
+	}
+
+	[data-kind='job'] .icon-wrapper {
+		color: var(--accent-text-over);
+	}
+
+	/* Events are one-off moments: a diamond rather than a disc. The icon is
+	   turned back so it stays upright. */
+	[data-kind='event'] .timeline-marker {
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: var(--radius-sm);
+		transform: translateX(-50%) rotate(45deg);
+	}
+
+	[data-kind='event'] .icon-wrapper {
+		transform: rotate(-45deg);
+	}
+
+	/* Leave is time away, not work: a dashed outline. */
+	[data-kind='leave'] .timeline-marker {
+		border-style: dashed;
 	}
 
 	.timeline-content {
@@ -193,6 +282,7 @@ const year = (value: string) => yearLabel(value, lang);
 
 	.card {
 		border: 1px solid var(--border);
+		border-left: 4px solid var(--kind-color);
 		border-radius: var(--radius-lg);
 		padding: 1.5rem;
 		background-color: var(--surface);
@@ -200,7 +290,18 @@ const year = (value: string) => yearLabel(value, lang);
 	}
 
 	.card:hover {
-		border-color: var(--accent-regular);
+		border-color: var(--kind-color);
+	}
+
+	/* The employment card carries a tint of its colour, so it reads as the
+	   frame the projects around it sit in. */
+	[data-kind='job'] .card {
+		background-color: color-mix(in srgb, var(--kind-color) 7%, var(--surface));
+	}
+
+	[data-kind='leave'] .card {
+		border-style: dashed;
+		border-left-style: solid;
 	}
 
 	.header {
@@ -211,10 +312,10 @@ const year = (value: string) => yearLabel(value, lang);
 		font-size: var(--text-sm);
 	}
 
-	/* Flat blue badge, no shadow, no gradient. */
+	/* Flat badge in the kind's colour, no shadow, no gradient. */
 	.type-badge {
-		background-color: var(--accent-regular);
-		color: var(--accent-text-over);
+		background-color: var(--kind-fill);
+		color: #ffffff;
 		padding: 0.2rem 0.6rem;
 		border-radius: var(--radius-full);
 		font-weight: 600;
@@ -233,10 +334,46 @@ const year = (value: string) => yearLabel(value, lang);
 		margin-bottom: 0.25rem;
 	}
 
+	/* Sits at the foot of the card, after the text it points onwards from,
+	   and is sized as a button so it is easy to hit on a phone. */
+	.entry-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 1rem;
+		min-height: 2.75rem;
+		padding: 0.5rem 1.1rem;
+		border: 1px solid var(--kind-color);
+		border-radius: var(--radius-full);
+		color: var(--kind-color);
+		background-color: color-mix(in srgb, var(--kind-color) 10%, var(--surface));
+		font-size: var(--text-sm);
+		font-weight: 600;
+		text-decoration: none;
+		transition: background-color var(--theme-transition), color var(--theme-transition);
+	}
+
+	.entry-link:hover,
+	.entry-link:focus-visible {
+		background-color: var(--kind-fill);
+		border-color: var(--kind-fill);
+		color: #ffffff;
+	}
+
 	.organization {
 		font-weight: 600;
-		color: var(--link-color);
+		color: var(--kind-color);
 		margin-bottom: 0.5rem;
+	}
+
+	.organization-label {
+		font-weight: 400;
+		color: var(--gray-400);
+		margin-right: 0.3em;
+	}
+
+	[data-kind='job'] .card h2 {
+		font-size: var(--text-2xl);
 	}
 
 	/* ── Phases within one entry ───────────────────────────────── */
@@ -269,7 +406,7 @@ const year = (value: string) => yearLabel(value, lang);
 	.phase h3 {
 		font-size: var(--text-md);
 		font-weight: 600;
-		color: var(--link-color);
+		color: var(--kind-color);
 	}
 
 	.phase-date {
