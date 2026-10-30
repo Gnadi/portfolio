@@ -338,7 +338,7 @@ export const CAREER: CareerEntry[] = [
 			en: '3rd Place. Development of a VR game for the ICAROS fitness device using Samsung VR Gear glasses.',
 			de: '3. Platz. Entwicklung eines VR Spiels für das Fitnessgerät ICAROS mit der Samsung VR Gear Brille.',
 		},
-		// RLB OÖ's hackathon page covers both of the in-house hackathons.
+		// RLB OÖ's hackathon page, which describes this one in its own section.
 		url: 'https://www.raiffeisen.at/ooe/rlb/de/meine-bank/hackathon.html',
 	},
 	{
