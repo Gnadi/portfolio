@@ -343,13 +343,16 @@ export const CAREER: CareerEntry[] = [
 	},
 	{
 		type: 'hackathon',
-		title: 'Climathon',
+		title: {
+			en: 'Climathon Vienna',
+			de: 'Climathon Wien',
+		},
 		organization: 'Developer',
 		startDate: '2021-11-11',
 		endDate: '2021-11-12',
 		description: {
-			en: '4th Place. Development of an app for an ÖBB bonus program where saved CO2 can be exchanged for vouchers.',
-			de: '4. Platz. Entwicklung einer App für ein Bonusprogramm der ÖBB, bei der gespartes CO2 in Gutscheine getauscht werden kann.',
+			en: '4th Place. For a challenge set by ÖBB, development of an app for a bonus program where saved CO2 can be exchanged for vouchers.',
+			de: '4. Platz. Zu einer Challenge der ÖBB Entwicklung einer App für ein Bonusprogramm, bei dem gespartes CO2 in Gutscheine getauscht werden kann.',
 		},
 	},
 ];
