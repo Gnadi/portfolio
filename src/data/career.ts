@@ -319,34 +319,42 @@ export const CAREER: CareerEntry[] = [
 		type: 'hackathon',
 		title: 'Raiffeisen Arena Hackathon',
 		organization: 'Developer',
-		startDate: '2023-11-10',
-		endDate: '2023-11-12',
+		startDate: '2021-09-27',
+		endDate: '2021-09-29',
 		description: {
 			en: '2nd Place. Development of an app for the Raiffeisen Arena.',
 			de: '2. Platz. Entwicklung einer App für die Raiffeisen Arena.',
 		},
+		// Raiffeisen OÖ's own video of this hackathon.
+		url: 'https://youtu.be/iTPrmnisEVs',
 	},
 	{
 		type: 'hackathon',
-		title: 'Samsung Icarus VR Hackathon',
+		title: 'ICAROS VR Hackathon',
 		organization: 'Developer',
-		startDate: '2022-11-11',
-		endDate: '2022-11-12',
+		startDate: '2019-09-30',
+		endDate: '2019-10-02',
 		description: {
-			en: '3rd Place. Development of a VR game for the Icarus fitness device using Samsung VR Gear glasses.',
-			de: '3. Platz. Entwicklung eines VR Spiels für das Fitnessgerät Icarus mit der Samsung VR Gear Brille.',
+			en: '3rd Place. Development of a VR game for the ICAROS fitness device using Samsung VR Gear glasses.',
+			de: '3. Platz. Entwicklung eines VR Spiels für das Fitnessgerät ICAROS mit der Samsung VR Gear Brille.',
 		},
+		// RLB OÖ's hackathon page, which describes this one in its own section.
+		url: 'https://www.raiffeisen.at/ooe/rlb/de/meine-bank/hackathon.html',
 	},
 	{
 		type: 'hackathon',
-		title: 'Climathon',
+		title: {
+			en: 'Climathon Vienna',
+			de: 'Climathon Wien',
+		},
 		organization: 'Developer',
 		startDate: '2021-11-11',
 		endDate: '2021-11-12',
 		description: {
-			en: '4th Place. Development of an app for an ÖBB bonus program where saved CO2 can be exchanged for vouchers.',
-			de: '4. Platz. Entwicklung einer App für ein Bonusprogramm der ÖBB, bei der gespartes CO2 in Gutscheine getauscht werden kann.',
+			en: '4th Place. For a challenge set by ÖBB, development of an app for a bonus program where saved CO2 can be exchanged for vouchers.',
+			de: '4. Platz. Zu einer Challenge der ÖBB Entwicklung einer App für ein Bonusprogramm, bei dem gespartes CO2 in Gutscheine getauscht werden kann.',
 		},
+		url: 'https://oekostrom.at/mediathek/blog/der-climathon-ist-zurueck-in-wien/',
 	},
 ];
 

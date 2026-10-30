@@ -37,13 +37,16 @@ export type JsonLdNode = Record<string, unknown>;
  * Awards and credentials are read out of the career timeline rather than
  * restated here, so the Person node cannot claim something the page does not
  * show. The hackathon entries state their placement in the first sentence of
- * the description ("2nd Place. …"), which is what `award` wants.
+ * the description ("2nd Place. …"), which is what `award` wants. The German
+ * ordinal carries its own full stop ("2. Platz. …"), so the sentence ends at
+ * the first full stop that does not follow a digit.
  */
 function awardsFromCareer(lang: 'en' | 'de'): string[] {
 	return CAREER.filter((entry) => entry.type === 'hackathon')
 		.map((entry) => {
 			if (!entry.description) return '';
-			const placement = translate(entry.description, lang).split('.')[0].trim();
+			const text = translate(entry.description, lang);
+			const placement = (text.match(/^(.+?)(?<!\d)\./)?.[1] ?? text).trim();
 			return `${placement} — ${translate(entry.title, lang)}`;
 		})
 		.filter((award) => award.length > 0);
