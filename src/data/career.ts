@@ -319,8 +319,8 @@ export const CAREER: CareerEntry[] = [
 		type: 'hackathon',
 		title: 'Raiffeisen Arena Hackathon',
 		organization: 'Developer',
-		startDate: '2023-11-10',
-		endDate: '2023-11-12',
+		startDate: '2021-09-27',
+		endDate: '2021-09-29',
 		description: {
 			en: '2nd Place. Development of an app for the Raiffeisen Arena.',
 			de: '2. Platz. Entwicklung einer App für die Raiffeisen Arena.',
@@ -330,13 +330,13 @@ export const CAREER: CareerEntry[] = [
 	},
 	{
 		type: 'hackathon',
-		title: 'Samsung Icarus VR Hackathon',
+		title: 'ICAROS VR Hackathon',
 		organization: 'Developer',
-		startDate: '2022-11-11',
-		endDate: '2022-11-12',
+		startDate: '2019-09-30',
+		endDate: '2019-10-02',
 		description: {
-			en: '3rd Place. Development of a VR game for the Icarus fitness device using Samsung VR Gear glasses.',
-			de: '3. Platz. Entwicklung eines VR Spiels für das Fitnessgerät Icarus mit der Samsung VR Gear Brille.',
+			en: '3rd Place. Development of a VR game for the ICAROS fitness device using Samsung VR Gear glasses.',
+			de: '3. Platz. Entwicklung eines VR Spiels für das Fitnessgerät ICAROS mit der Samsung VR Gear Brille.',
 		},
 		// RLB OÖ's hackathon page covers both of the in-house hackathons.
 		url: 'https://www.raiffeisen.at/ooe/rlb/de/meine-bank/hackathon.html',
