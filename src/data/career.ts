@@ -325,6 +325,8 @@ export const CAREER: CareerEntry[] = [
 			en: '2nd Place. Development of an app for the Raiffeisen Arena.',
 			de: '2. Platz. Entwicklung einer App für die Raiffeisen Arena.',
 		},
+		// RLB OÖ's hackathon page covers both of the in-house hackathons.
+		url: 'https://www.raiffeisen.at/ooe/rlb/de/meine-bank/hackathon.html',
 	},
 	{
 		type: 'hackathon',
@@ -336,6 +338,8 @@ export const CAREER: CareerEntry[] = [
 			en: '3rd Place. Development of a VR game for the Icarus fitness device using Samsung VR Gear glasses.',
 			de: '3. Platz. Entwicklung eines VR Spiels für das Fitnessgerät Icarus mit der Samsung VR Gear Brille.',
 		},
+		// RLB OÖ's hackathon page covers both of the in-house hackathons.
+		url: 'https://www.raiffeisen.at/ooe/rlb/de/meine-bank/hackathon.html',
 	},
 	{
 		type: 'hackathon',
