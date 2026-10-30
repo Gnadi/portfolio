@@ -354,6 +354,7 @@ export const CAREER: CareerEntry[] = [
 			en: '4th Place. For a challenge set by ÖBB, development of an app for a bonus program where saved CO2 can be exchanged for vouchers.',
 			de: '4. Platz. Zu einer Challenge der ÖBB Entwicklung einer App für ein Bonusprogramm, bei dem gespartes CO2 in Gutscheine getauscht werden kann.',
 		},
+		url: 'https://oekostrom.at/mediathek/blog/der-climathon-ist-zurueck-in-wien/',
 	},
 ];
 
