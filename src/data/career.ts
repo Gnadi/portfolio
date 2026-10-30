@@ -325,8 +325,8 @@ export const CAREER: CareerEntry[] = [
 			en: '2nd Place. Development of an app for the Raiffeisen Arena.',
 			de: '2. Platz. Entwicklung einer App für die Raiffeisen Arena.',
 		},
-		// RLB OÖ's hackathon page covers both of the in-house hackathons.
-		url: 'https://www.raiffeisen.at/ooe/rlb/de/meine-bank/hackathon.html',
+		// Raiffeisen OÖ's own video of this hackathon.
+		url: 'https://youtu.be/iTPrmnisEVs',
 	},
 	{
 		type: 'hackathon',
