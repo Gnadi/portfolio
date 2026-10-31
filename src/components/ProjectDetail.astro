@@ -19,6 +19,7 @@ const t = copy[lang];
 const backHref = lang === 'de' ? '/de/work' : '/work/';
 const statusLabel = data.status === 'live' ? t.live : data.status === 'preview' ? t.preview : null;
 
+const slug = entry.id.replace(/\.md$/, '').replace(/^de\//, '');
 const { Content } = await render(entry);
 ---
 
@@ -40,7 +41,7 @@ const { Content } = await render(entry);
 							</div>
 						)
 					}
-					<h1 class="title">{data.title}</h1>
+					<h1 class="title" style={`view-transition-name: proj-${slug}`}>{data.title}</h1>
 					<p class="tagline">{data.tagline ?? data.description}</p>
 				</div>
 
@@ -67,14 +68,14 @@ const { Content } = await render(entry);
 
 		{
 			data.screenshots.length > 0 && (
-				<section class="wrapper stack gap-8">
+				<section class="wrapper stack gap-8" data-reveal>
 					<h2 class="section-title">{t.screenshots}</h2>
 					<ProjectGallery shots={data.screenshots} closeLabel={t.close} />
 				</section>
 			)
 		}
 
-		<section class="wrapper body">
+		<section class="wrapper body" data-reveal>
 			<article class="prose">
 				<Content />
 			</article>

@@ -22,9 +22,9 @@ const statusLabel = data.status === 'live'
 		: null;
 const HeadingTag = `h${headingLevel}` as 'h2' | 'h3';
 ---
-<a class:list={['card', { preview: data.status === 'preview' }]} href={href}>
+<a class:list={['card', { preview: data.status === 'preview' }]} href={href} data-tilt="5" data-cursor={isDe ? 'Ansehen' : 'View'}>
 	<div class="header">
-		<HeadingTag class="title">{data.title}</HeadingTag>
+		<HeadingTag class="title" style={`view-transition-name: proj-${slug}`}>{data.title}</HeadingTag>
 		<div class="meta">
 			{statusLabel && <Pill>{statusLabel}</Pill>}
 			<span class="external"><Icon icon="arrow-right" size="1.2em" /></span>
@@ -51,6 +51,11 @@ const HeadingTag = `h${headingLevel}` as 'h2' | 'h3';
 		transition:
 			border-color var(--theme-transition),
 			background-color var(--theme-transition);
+	}
+
+	.card > :global(*) {
+		position: relative;
+		z-index: 1;
 	}
 
 	.card:hover,

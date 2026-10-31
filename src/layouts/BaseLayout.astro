@@ -9,6 +9,7 @@ import Footer from '../components/Footer.astro';
 import AskAi from '../components/AskAi.astro';
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
+import '../styles/motion.css';
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, type JsonLdNode } from '../lib/schema';
 
 interface Props {
@@ -56,10 +57,16 @@ const lang = pathname === '/de' || pathname.startsWith('/de/') ? 'de' : 'en';
 			publishedTime={publishedTime}
 			noindex={noindex}
 		/>
+		<!-- Motion is opt-in per visit: only when scripts run and the visitor has
+		     not asked for reduced motion. Hidden "before" states key off this. -->
+		<script is:inline>
+			if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('js-motion');
+		</script>
 		<Analytics />
 		<SpeedInsights />
 	</head>
 	<body>
+		<div class="scroll-progress" data-progress aria-hidden="true"></div>
 		<div class="stack backgrounds">
 			<Nav />
 			<slot />
@@ -68,6 +75,10 @@ const lang = pathname === '/de' || pathname.startsWith('/de/') ? 'de' : 'en';
 				<Footer />
 			</div>
 		</div>
+
+		<script>
+			import '../scripts/motion';
+		</script>
 
 		<style>
 			/* Leiste und Footer bleiben zusammen: Ein Auto-Margin für den ganzen

@@ -9,6 +9,8 @@ import { Image } from 'astro:assets';
 // Component Imports
 import CallToAction from '../components/CallToAction.astro';
 import Grid from '../components/Grid.astro';
+import HeroCanvas from '../components/HeroCanvas.astro';
+import Marquee from '../components/Marquee.astro';
 import Hero from '../components/Hero.astro';
 import Icon from '../components/Icon.astro';
 import Pill from '../components/Pill.astro';
@@ -33,6 +35,8 @@ const projects = (await getCollection('work')).map((entry: any) => {
 		return b.props.data.publishDate.valueOf() - a.props.data.publishDate.valueOf();
 	})
 	.slice(0, 4);
+const marqueeItems = ['Java', 'Jakarta EE', 'SEPA', 'EBICS', 'REST APIs', 'Angular', 'Payment Systems', 'Ledger Consistency'];
+const marqueeLabel = 'Technologies and topics';
 const contacts = (await getCollection('contact')).slice(0,4);
 ---
 
@@ -42,6 +46,8 @@ const contacts = (await getCollection('contact')).slice(0,4);
 >
 	<div class="stack gap-20 lg:gap-48">
 		<div class="wrapper stack gap-8 lg:gap-20">
+			<div class="hero-stage">
+			<HeroCanvas />
 			<header class="hero">
 				<Hero
 					title="Hello, my name is Johannes Gnadlinger"
@@ -58,6 +64,7 @@ const contacts = (await getCollection('contact')).slice(0,4);
 					</div>
 				</Hero>
 
+				<div class="portrait" data-portrait>
 				<Image
 					loading="eager"
 					alt="Selfie of Johannes Gnadlinger"
@@ -65,22 +72,26 @@ const contacts = (await getCollection('contact')).slice(0,4);
 					height="620"
 					src="/assets/portrait.webp"
 				/>
+				</div>
 			</header>
+			</div>
 
 			<section class="systems-section stack gap-6 lg:gap-10">
-				<header class="section-header stack gap-2 lg:gap-4 systems-header">
-					<h2>Areas of Expertise</h2>
+				<header data-reveal class="section-header stack gap-2 lg:gap-4 systems-header">
+					<h2 data-split>Areas of Expertise</h2>
 					<p>Backend systems for private and corporate banking — payment flows, transaction reliability, operational correctness.</p>
 				</header>
 				<Skills lang="en" />
-				<p class="tech-line">Primary technologies: Java, Jakarta EE, REST APIs, Angular</p>
+				<p class="tech-line" data-reveal>Primary technologies: Java, Jakarta EE, REST APIs, Angular</p>
 			</section>
 		</div>
 
+		<Marquee label={marqueeLabel} items={marqueeItems} />
+
 		<main class="wrapper stack gap-20 lg:gap-48">
 			<section class="section with-cta">
-				<header class="section-header stack gap-2 lg:gap-4">
-					<h2>Projects</h2>
+				<header data-reveal class="section-header stack gap-2 lg:gap-4">
+					<h2 data-split>Projects</h2>
 					<p>Side projects I designed, built, and ship myself.</p>
 				</header>
 
@@ -88,7 +99,7 @@ const contacts = (await getCollection('contact')).slice(0,4);
 					<Grid>
 						{
 							projects.map((project: any) => (
-								<li>
+								<li data-reveal>
 									<PortfolioPreview project={project.props} />
 								</li>
 							))
@@ -96,17 +107,17 @@ const contacts = (await getCollection('contact')).slice(0,4);
 					</Grid>
 				</div>
 
-				<div class="cta">
-					<CallToAction href="/work/">
+				<div class="cta" data-reveal>
+					<span data-magnetic style="display:block"><CallToAction href="/work/">
 						View All
 						<Icon icon="arrow-right" size="1.2em" />
-					</CallToAction>
+					</CallToAction></span>
 				</div>
 			</section>
 
 			<section class="section">
-				<header class="section-header stack gap-2 lg:gap-4">
-					<h2>Find Me / Contact Me</h2>
+				<header data-reveal class="section-header stack gap-2 lg:gap-4">
+					<h2 data-split>Find Me / Contact Me</h2>
 					<p>Find me on Stack Overflow, GitHub, and LinkedIn.</p>
 				</header>
 
@@ -114,7 +125,7 @@ const contacts = (await getCollection('contact')).slice(0,4);
 					<Grid variant="small">
 						{
 							contacts.map((contact: any) => (
-								<li class="mention-card">
+								<li class="mention-card" data-reveal data-tilt="5" data-cursor="Open">
 									<ContactPreview contact={contact} />
 								</li>
 							))
@@ -129,6 +140,23 @@ const contacts = (await getCollection('contact')).slice(0,4);
 </BaseLayout>
 
 <style>
+	.hero-stage {
+		position: relative;
+		isolation: isolate;
+	}
+
+	.portrait {
+		border-radius: var(--radius-lg);
+		overflow: hidden;
+		width: 100%;
+	}
+
+	.portrait img {
+		width: 100%;
+		display: block;
+		border-radius: 0;
+	}
+
 	.hero {
 		display: flex;
 		flex-direction: column;
