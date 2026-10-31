@@ -8,6 +8,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import AskAi from '../components/AskAi.astro';
 import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, type JsonLdNode } from '../lib/schema';
 
 interface Props {
@@ -56,6 +57,7 @@ const lang = pathname === '/de' || pathname.startsWith('/de/') ? 'de' : 'en';
 			noindex={noindex}
 		/>
 		<Analytics />
+		<SpeedInsights />
 	</head>
 	<body>
 		<div class="stack backgrounds">
