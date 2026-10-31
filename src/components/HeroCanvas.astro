@@ -1,0 +1,53 @@
+---
+/**
+ * The hero's living background: a WebGL2 fragment shader that draws a field of
+ * flowing contour lines — read it as payment streams finding their way through
+ * a network. It reacts to the cursor (lines bend away from the pointer), to a
+ * click (a shockwave ring travels through the field) and to scroll (the field
+ * drifts). Colours are read from the page's own tokens, so the current
+ * tournament palette and the light/dark theme tint it automatically.
+ *
+ * Progressive by design: no WebGL2 → the CSS gradient underneath stays;
+ * `prefers-reduced-motion` → one still frame and no loop; off-screen or hidden
+ * tab → the loop is paused.
+ */
+---
+
+<div class="hero-fx" aria-hidden="true">
+	<canvas data-hero-canvas></canvas>
+</div>
+
+<style>
+	.hero-fx {
+		position: absolute;
+		z-index: -1;
+		left: calc(50% - 50vw);
+		width: 100vw;
+		top: -7rem;
+		bottom: -5rem;
+		pointer-events: none;
+		overflow: hidden;
+		background:
+			radial-gradient(60rem 30rem at 85% 20%, color-mix(in srgb, var(--accent-regular) 14%, transparent), transparent 70%),
+			radial-gradient(40rem 24rem at 5% 80%, color-mix(in srgb, var(--accent-regular) 8%, transparent), transparent 70%);
+		-webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 70%, transparent);
+		mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 70%, transparent);
+	}
+
+	canvas {
+		display: block;
+		width: 100%;
+		height: 100%;
+		opacity: 0;
+		transition: opacity 1.4s ease-out;
+	}
+
+	canvas.ready {
+		opacity: 1;
+	}
+</style>
+
+<script>
+	import { heroShader } from '../scripts/heroShader';
+	heroShader();
+</script>

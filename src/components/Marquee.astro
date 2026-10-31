@@ -1,0 +1,29 @@
+---
+/**
+ * A strip of outlined type that scrolls on its own and speeds up and leans
+ * with the page's scroll velocity (see src/scripts/motion.ts). Without JS it is
+ * a static, centred line. The terms are the ones the site already uses.
+ */
+interface Props {
+	items: string[];
+	label: string;
+}
+const { items, label } = Astro.props;
+---
+
+<div class="marquee" data-marquee role="group" aria-label={label}>
+	<div class="marquee-track" data-marquee-track>
+		{
+			[0, 1].map((copy) => (
+				<ul class="marquee-group" aria-hidden={copy === 1 ? 'true' : undefined}>
+					{items.map((item) => (
+						<>
+							<li>{item}</li>
+							<li class="dot" aria-hidden="true" />
+						</>
+					))}
+				</ul>
+			))
+		}
+	</div>
+</div>

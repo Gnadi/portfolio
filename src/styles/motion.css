@@ -1,0 +1,264 @@
+/* ── Motion layer ────────────────────────────────────────────────
+   Companion to src/scripts/motion.ts. Every "hidden until revealed" state is
+   scoped to `.js-motion`, which is only set when scripts run AND the visitor
+   has not asked for reduced motion — so nothing is ever stuck invisible. */
+
+/* Smooth scroll (Lenis) */
+html.lenis,
+html.lenis body {
+	height: auto;
+}
+.lenis.lenis-smooth {
+	scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+	overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+	overflow: clip;
+}
+
+/* ── Before-states ─────────────────────────────────────────────── */
+.js-motion [data-reveal],
+.js-motion [data-hero-bit] {
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(28px);
+}
+.js-motion .motion-ready [data-reveal] {
+	visibility: visible;
+}
+.js-motion [data-hero-title],
+.js-motion [data-split] {
+	/* Fixed once split; before that, avoid a flash of the unsplit text. */
+	opacity: 1;
+}
+.sw {
+	display: inline-block;
+	overflow: hidden;
+	vertical-align: top;
+	/* The mask must not clip descenders and the tops of capitals. */
+	padding: 0.12em 0.04em 0.16em;
+	margin: -0.12em -0.04em -0.16em;
+	white-space: nowrap;
+}
+.si {
+	display: inline-block;
+	will-change: transform;
+}
+.js-motion [data-portrait] {
+	clip-path: inset(100% 0 0 0 round 14px);
+	overflow: hidden;
+}
+.js-motion [data-portrait] img {
+	transform: scale(1.35);
+	will-change: transform;
+}
+
+/* ── Scroll progress ──────────────────────────────────────────── */
+.scroll-progress {
+	position: fixed;
+	inset: 0 0 auto 0;
+	z-index: 10000;
+	height: 3px;
+	background: linear-gradient(90deg, var(--accent-regular), var(--link-color));
+	transform: scaleX(0);
+	transform-origin: 0 50%;
+	pointer-events: none;
+}
+
+/* ── Cursor ────────────────────────────────────────────────────── */
+.cursor-ring,
+.cursor-dot {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 10001;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.3s;
+}
+.cursor-on .cursor-ring,
+.cursor-on .cursor-dot {
+	opacity: 1;
+}
+.cursor-dot {
+	width: 6px;
+	height: 6px;
+	margin: -3px 0 0 -3px;
+	border-radius: 50%;
+	background: var(--accent-regular);
+}
+.cursor-ring {
+	display: grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	margin: -19px 0 0 -19px;
+	border-radius: 50%;
+	border: 1.5px solid var(--accent-regular);
+	font: 600 0.7rem/1 var(--font-brand);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--accent-text-over);
+	transition:
+		opacity 0.3s,
+		width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+		height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+		margin 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+		background-color 0.25s;
+}
+.cursor-ring.is-link {
+	width: 58px;
+	height: 58px;
+	margin: -29px 0 0 -29px;
+	background: color-mix(in srgb, var(--accent-regular) 16%, transparent);
+}
+.cursor-ring.is-label {
+	width: 84px;
+	height: 84px;
+	margin: -42px 0 0 -42px;
+	background: var(--accent-regular);
+}
+.cursor-ring.is-down {
+	width: 28px;
+	height: 28px;
+	margin: -14px 0 0 -14px;
+}
+.cursor-ring:not(.is-label) span {
+	display: none;
+}
+
+/* ── Tilt cards: lean + a light under the pointer ─────────────── */
+[data-tilt] {
+	--rx: 0deg;
+	--ry: 0deg;
+	--mx: 50%;
+	--my: 50%;
+	position: relative;
+	transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+	transform-style: preserve-3d;
+	will-change: transform;
+	overflow: hidden;
+}
+[data-tilt]::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	border-radius: inherit;
+	opacity: 0;
+	transition: opacity 0.35s;
+	background: radial-gradient(
+		22rem circle at var(--mx) var(--my),
+		color-mix(in srgb, var(--accent-regular) 20%, transparent),
+		transparent 65%
+	);
+}
+[data-tilt]:hover::before {
+	opacity: 1;
+}
+
+/* ── Timeline line that draws with the scroll ─────────────────── */
+.timeline-progress {
+	position: absolute;
+	left: -2px;
+	top: 0;
+	bottom: 0;
+	width: 2px;
+	background: linear-gradient(var(--accent-regular), var(--link-color));
+	transform-origin: top;
+	pointer-events: none;
+	z-index: 0;
+}
+
+/* ── Marquee ───────────────────────────────────────────────────── */
+.marquee {
+	overflow: hidden;
+	padding-block: 1.25rem;
+	border-block: 1px solid var(--border);
+	-webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+	mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.marquee-track {
+	display: flex;
+	width: max-content;
+	will-change: transform;
+}
+.marquee-group {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	gap: 2.5rem;
+	padding-right: 2.5rem;
+	margin: 0;
+	list-style: none;
+}
+.marquee-group li {
+	font-family: var(--font-brand);
+	font-size: clamp(2rem, 5.5vw, 4.5rem);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	white-space: nowrap;
+	color: transparent;
+	-webkit-text-stroke: 1.5px var(--gray-500);
+	transition: color 0.3s, -webkit-text-stroke-color 0.3s;
+}
+.marquee-group li:hover {
+	color: var(--accent-regular);
+	-webkit-text-stroke-color: var(--accent-regular);
+}
+.marquee-group li.dot {
+	width: 0.6rem;
+	height: 0.6rem;
+	border-radius: 50%;
+	background: var(--accent-regular);
+	-webkit-text-stroke: 0;
+}
+
+/* ── Cross-document page transitions ─────────────────────────────
+   Native View Transitions (Chrome, Edge, Safari 18.2+): no router, no
+   re-initialising scripts. Unsupported browsers just navigate normally. */
+@media (prefers-reduced-motion: no-preference) {
+	@view-transition {
+		navigation: auto;
+	}
+	::view-transition-group(root) {
+		animation-duration: 0.7s;
+	}
+	::view-transition-old(root) {
+		animation: vt-out 0.45s cubic-bezier(0.65, 0, 0.35, 1) both;
+	}
+	::view-transition-new(root) {
+		animation: vt-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+	::view-transition-group(site-nav) {
+		animation-duration: 0s;
+	}
+	::view-transition-group(*) {
+		animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	@keyframes vt-out {
+		to {
+			opacity: 0;
+			transform: translateY(-2.5vh) scale(0.985);
+			filter: blur(6px);
+		}
+	}
+	@keyframes vt-in {
+		from {
+			opacity: 0;
+			clip-path: inset(6% 0 0 0);
+			transform: translateY(4vh);
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cursor-ring,
+	.cursor-dot,
+	.scroll-progress {
+		display: none;
+	}
+}

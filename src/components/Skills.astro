@@ -44,7 +44,7 @@ const areas = [
 <section class="box skills">
 	{
 		areas.map((area) => (
-			<div class="stack gap-2 lg:gap-4">
+			<div class="stack gap-2 lg:gap-4" data-reveal>
 				<Icon icon={area.icon as any} color="var(--accent-regular)" size="2.5rem" />
 				<h3>{area.title}</h3>
 				<p>{area.body[lang]}</p>
