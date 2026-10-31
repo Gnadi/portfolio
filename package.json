@@ -23,6 +23,7 @@
     "@fontsource/rubik": "^5.3.0",
     "@types/qrcode": "^1.5.6",
     "@vercel/analytics": "^1.6.1",
+    "@vercel/speed-insights": "^2.0.0",
     "astro": "^6.4.5",
     "qrcode": "^1.5.4",
     "tailwindcss": "^3.4.19",
